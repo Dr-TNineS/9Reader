@@ -6,6 +6,7 @@
   import type { LookupResultCache } from "./lookup-result-cache";
   import type { LookupState } from "./lookup-popup";
   import { defaultLookupPopupSettings, type LookupPopupSettings } from "./lookup-popup-settings";
+  import { popupTextHitAtPoint } from "./popup-selection";
   import type { DictionarySearchState } from "./state/dictionary-search-state.svelte";
   import type {
     AnkiAddNoteResult,
@@ -368,7 +369,11 @@
     const target = event.target instanceof Element ? event.target : null;
     if (!target) return;
     if (target.closest(".lookup-pop")) return;
-    if (target.closest(".lookup-glossary-content, a[href], button, input, select, summary, textarea")) return;
+    if (target.closest("a[href], button, input, select, summary, textarea")) return;
+    if (target.closest(".lookup-glossary-content") && popupTextHitAtPoint(event.clientX, event.clientY, {
+      maxLength: dictionarySettings.scanLength,
+      scanNonJapaneseText: dictionarySettings.scanNonJapaneseText,
+    })) return;
     clearPopupChildren(rootPopupId);
   }
 

@@ -128,6 +128,31 @@ async function blankResultsPoint(page) {
   });
 }
 
+async function glossaryBlankPoint(page) {
+  return page.evaluate(() => {
+    const roots = Array.from(document.querySelectorAll(".lookup-root-frame .lookup-glossary-content"));
+    for (const root of roots) {
+      if (!(root instanceof HTMLElement)) continue;
+      const rect = root.getBoundingClientRect();
+      const xs = [rect.right - 8, rect.left + rect.width * 0.75, rect.left + rect.width * 0.5];
+      const ys = [rect.top + 10, rect.top + rect.height * 0.5, rect.bottom - 6];
+      for (const y of ys) {
+        for (const x of xs) {
+          if (x <= rect.left || x >= rect.right || y <= rect.top || y >= rect.bottom) continue;
+          const target = document.elementFromPoint(x, y);
+          if (!(target instanceof Element)) continue;
+          if (target.closest(".lookup-pop")) continue;
+          if (target.closest("a[href], button, input, select, summary, textarea")) continue;
+          if (target.closest(".lookup-glossary-content") === root) {
+            return { x, y, target: target.className?.toString?.() ?? target.tagName };
+          }
+        }
+      }
+    }
+    return null;
+  });
+}
+
 async function main() {
   const vite = spawn(
     process.platform === "win32" ? "cmd.exe" : "npm",
@@ -216,6 +241,18 @@ async function main() {
     assert(state.childCount > 0, "Selecting glossary text should open a child popup.", state);
     assert(state.childScale === "1.15" && Math.abs(state.childExpressionFontSize - 29.9) < 0.2, "Child popups should use shared lookup popup scale.", state);
     assert(state.child && Math.abs(state.child.width - 320) < 30 && Math.abs(state.child.height - 250) < 30, "Child popups should use shared lookup popup dimensions.", state);
+
+    const glossaryBlank = await glossaryBlankPoint(page);
+    assert(glossaryBlank, "Dictionary glossary content should expose blank space outside text.", state);
+    await page.mouse.click(glossaryBlank.x, glossaryBlank.y);
+    await page.waitForFunction(() => Number(document.querySelector(".probe-state")?.getAttribute("data-child-count") ?? 0) === 0);
+    state = await metrics(page);
+    assert(state.childCount === 0 && state.rootResults === 1, "Clicking blank glossary content should close child popups but keep root results.", { state, glossaryBlank });
+
+    await page.keyboard.down("Shift");
+    await page.mouse.move(box.x + Math.min(86, box.width / 2), box.y + Math.min(13, box.height / 2));
+    await page.keyboard.up("Shift");
+    await page.waitForFunction(() => Number(document.querySelector(".probe-state")?.getAttribute("data-child-count") ?? 0) > 0);
 
     const blankPoint = await blankResultsPoint(page);
     assert(blankPoint, "Dictionary results should expose a blank point outside child popups.", state);
