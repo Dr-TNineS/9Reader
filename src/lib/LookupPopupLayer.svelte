@@ -235,6 +235,6 @@
 {/each}
 
 <style>
-  .lookup-root-frame { min-width: 0; min-height: 0; flex: 1 1 auto; display: flex; flex-direction: column; overflow: hidden; }
-  .lookup-pop { position: fixed; z-index: var(--popup-z); display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; background: var(--app-surface); color: var(--app-text); border: 1px solid var(--app-border); border-radius: 6px; box-shadow: 0 14px 38px var(--app-shadow); overflow: hidden; }
+  .lookup-root-frame { min-width: 0; min-height: 0; flex: 1 1 auto; display: flex; flex-direction: column; background: var(--reader-bg, var(--app-bg)); color: var(--reader-text, var(--app-text)); overflow: hidden; }
+  .lookup-pop { position: fixed; z-index: var(--popup-z); display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; background: var(--reader-bg, var(--app-surface)); color: var(--reader-text, var(--app-text)); border: 1px solid var(--app-border); border-radius: 6px; box-shadow: 0 14px 38px var(--app-shadow); overflow: hidden; }
 </style>
