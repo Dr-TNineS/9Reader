@@ -474,7 +474,7 @@
 
 <style>
   .dictionary-search { position: relative; min-width: 0; min-height: 0; height: 100%; display: flex; flex-direction: column; background: var(--app-bg); color: var(--app-text); overflow: hidden; }
-  .dictionary-search-head { position: sticky; top: 0; z-index: 20; flex: 0 0 auto; padding: 10px 16px 0; background: var(--app-bg); }
+  .dictionary-search-head { position: sticky; top: 0; z-index: 20; flex: 0 0 auto; padding: 10px 16px 8px; background: var(--app-bg); border-bottom: 1px solid color-mix(in srgb, var(--app-border) 65%, transparent); }
   .dictionary-search-bar { min-width: 0; height: 54px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 0 14px 0 18px; background: var(--app-surface); color: var(--app-text); border: 1px solid var(--app-border); border-radius: 12px; }
   .search-icon { color: var(--app-muted); font-size: 22px; line-height: 1; }
   .dictionary-search-bar input { min-width: 0; width: 100%; background: transparent; color: var(--app-text); border: 0; outline: 0; font: inherit; font-size: 18px; line-height: 1.3; }
