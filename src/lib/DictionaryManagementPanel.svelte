@@ -292,7 +292,7 @@
 </section>
 
 <style>
-  .dictionary-panel { min-width: 0; display: flex; flex-direction: column; gap: 10px; padding: 12px; background: var(--app-surface, #121212); border: 1px solid var(--app-border, #333333); border-radius: 6px; }
+  .dictionary-panel { min-width: 0; min-height: 0; height: 100%; display: flex; flex-direction: column; gap: 10px; padding: 16px clamp(24px, 4vw, 56px) 24px; background: var(--app-bg, #000); overflow-y: auto; }
   .dictionary-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
   .dictionary-summary { margin-top: 4px; color: var(--app-muted, #999999); font-size: 12px; line-height: 1.35; }
   .dictionary-actions { flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
@@ -331,6 +331,7 @@
   .collapsed-list label { display: flex; align-items: center; gap: 7px; min-width: 0; color: var(--app-text, #fff); font-size: 12px; }
   .collapsed-list span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   @media (max-width: 640px) {
+    .dictionary-panel { padding: 14px 16px 20px; }
     .dictionary-head { flex-direction: column; }
     .dictionary-actions { width: 100%; }
     .dictionary-actions button { flex: 1 1 0; min-width: 0; }

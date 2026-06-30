@@ -261,7 +261,7 @@
     </nav>
   </aside>
 
-  <main class="panel-shell">
+  <main class="panel-shell" class:full-bleed={activePanel === "dictionary" || activePanel === "dictionaries"}>
     <header class="panel-head">
       <div>
         <h2>{panelTitle(activePanel)}</h2>
@@ -460,6 +460,11 @@
   .open-epub:hover:not(:disabled) { background: var(--app-primary-hover); }
   .open-epub:disabled { cursor: default; opacity: 0.7; }
   .panel-shell { min-width: 0; height: 100vh; display: flex; flex-direction: column; gap: 18px; padding: 30px clamp(24px, 4vw, 56px); overflow-y: auto; }
+  .panel-shell.full-bleed { gap: 0; padding: 0; overflow: hidden; }
+  .panel-shell.full-bleed .panel-head { padding: 30px clamp(24px, 4vw, 56px) 34px; }
+  .panel-shell.full-bleed .status-stack:not(:empty) { padding: 0 clamp(24px, 4vw, 56px) 18px; }
+  .panel-shell.full-bleed :global(.dictionary-search),
+  .panel-shell.full-bleed :global(.dictionary-panel) { flex: 1 1 auto; min-height: 0; }
   .panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
   h2 { color: var(--app-text); font-size: 30px; font-weight: 650; letter-spacing: 0; line-height: 1.15; }
   .head-open { flex-shrink: 0; min-width: 132px; }
@@ -499,6 +504,9 @@
     .side-nav button { grid-template-columns: 1fr; padding: 8px; }
     .nav-marker { margin: 0 auto; }
     .panel-shell { padding: 22px 16px; }
+    .panel-shell.full-bleed { padding: 0; }
+    .panel-shell.full-bleed .panel-head { padding: 22px 16px 24px; }
+    .panel-shell.full-bleed .status-stack:not(:empty) { padding: 0 16px 14px; }
     .panel-head { flex-direction: column; }
     .head-open { width: 100%; }
     .section-head { align-items: start; flex-direction: column; gap: 4px; }

@@ -474,7 +474,7 @@
 
 <style>
   .dictionary-search { position: relative; min-width: 0; min-height: 0; height: 100%; display: flex; flex-direction: column; background: var(--app-bg); color: var(--app-text); overflow: hidden; }
-  .dictionary-search-head { position: sticky; top: 0; z-index: 20; flex: 0 0 auto; padding: 10px 0 12px; background: var(--app-bg); border-bottom: 1px solid var(--app-border); }
+  .dictionary-search-head { position: sticky; top: 0; z-index: 20; flex: 0 0 auto; padding: 10px 0 0; background: var(--app-bg); }
   .dictionary-search-bar { min-width: 0; height: 54px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 0 14px 0 18px; background: var(--app-surface); color: var(--app-text); border: 1px solid var(--app-border); border-radius: 12px; }
   .search-icon { color: var(--app-muted); font-size: 22px; line-height: 1; }
   .dictionary-search-bar input { min-width: 0; width: 100%; background: transparent; color: var(--app-text); border: 0; outline: 0; font: inherit; font-size: 18px; line-height: 1.3; }
@@ -482,7 +482,7 @@
   .dictionary-search-bar input:disabled { opacity: 0.72; }
   .clear-search { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: var(--app-muted); border: 0; border-radius: 6px; cursor: pointer; font-size: 24px; line-height: 1; }
   .clear-search:hover { background: var(--app-control); color: var(--app-text); }
-  .dictionary-search-results { min-width: 0; min-height: 0; flex: 1 1 auto; display: flex; flex-direction: column; padding-top: 10px; overflow: hidden; }
+  .dictionary-search-results { min-width: 0; min-height: 0; flex: 1 1 auto; display: flex; flex-direction: column; overflow: hidden; }
   .dictionary-search-message-block { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 4px 0; }
   .dictionary-search-message { margin: 0; color: var(--app-muted); font-size: 13px; line-height: 1.4; overflow-wrap: anywhere; }
   .dictionary-search-action { padding: 6px 11px; background: var(--app-primary); color: var(--app-bg); border: 0; border-radius: 4px; cursor: pointer; font-size: 12px; }
