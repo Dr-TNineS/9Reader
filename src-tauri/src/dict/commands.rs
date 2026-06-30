@@ -2,6 +2,7 @@ use base64::{engine::general_purpose, Engine as _};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::{HashMap, HashSet};
+use std::error::Error as StdError;
 use std::fs;
 use std::path::{Component, Path, PathBuf};
 use std::sync::Mutex;
@@ -550,6 +551,7 @@ struct DictionaryUpdateCandidate {
     title: String,
     revision: String,
     index_url: String,
+    download_url: String,
 }
 
 fn update_updatable_dictionaries(
@@ -575,6 +577,11 @@ fn update_updatable_dictionaries(
     }
 
     let client = reqwest::blocking::Client::builder()
+        .user_agent(format!(
+            "Hoshi Reader Windows/{}",
+            env!("CARGO_PKG_VERSION")
+        ))
+        .connect_timeout(Duration::from_secs(15))
         .timeout(Duration::from_secs(DICTIONARY_UPDATE_TIMEOUT_SECS))
         .build()
         .map_err(|e| format!("Cannot create dictionary update client: {e}"))?;
@@ -619,6 +626,7 @@ fn updatable_dictionary_candidates(
     for entry in &manifest.dictionaries {
         if !entry.is_updatable
             || entry.index_url.trim().is_empty()
+            || entry.download_url.trim().is_empty()
             || !seen.insert(entry.import_id.clone())
         {
             continue;
@@ -628,6 +636,7 @@ fn updatable_dictionary_candidates(
             title: entry.title.clone(),
             revision: entry.revision.clone(),
             index_url: entry.index_url.clone(),
+            download_url: entry.download_url.clone(),
         });
     }
     candidates
@@ -642,17 +651,48 @@ fn update_one_dictionary(
     manifest_path: &Path,
     imported_root: &Path,
 ) -> Result<Option<DictionaryUpdateRename>, String> {
-    let remote_index = fetch_dictionary_index(client, &candidate.index_url)?;
-    let remote = DictionaryImportMetadata::from_index(remote_index, &candidate.title);
+    let download_path = imported_root.join(format!(".updating-{}.zip", candidate.import_id));
+    let mut archive_downloaded = false;
+    let remote = match fetch_dictionary_index(client, &candidate.index_url) {
+        Ok(remote_index) => DictionaryImportMetadata::from_index(remote_index, &candidate.title),
+        Err(index_error) => {
+            if let Err(download_error) =
+                download_dictionary_zip(client, &candidate.download_url, &download_path)
+            {
+                let _ = fs::remove_file(&download_path);
+                return Err(format!(
+                    "{index_error}; fallback download failed: {download_error}"
+                ));
+            }
+            archive_downloaded = true;
+            let remote_index = match read_dictionary_update_index_from_zip(&download_path) {
+                Ok(remote_index) => remote_index,
+                Err(read_error) => {
+                    let _ = fs::remove_file(&download_path);
+                    return Err(format!(
+                        "{index_error}; fallback archive index failed: {read_error}"
+                    ));
+                }
+            };
+            DictionaryImportMetadata::from_index(remote_index, &candidate.title)
+        }
+    };
     if remote.revision == candidate.revision {
+        if archive_downloaded {
+            let _ = fs::remove_file(&download_path);
+        }
         return Ok(None);
     }
-    if remote.download_url.trim().is_empty() {
+    if !archive_downloaded && remote.download_url.trim().is_empty() {
         return Err("Remote dictionary index does not include a download URL.".into());
     }
 
-    let download_path = imported_root.join(format!(".updating-{}.zip", candidate.import_id));
-    download_dictionary_zip(client, &remote.download_url, &download_path)?;
+    if !archive_downloaded {
+        if let Err(error) = download_dictionary_zip(client, &remote.download_url, &download_path) {
+            let _ = fs::remove_file(&download_path);
+            return Err(error);
+        }
+    }
     let import_result = import_yomitan_zip(
         &download_path.to_string_lossy(),
         app,
@@ -680,7 +720,7 @@ fn fetch_dictionary_index(
     let response = client
         .get(url)
         .send()
-        .map_err(|e| format!("Cannot fetch dictionary update index: {e}"))?
+        .map_err(|e| format!("Cannot fetch dictionary update index: {}", error_chain(&e)))?
         .error_for_status()
         .map_err(|e| format!("Dictionary update index request failed: {e}"))?;
     let text = response
@@ -703,7 +743,7 @@ fn download_dictionary_zip(
     let mut response = client
         .get(url)
         .send()
-        .map_err(|e| format!("Cannot download dictionary update: {e}"))?
+        .map_err(|e| format!("Cannot download dictionary update: {}", error_chain(&e)))?
         .error_for_status()
         .map_err(|e| format!("Dictionary update download failed: {e}"))?;
     if response
@@ -732,6 +772,34 @@ fn download_dictionary_zip(
             .map_err(|e| format!("Cannot write update zip: {e}"))?;
     }
     Ok(())
+}
+
+fn read_dictionary_update_index_from_zip(path: &Path) -> Result<ImportedDictionaryIndex, String> {
+    let file = fs::File::open(path).map_err(|e| format!("Cannot open update zip: {e}"))?;
+    let mut archive =
+        zip::ZipArchive::new(file).map_err(|e| format!("Cannot read update zip: {e}"))?;
+    let mut index = archive
+        .by_name("index.json")
+        .map_err(|e| format!("Update zip does not contain index.json: {e}"))?;
+    let mut text = String::new();
+    index
+        .read_to_string(&mut text)
+        .map_err(|e| format!("Cannot read update zip index.json: {e}"))?;
+    serde_json::from_str::<ImportedDictionaryIndex>(text.trim_start_matches('\u{feff}'))
+        .map_err(|e| format!("Cannot parse update zip index.json: {e}"))
+}
+
+fn error_chain(error: &dyn StdError) -> String {
+    let mut parts = vec![error.to_string()];
+    let mut source = error.source();
+    while let Some(cause) = source {
+        let message = cause.to_string();
+        if !parts.iter().any(|part| part == &message) {
+            parts.push(message);
+        }
+        source = cause.source();
+    }
+    parts.join(": ")
 }
 
 fn validate_dictionary_update_url(url: &str) -> Result<reqwest::Url, String> {
@@ -3757,6 +3825,7 @@ mod tests {
                     revision: "1".into(),
                     is_updatable: true,
                     index_url: "https://example.test/a/index.json".into(),
+                    download_url: "https://example.test/a/dict.zip".into(),
                     ..manifest_entry("a", 0)
                 },
                 DictionaryManifestEntry {
@@ -3766,17 +3835,26 @@ mod tests {
                     revision: "1".into(),
                     is_updatable: true,
                     index_url: "https://example.test/a/index.json".into(),
+                    download_url: "https://example.test/a/dict.zip".into(),
                     ..manifest_entry("a", 1)
                 },
                 DictionaryManifestEntry {
                     is_updatable: true,
                     index_url: String::new(),
+                    download_url: "https://example.test/missing-url/dict.zip".into(),
                     ..manifest_entry("missing_url", 2)
+                },
+                DictionaryManifestEntry {
+                    is_updatable: true,
+                    index_url: "https://example.test/missing-download/index.json".into(),
+                    download_url: String::new(),
+                    ..manifest_entry("missing_download", 3)
                 },
                 DictionaryManifestEntry {
                     is_updatable: false,
                     index_url: "https://example.test/off/index.json".into(),
-                    ..manifest_entry("off", 3)
+                    download_url: "https://example.test/off/dict.zip".into(),
+                    ..manifest_entry("off", 4)
                 },
             ],
         };
@@ -3785,6 +3863,23 @@ mod tests {
         assert_eq!(candidates.len(), 1);
         assert_eq!(candidates[0].import_id, "a");
         assert_eq!(candidates[0].revision, "1");
+    }
+
+    #[test]
+    fn reads_update_index_from_downloaded_zip() {
+        let root = temp_path("update_zip_index");
+        fs::create_dir_all(&root).unwrap();
+        let source = root.join("source.zip");
+        let index = r#"{"title":"Remote Dictionary","format":3,"revision":"2","isUpdatable":true,"indexUrl":"https://example.test/index.json","downloadUrl":"https://example.test/dict.zip"}"#;
+        write_raw_stored_zip(&source, &[(b"index.json", index.as_bytes())]);
+
+        let parsed = read_dictionary_update_index_from_zip(&source).unwrap();
+        assert_eq!(parsed.title.as_deref(), Some("Remote Dictionary"));
+        assert_eq!(parsed.revision, "2");
+        assert!(parsed.is_updatable);
+        assert_eq!(parsed.download_url, "https://example.test/dict.zip");
+
+        let _ = fs::remove_dir_all(root);
     }
 
     #[test]
