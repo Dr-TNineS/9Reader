@@ -106,6 +106,28 @@ async function search(page, text) {
   await input.press("Enter");
 }
 
+async function blankResultsPoint(page) {
+  return page.evaluate(() => {
+    const results = document.querySelector(".dictionary-search-results");
+    if (!(results instanceof HTMLElement)) return null;
+    const rect = results.getBoundingClientRect();
+    const blockedSelector = ".lookup-pop, .lookup-glossary-content, a[href], button, input, select, summary, textarea";
+    const xs = [rect.right - 24, rect.left + rect.width * 0.66, rect.left + rect.width * 0.5, rect.left + 24];
+    const ys = [rect.top + 32, rect.top + rect.height * 0.35, rect.top + rect.height * 0.62, rect.bottom - 24];
+    for (const y of ys) {
+      for (const x of xs) {
+        if (x <= rect.left || x >= rect.right || y <= rect.top || y >= rect.bottom) continue;
+        const target = document.elementFromPoint(x, y);
+        if (!(target instanceof Element)) continue;
+        if (!results.contains(target)) continue;
+        if (target.closest(blockedSelector)) continue;
+        return { x, y, target: target.className?.toString?.() ?? target.tagName };
+      }
+    }
+    return null;
+  });
+}
+
 async function main() {
   const vite = spawn(
     process.platform === "win32" ? "cmd.exe" : "npm",
@@ -194,6 +216,20 @@ async function main() {
     assert(state.childCount > 0, "Selecting glossary text should open a child popup.", state);
     assert(state.childScale === "1.15" && Math.abs(state.childExpressionFontSize - 29.9) < 0.2, "Child popups should use shared lookup popup scale.", state);
     assert(state.child && Math.abs(state.child.width - 320) < 30 && Math.abs(state.child.height - 250) < 30, "Child popups should use shared lookup popup dimensions.", state);
+
+    const blankPoint = await blankResultsPoint(page);
+    assert(blankPoint, "Dictionary results should expose a blank point outside child popups.", state);
+    await page.mouse.click(blankPoint.x, blankPoint.y);
+    await page.waitForFunction(() => Number(document.querySelector(".probe-state")?.getAttribute("data-child-count") ?? 0) === 0);
+    state = await metrics(page);
+    assert(state.childCount === 0 && state.rootResults === 1, "Clicking blank dictionary result space should close child popups but keep root results.", { state, blankPoint });
+
+    await page.keyboard.down("Shift");
+    await page.mouse.move(box.x + Math.min(92, box.width / 2), box.y + Math.min(14, box.height / 2));
+    await page.keyboard.up("Shift");
+    await page.waitForFunction(() => Number(document.querySelector(".probe-state")?.getAttribute("data-child-count") ?? 0) > 0);
+    state = await metrics(page);
+    assert(state.childCount > 0 && state.rootResults === 1, "Dictionary glossary text should still reopen a child popup after blank-space dismissal.", state);
 
     await page.getByRole("button", { name: /Appearance Reader theme/ }).click();
     await page.locator('input[aria-label="Popup scale"]').evaluate((node) => {

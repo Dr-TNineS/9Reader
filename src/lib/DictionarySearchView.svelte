@@ -363,6 +363,15 @@
     clearPopupChildren(popupId, true);
   }
 
+  function handleResultsPointerDown(event: PointerEvent) {
+    if (!active || searchState.childPopups.length === 0) return;
+    const target = event.target instanceof Element ? event.target : null;
+    if (!target) return;
+    if (target.closest(".lookup-pop")) return;
+    if (target.closest(".lookup-glossary-content, a[href], button, input, select, summary, textarea")) return;
+    clearPopupChildren(rootPopupId);
+  }
+
   function ankiTitleFor(query: string, result: DictResult, resultIndex: number): string {
     return `Payload prepared for ${buildDictionarySearchAnkiPayload(query, result, resultIndex).sourceBook.title}`;
   }
@@ -417,7 +426,7 @@
     </form>
   </header>
 
-  <section class="dictionary-search-results" aria-label="Dictionary results" use:observeBounds>
+  <section class="dictionary-search-results" aria-label="Dictionary results" use:observeBounds onpointerdown={handleResultsPointerDown}>
     {#if searchState.rootState === "loading" && searchState.rootResults.length === 0}
       <p class="dictionary-search-message">Looking up...</p>
     {:else if searchState.rootState === "noDictionaries"}
