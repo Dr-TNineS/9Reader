@@ -950,7 +950,7 @@
     font-family: var(--reader-body-font, "Yu Mincho", "Hiragino Mincho Pro", "MS Mincho", serif);
   }
   .lookup-content.page-presentation { gap: 0; }
-  .lookup-content.page-presentation .lookup-results { padding: 0 4px 24px 0; }
+  .lookup-content.page-presentation .lookup-results { padding: 0 16px 24px; }
   .lookup-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--app-muted, #999999); font-size: 11px; text-transform: uppercase; }
   .lookup-head-actions { display: flex; align-items: center; gap: 4px; }
   .lookup-sasayaki-controls { display: flex; flex: 1 1 auto; justify-content: center; gap: 4px; min-width: 0; }
