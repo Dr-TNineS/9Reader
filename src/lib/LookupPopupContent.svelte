@@ -1066,8 +1066,8 @@
   .lookup-glossary-content :global(li) { margin: calc(2px * var(--popup-scale, 1)) 0; }
   .lookup-glossary-content :global(table) { max-width: 100%; table-layout: auto; border-collapse: collapse; }
   .lookup-glossary-content :global(th),
-  .lookup-glossary-content :global(td) { padding: calc(3px * var(--popup-scale, 1)) calc(5px * var(--popup-scale, 1)); background: var(--lookup-entry-bg); color: var(--lookup-entry-text); border: 1px solid var(--app-border, #333333); vertical-align: top; }
-  .lookup-glossary-content :global(th) { background: var(--lookup-entry-bg); color: var(--lookup-entry-text); font-weight: 600; }
+  .lookup-glossary-content :global(td) { padding: calc(3px * var(--popup-scale, 1)) calc(5px * var(--popup-scale, 1)); background: transparent; color: var(--lookup-entry-text); border: 1px solid var(--app-border, #333333); vertical-align: top; }
+  .lookup-glossary-content :global(th) { background: rgba(128, 128, 128, 0.12); color: var(--lookup-entry-text); font-weight: 600; }
   .lookup-glossary-content :global(.gloss-sc-table-container) { display: block; max-width: 100%; overflow-x: auto; }
   .lookup-glossary-content :global(a) { color: var(--app-primary, #d0bcff); }
   .lookup-glossary-content :global(a[data-lookup-redirect]) { border-bottom: 0 !important; cursor: pointer; text-decoration: none !important; }

@@ -142,6 +142,10 @@ async function popupMetrics(page) {
     const rgkoExampleLabel = groupQuery("RGKO12 [probe]", '[data-sc-class="probe-rgko-example-label"]');
     const meikyoRect = groupQuery("Meikyo3 [probe]", '[data-sc-class="probe-meikyo-rect"]');
     const meikyoFilledRect = groupQuery("Meikyo3 [probe]", '[data-sc-class="probe-meikyo-filled-rect"]');
+    const meikyoShikiri = groupQuery("Meikyo3 [probe]", '[data-sc-class~="probe-meikyo-shikiri"]');
+    const meikyoRedCell = groupQuery("Meikyo3 [probe]", '[data-sc-class~="probe-meikyo-red-cell"]');
+    const meikyoRedCellText = groupQuery("Meikyo3 [probe]", '[data-sc-class~="probe-meikyo-red-cell"] span[data-sc-red]');
+    const meikyoDefinitionCell = groupQuery("Meikyo3 [probe]", '[data-sc-class~="probe-meikyo-definition-cell"]');
     const daijisenRect = groupQuery("Daijisen2 [probe]", '[data-sc-class="probe-daijisen-rect"]');
     const daijisenCircle = groupQuery("Daijisen2 [probe]", '[data-sc-class="probe-daijisen-circle"]');
     const daijisenLogoGroup = groupQuery("Daijisen2 [probe]", '[data-sc-class="probe-daijisen-logo-group"]');
@@ -331,6 +335,10 @@ async function popupMetrics(page) {
       meikyoRectBackground: meikyoRect instanceof HTMLElement ? getComputedStyle(meikyoRect).backgroundColor : "",
       meikyoFilledRectBackground: meikyoFilledRect instanceof HTMLElement ? getComputedStyle(meikyoFilledRect).backgroundColor : "",
       meikyoFilledRectColor: meikyoFilledRect instanceof HTMLElement ? getComputedStyle(meikyoFilledRect).color : "",
+      meikyoShikiriBackground: meikyoShikiri instanceof HTMLElement ? getComputedStyle(meikyoShikiri).backgroundColor : "",
+      meikyoRedCellBackground: meikyoRedCell instanceof HTMLElement ? getComputedStyle(meikyoRedCell).backgroundColor : "",
+      meikyoRedCellTextColor: meikyoRedCellText instanceof HTMLElement ? getComputedStyle(meikyoRedCellText).color : "",
+      meikyoDefinitionCellBackground: meikyoDefinitionCell instanceof HTMLElement ? getComputedStyle(meikyoDefinitionCell).backgroundColor : "",
       daijisenRectClasses: daijisenRect instanceof HTMLElement ? Array.from(daijisenRect.classList).join(" ") : "",
       daijisenRectBorderStyle: daijisenRect instanceof HTMLElement ? getComputedStyle(daijisenRect).borderTopStyle : "",
       daijisenRectBorderColor: daijisenRect instanceof HTMLElement ? getComputedStyle(daijisenRect).borderTopColor : "",
@@ -624,6 +632,9 @@ async function main() {
     assert(ready.rgkoBlueLabelBackground !== "rgba(0, 0, 0, 0)" && ready.rgkoBlackLabelBackground !== "rgba(0, 0, 0, 0)" && ready.rgkoExampleLabelBackground !== "rgba(0, 0, 0, 0)", "RGKO filled labels should keep visible backgrounds.", ready);
     assert(!ready.meikyoRectClasses.split(/\s+/).includes("gloss-rgko-numeric-marker") && ready.meikyoRectBorderStyle === "solid" && ready.meikyoRectBorderColor === "rgb(51, 42, 27)" && ready.meikyoRectBackground !== "rgb(16, 154, 47)", "Meikyo-like rectangle markers should keep dictionary CSS and not receive RGKO marker styling.", ready);
     assert(ready.meikyoFilledRectBackground === "rgb(51, 42, 27)" && ready.meikyoFilledRectColor === "rgb(255, 255, 255)", "Meikyo-like filled rectangle markers should keep dictionary-provided fill colors.", ready);
+    assert(ready.meikyoShikiriBackground === "rgb(255, 204, 204)", "Meikyo shikiri rows should keep the dictionary-provided pink background.", ready);
+    assert(ready.meikyoDefinitionCellBackground === "rgba(0, 0, 0, 0)", "Meikyo definition table cells should stay transparent so the pink shikiri background appears behind text.", ready);
+    assert(ready.meikyoRedCellBackground === "rgb(255, 51, 51)" && ready.meikyoRedCellTextColor === "rgb(255, 255, 255)", "Meikyo red label cells should keep red fill with white label text.", ready);
     assert(!ready.daijisenRectClasses.split(/\s+/).includes("gloss-rgko-numeric-marker") && ready.daijisenRectBorderStyle === "solid" && ready.daijisenRectBorderColor === "rgb(68, 68, 68)", "Daijisen-like rectangle markers should keep dictionary CSS and not receive RGKO marker styling.", ready);
     assert(ready.daijisenCircleBorderStyle === "solid" && ready.daijisenCircleBorderRadius === "10px", "Daijisen-like circle markers should keep rounded dictionary styling.", ready);
     assert(ready.daijisenLogoGroupBackground === "rgb(48, 48, 48)" && ready.daijisenLogoBackground === "rgb(255, 255, 255)" && ready.daijisenLogoColor === "rgb(51, 42, 27)", "Daijisen-like supplemental labels should keep dictionary logo styling.", ready);

@@ -233,6 +233,34 @@
             { tag: "span", data: { class: "probe-meikyo-filled-rect", rect: "", fill: "" }, content: "2" },
           ],
         },
+        {
+          tag: "div",
+          data: { class: "shikiri probe-meikyo-shikiri" },
+          content: {
+            tag: "table",
+            content: [
+              {
+                tag: "tr",
+                content: [
+                  {
+                    tag: "td",
+                    data: { class: "red probe-meikyo-red-cell", td: "" },
+                    content: { tag: "span", data: { red: "" }, content: "A" },
+                  },
+                  {
+                    tag: "td",
+                    data: { class: "probe-meikyo-definition-cell", td: "" },
+                    content: {
+                      tag: "div",
+                      data: { meaning: "" },
+                      content: "動作・作用の対象を表す",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        },
       ],
     },
   ]);
@@ -768,6 +796,21 @@
             color: rgb(255, 255, 255);
             background-color: rgb(51, 42, 27);
             border-color: rgb(51, 42, 27);
+          }
+          div[data-sc-class~="shikiri"] {
+            margin: 0.5em 0;
+            background-color: rgb(255, 204, 204);
+          }
+          div[data-sc-class~="shikiri"] div[data-sc-meaning] {
+            font-weight: bold;
+          }
+          div[data-sc-class~="shikiri"] td[data-sc-td][data-sc-class~="red"] {
+            padding: 0 0.375em;
+            margin-inline-end: 0.25em;
+            background-color: rgb(255, 51, 51);
+          }
+          div[data-sc-class~="shikiri"] td[data-sc-td][data-sc-class~="red"] span[data-sc-red] {
+            color: rgb(255, 255, 255);
           }
         `,
       };
