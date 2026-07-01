@@ -317,7 +317,7 @@
 
   const baseResult: DictResult = {
     expression: emptyExpression ? "" : "school",
-    reading: showReading ? "すくーる" : "school",
+    reading: showReading ? "もたれる" : "school",
     glossary: [
       { dict: "Jitendex.org [probe]", text: structuredGlossaryText, termTags: "n common", definitionTags: "education" },
       { dict: "Jitendex.org [probe]", text: "academy; lesson context", definitionTags: "place" },
@@ -333,7 +333,7 @@
     dictionary: "Jitendex.org [probe]",
     frequencies: [{ dictionary: "Freq Probe", items: [{ value: 120, displayValue: "120" }, { value: 240, displayValue: "240" }] }],
     pitches: [
-      { dictionary: "Pitch Probe", positions: [0, 2], transcriptions: ["school"] },
+      { dictionary: "Pitch Probe", positions: [0, 2, 3], transcriptions: ["もたれる"] },
       ...(dictionarySettings.deduplicatePitchAccents ? [{ dictionary: "Pitch Duplicate Probe", positions: [2], transcriptions: ["duplicate pitch"] }] : []),
     ],
   };

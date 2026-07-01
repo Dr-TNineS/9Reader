@@ -123,6 +123,47 @@ async function popupMetrics(page) {
     const glossaryGroupFor = (dictionary) => Array.from(document.querySelectorAll(".lookup-glossary-group"))
       .find((node) => node instanceof HTMLElement && node.dataset.dictionary === dictionary);
     const groupQuery = (dictionary, selector) => glossaryGroupFor(dictionary)?.querySelector(selector) ?? null;
+    const pitchTransitions = Array.from(document.querySelectorAll(".pitch-visual")).map((visual) => ({
+      label: visual instanceof HTMLElement ? visual.getAttribute("aria-label") ?? "" : "",
+      moras: Array.from(visual.querySelectorAll(".pronunciation-mora")).map((mora) => ({
+        text: mora.textContent?.trim() ?? "",
+        pitch: mora instanceof HTMLElement ? mora.dataset.pitch ?? "" : "",
+        next: mora instanceof HTMLElement ? mora.dataset.pitchNext ?? "" : "",
+        hasRisingEdge: (() => {
+          const line = mora.querySelector(".pronunciation-mora-line");
+          return mora instanceof HTMLElement
+            && line instanceof Element
+            && getComputedStyle(line, "::after").content !== "none"
+            && mora.dataset.pitch === "low"
+            && mora.dataset.pitchNext === "high";
+        })(),
+        hasFallingEdge: (() => {
+          const line = mora.querySelector(".pronunciation-mora-line");
+          return mora instanceof HTMLElement
+            && line instanceof Element
+            && getComputedStyle(line, "::after").content !== "none"
+            && mora.dataset.pitch === "high"
+            && mora.dataset.pitchNext === "low";
+        })(),
+      })),
+    }));
+    const inlineMarkerMetrics = (node, rowSelector) => {
+      if (!(node instanceof HTMLElement)) return null;
+      const row = node.closest(rowSelector);
+      if (!(row instanceof HTMLElement)) return null;
+      const markerRect = node.getBoundingClientRect();
+      const rowRect = row.getBoundingClientRect();
+      return {
+        text: node.textContent?.trim() ?? "",
+        markerTop: markerRect.top,
+        markerBottom: markerRect.bottom,
+        markerHeight: markerRect.height,
+        rowTop: rowRect.top,
+        rowBottom: rowRect.bottom,
+        rowHeight: rowRect.height,
+        centerDelta: Math.abs((markerRect.top + markerRect.bottom) / 2 - (rowRect.top + rowRect.bottom) / 2),
+      };
+    };
     const explicitChinese = document.querySelector('.lookup-glossary-content [data-sc-class="probe-sgkk-zh"]');
     const inferredChinese = document.querySelector('.lookup-glossary-content [data-sc-class="probe-inferred-zh"]');
     const kanjiJapanese = document.querySelector('.lookup-glossary-content [data-sc-class="probe-kanji-ja"]');
@@ -242,6 +283,7 @@ async function popupMetrics(page) {
       frequencyDictLabels: Array.from(document.querySelectorAll(".frequency-dict-label")).map((node) => node.textContent ?? ""),
       pitchGroups: document.querySelectorAll(".pitch-group").length,
       pitchVisuals: document.querySelectorAll(".pitch-visual").length,
+      pitchTransitions,
       lookupDetailRows: document.querySelectorAll(".lookup-detail").length,
       structuredListItems: document.querySelectorAll(".lookup-glossary-content ul li").length,
       structuredBreaks: document.querySelectorAll(".lookup-glossary-content br").length,
@@ -323,16 +365,22 @@ async function popupMetrics(page) {
       rgkoNumberBackground: rgkoNumber instanceof HTMLElement ? getComputedStyle(rgkoNumber).backgroundColor : "",
       rgkoNumberBorderRadius: rgkoNumber instanceof HTMLElement ? getComputedStyle(rgkoNumber).borderTopLeftRadius : "",
       rgkoNumberFontFamily: rgkoNumber instanceof HTMLElement ? getComputedStyle(rgkoNumber).fontFamily : "",
+      rgkoNumberText: rgkoNumber instanceof HTMLElement ? rgkoNumber.textContent?.trim() ?? "" : "",
+      rgkoNumberInline: inlineMarkerMetrics(rgkoNumber, '[data-sc-class="probe-rgko-meaning-row"]'),
       rgkoBlueLabelColor: rgkoBlueLabel instanceof HTMLElement ? getComputedStyle(rgkoBlueLabel).color : "",
       rgkoBlueLabelBackground: rgkoBlueLabel instanceof HTMLElement ? getComputedStyle(rgkoBlueLabel).backgroundColor : "",
       rgkoBlackLabelColor: rgkoBlackLabel instanceof HTMLElement ? getComputedStyle(rgkoBlackLabel).color : "",
       rgkoBlackLabelBackground: rgkoBlackLabel instanceof HTMLElement ? getComputedStyle(rgkoBlackLabel).backgroundColor : "",
       rgkoExampleLabelColor: rgkoExampleLabel instanceof HTMLElement ? getComputedStyle(rgkoExampleLabel).color : "",
       rgkoExampleLabelBackground: rgkoExampleLabel instanceof HTMLElement ? getComputedStyle(rgkoExampleLabel).backgroundColor : "",
+      rgkoExampleLabelText: rgkoExampleLabel instanceof HTMLElement ? rgkoExampleLabel.textContent?.trim() ?? "" : "",
+      rgkoExampleLabelInline: inlineMarkerMetrics(rgkoExampleLabel, '[data-sc-class="probe-rgko-label-row"]'),
       meikyoRectClasses: meikyoRect instanceof HTMLElement ? Array.from(meikyoRect.classList).join(" ") : "",
       meikyoRectBorderStyle: meikyoRect instanceof HTMLElement ? getComputedStyle(meikyoRect).borderTopStyle : "",
       meikyoRectBorderColor: meikyoRect instanceof HTMLElement ? getComputedStyle(meikyoRect).borderTopColor : "",
       meikyoRectBackground: meikyoRect instanceof HTMLElement ? getComputedStyle(meikyoRect).backgroundColor : "",
+      meikyoRectText: meikyoRect instanceof HTMLElement ? meikyoRect.textContent?.trim() ?? "" : "",
+      meikyoRectInline: inlineMarkerMetrics(meikyoRect, '[data-sc-class="probe-meikyo-row"]'),
       meikyoFilledRectBackground: meikyoFilledRect instanceof HTMLElement ? getComputedStyle(meikyoFilledRect).backgroundColor : "",
       meikyoFilledRectColor: meikyoFilledRect instanceof HTMLElement ? getComputedStyle(meikyoFilledRect).color : "",
       meikyoShikiriBackground: meikyoShikiri instanceof HTMLElement ? getComputedStyle(meikyoShikiri).backgroundColor : "",
@@ -342,6 +390,8 @@ async function popupMetrics(page) {
       daijisenRectClasses: daijisenRect instanceof HTMLElement ? Array.from(daijisenRect.classList).join(" ") : "",
       daijisenRectBorderStyle: daijisenRect instanceof HTMLElement ? getComputedStyle(daijisenRect).borderTopStyle : "",
       daijisenRectBorderColor: daijisenRect instanceof HTMLElement ? getComputedStyle(daijisenRect).borderTopColor : "",
+      daijisenRectText: daijisenRect instanceof HTMLElement ? daijisenRect.textContent?.trim() ?? "" : "",
+      daijisenRectInline: inlineMarkerMetrics(daijisenRect, '[data-sc-class="probe-daijisen-row"]'),
       daijisenCircleBorderStyle: daijisenCircle instanceof HTMLElement ? getComputedStyle(daijisenCircle).borderTopStyle : "",
       daijisenCircleBorderRadius: daijisenCircle instanceof HTMLElement ? getComputedStyle(daijisenCircle).borderTopLeftRadius : "",
       daijisenLogoGroupBackground: daijisenLogoGroup instanceof HTMLElement ? getComputedStyle(daijisenLogoGroup).backgroundColor : "",
@@ -585,6 +635,14 @@ async function main() {
     assert(ready.glossaryFontSize === "14px" && ready.glossaryItemFontSize === "14px" && ready.glossaryDictionaryFontSize === "10px", "Scale 1 should apply compact glossary defaults while preserving the type hierarchy.", ready);
     assert(Math.abs(parseFloat(ready.glossaryLineHeight) - 18.48) < 0.1 && ready.pitchFontSize === "12px", "Scale 1 should apply HSA compact glossary and pitch defaults.", ready);
     assert(ready.compactGlossariesClass && ready.compactPitchClass, "HSA compact glossary and pitch defaults should be active.", ready);
+    const pitchByLabel = Object.fromEntries(ready.pitchTransitions.map((entry) => [entry.label, entry]));
+    assert(pitchByLabel["pitch 0"]?.moras.map((mora) => mora.pitch).join("") === "lowhighhighhigh", "Heiban pitch [0] should start low then stay high without an initial rising edge.", ready.pitchTransitions);
+    assert(pitchByLabel["pitch 2"]?.moras.map((mora) => mora.pitch).join("") === "lowhighlowlow", "Pitch [2] should drop after the second mora.", ready.pitchTransitions);
+    assert(pitchByLabel["pitch 3"]?.moras.map((mora) => mora.pitch).join("") === "lowhighhighlow", "Pitch [3] should drop after the third mora.", ready.pitchTransitions);
+    assert(ready.pitchTransitions.every((entry) => entry.moras.every((mora) => !mora.hasRisingEdge)), "Pitch visuals should not draw low-to-high rising vertical strokes.", ready.pitchTransitions);
+    assert(!pitchByLabel["pitch 0"]?.moras.some((mora) => mora.hasFallingEdge), "Heiban pitch [0] should not draw a falling stroke inside the word.", ready.pitchTransitions);
+    assert(pitchByLabel["pitch 2"]?.moras.filter((mora) => mora.hasFallingEdge).map((mora) => mora.text).join("") === "た", "Pitch [2] should draw exactly one falling stroke at the second mora.", ready.pitchTransitions);
+    assert(pitchByLabel["pitch 3"]?.moras.filter((mora) => mora.hasFallingEdge).map((mora) => mora.text).join("") === "れ", "Pitch [3] should draw exactly one falling stroke at the third mora.", ready.pitchTransitions);
     assert(ready.actionSlotWidth === "28px", "Scale 1 should keep result-level action slots at 28 px.", ready);
     assert(ready.lookupResultRows >= 5 && ready.text.includes("extra rendered lookup result 5"), "Ready popup should render all backend lookup results, not only the first three.", ready);
     assert(ready.text.includes("Jitendex.org [probe]"), "Ready popup should render dictionary source.", ready);
@@ -628,14 +686,18 @@ async function main() {
     assert(ready.rgkoNumberMarkerClasses.split(/\s+/).includes("gloss-rgko-numeric-marker") && !ready.rgkoNumberMarkerClasses.split(/\s+/).includes("gloss-numeric-marker"), "RGKO numeric markers should use the RGKO class instead of the dark MK3 square marker class.", ready);
     assert(ready.rgkoNumberColor === "rgb(255, 255, 255)" && ready.rgkoNumberBackground === "rgb(16, 154, 47)" && ready.rgkoNumberBorderRadius !== "2px", "RGKO filled numeric markers should show white text on a green rounded marker.", ready);
     assert(/Yu Gothic UI|Meiryo|Hiragino Sans|Segoe UI|Arial|sans-serif/i.test(ready.rgkoNumberFontFamily), "RGKO numeric markers should use a UI/Japanese sans font.", ready);
+    assert(ready.rgkoNumberText === "1" && ready.rgkoNumberInline?.centerDelta <= Math.max(4, ready.rgkoNumberInline.rowHeight * 0.4), "RGKO numeric markers should keep visible text aligned with the surrounding line.", ready);
     assert(ready.rgkoBlueLabelColor === "rgb(255, 255, 255)" && ready.rgkoBlackLabelColor === "rgb(255, 255, 255)" && ready.rgkoExampleLabelColor === "rgb(255, 255, 255)", "RGKO filled blue, black, and example labels should render readable white text.", ready);
     assert(ready.rgkoBlueLabelBackground !== "rgba(0, 0, 0, 0)" && ready.rgkoBlackLabelBackground !== "rgba(0, 0, 0, 0)" && ready.rgkoExampleLabelBackground !== "rgba(0, 0, 0, 0)", "RGKO filled labels should keep visible backgrounds.", ready);
+    assert(ready.rgkoExampleLabelText === "例" && ready.rgkoExampleLabelInline?.centerDelta <= Math.max(4, ready.rgkoExampleLabelInline.rowHeight * 0.4), "RGKO example labels should keep their text visible and aligned inline.", ready);
     assert(!ready.meikyoRectClasses.split(/\s+/).includes("gloss-rgko-numeric-marker") && ready.meikyoRectBorderStyle === "solid" && ready.meikyoRectBorderColor === "rgb(51, 42, 27)" && ready.meikyoRectBackground !== "rgb(16, 154, 47)", "Meikyo-like rectangle markers should keep dictionary CSS and not receive RGKO marker styling.", ready);
+    assert(ready.meikyoRectText === "1" && ready.meikyoRectInline?.centerDelta <= Math.max(4, ready.meikyoRectInline.rowHeight * 0.4), "Meikyo rectangle markers should keep visible text aligned with the surrounding line.", ready);
     assert(ready.meikyoFilledRectBackground === "rgb(51, 42, 27)" && ready.meikyoFilledRectColor === "rgb(255, 255, 255)", "Meikyo-like filled rectangle markers should keep dictionary-provided fill colors.", ready);
     assert(ready.meikyoShikiriBackground === "rgb(255, 204, 204)", "Meikyo shikiri rows should keep the dictionary-provided pink background.", ready);
     assert(ready.meikyoDefinitionCellBackground === "rgba(0, 0, 0, 0)", "Meikyo definition table cells should stay transparent so the pink shikiri background appears behind text.", ready);
     assert(ready.meikyoRedCellBackground === "rgb(255, 51, 51)" && ready.meikyoRedCellTextColor === "rgb(255, 255, 255)", "Meikyo red label cells should keep red fill with white label text.", ready);
     assert(!ready.daijisenRectClasses.split(/\s+/).includes("gloss-rgko-numeric-marker") && ready.daijisenRectBorderStyle === "solid" && ready.daijisenRectBorderColor === "rgb(68, 68, 68)", "Daijisen-like rectangle markers should keep dictionary CSS and not receive RGKO marker styling.", ready);
+    assert(ready.daijisenRectText === "1" && ready.daijisenRectInline?.centerDelta <= Math.max(4, ready.daijisenRectInline.rowHeight * 0.4), "Daijisen rectangle markers should keep visible text aligned with the surrounding line.", ready);
     assert(ready.daijisenCircleBorderStyle === "solid" && ready.daijisenCircleBorderRadius === "10px", "Daijisen-like circle markers should keep rounded dictionary styling.", ready);
     assert(ready.daijisenLogoGroupBackground === "rgb(48, 48, 48)" && ready.daijisenLogoBackground === "rgb(255, 255, 255)" && ready.daijisenLogoColor === "rgb(51, 42, 27)", "Daijisen-like supplemental labels should keep dictionary logo styling.", ready);
     assert(ready.noCssCjkBadgeColor !== "rgb(16, 154, 47)" && ready.noCssCjkBadgeBorderStyle === "none", "Dictionary CSS should stay scoped to the matching dictionary group.", ready);
@@ -757,7 +819,7 @@ async function main() {
     assert(ankiAdded.ankiAudioStoreCount === 1, "Add Anki should store remote word audio before note creation.", ankiAdded);
     assert(ankiAdded.ankiLastAudioRequest.expression === "school" && ankiAdded.ankiLastAudioRequest.reading === "school", "Remote audio request should use lookup expression and reading.", ankiAdded);
     assert(ankiAdded.ankiLastFields.Audio === "[sound:hsw_audio_probe.mp3]", "Add Anki should render the stored word audio filename.", ankiAdded);
-    assert(ankiAdded.ankiLastFields.Pitch === '<ol><li><span style="display:inline;"><span>[</span><span>0</span><span>]</span></span></li><li><span style="display:inline;"><span>[</span><span>2</span><span>]</span></span></li></ol>', "Add Anki should render HSA-style pitch accent positions.", ankiAdded);
+    assert(ankiAdded.ankiLastFields.Pitch === '<ol><li><span style="display:inline;"><span>[</span><span>0</span><span>]</span></span></li><li><span style="display:inline;"><span>[</span><span>2</span><span>]</span></span></li><li><span style="display:inline;"><span>[</span><span>3</span><span>]</span></span></li></ol>', "Add Anki should render HSA-style pitch accent positions.", ankiAdded);
     assert(ankiAdded.coverStoreCount === 1 && ankiAdded.coverLastBookId === "probe-book", "Referenced book cover should be stored by bookId.", ankiAdded);
     assert(ankiAdded.ankiLastFields.Picture === '<img src="hsw_cover_probe.jpg">', "Stored cover should render into the book-cover field.", ankiAdded);
     assert(ankiAdded.operationEvents === "dictionary,cover,audio,add", "Media should store in dictionary-cover-audio order before addNote.", ankiAdded);

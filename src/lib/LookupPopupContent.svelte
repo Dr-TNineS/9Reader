@@ -727,16 +727,14 @@
     return canPreviewAnki ? "+" : "-";
   }
 
-  function pitchLevel(position: number, index: number, total: number): "high" | "low" {
-    if (total <= 1) return position === 0 ? "low" : "high";
-    if (position === 0) return index === 0 ? "low" : "high";
-    if (position === 1) return index === 0 ? "high" : "low";
+  function pitchLevel(position: number, index: number): "high" | "low" {
+    if (position === 0) return index > 0 ? "high" : "low";
+    if (position === 1) return index < 1 ? "high" : "low";
     return index > 0 && index < position ? "high" : "low";
   }
 
-  function nextPitchLevel(position: number, index: number, total: number): "high" | "low" | "none" {
-    if (index >= total - 1) return "none";
-    return pitchLevel(position, index + 1, total);
+  function nextPitchLevel(position: number, index: number): "high" | "low" {
+    return pitchLevel(position, index + 1);
   }
 
   function pitchPositionLabel(position: number): string {
@@ -873,7 +871,7 @@
                             <li>
                               <span class="pitch-visual" aria-label={pitchPositionLabel(position)}>
                                 {#each rendered.pitchMoras as mora, moraIndex}
-                                  <span class="pronunciation-mora" data-pitch={pitchLevel(position, moraIndex, rendered.pitchMoras.length)} data-next-pitch={nextPitchLevel(position, moraIndex, rendered.pitchMoras.length)}>
+                                  <span class="pronunciation-mora" data-pitch={pitchLevel(position, moraIndex)} data-pitch-next={nextPitchLevel(position, moraIndex)}>
                                     <span class="pronunciation-mora-line"></span>
                                     <span>{mora}</span>
                                   </span>
@@ -1026,16 +1024,7 @@
   .pronunciation-mora { position: relative; display: inline-flex; flex-direction: column; align-items: center; min-width: 1.05em; padding-top: calc(6px * var(--popup-scale, 1)); color: var(--lookup-entry-text); font-size: calc(13px * var(--popup-scale, 1)); line-height: 1.1; }
   .pronunciation-mora-line { position: absolute; top: calc(2px * var(--popup-scale, 1)); left: 0; right: 0; height: 1px; background: transparent; }
   .pronunciation-mora[data-pitch="high"] .pronunciation-mora-line { background: var(--lookup-entry-text); }
-  .pronunciation-mora[data-pitch="high"][data-next-pitch="low"] .pronunciation-mora-line::after {
-    content: "";
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 1px;
-    height: calc(9px * var(--popup-scale, 1));
-    background: var(--lookup-entry-text);
-  }
-  .pronunciation-mora[data-pitch="low"][data-next-pitch="high"] .pronunciation-mora-line::after {
+  .pronunciation-mora[data-pitch="high"][data-pitch-next="low"] .pronunciation-mora-line::after {
     content: "";
     position: absolute;
     right: 0;
@@ -1158,6 +1147,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    min-width: 1.18em;
+    min-height: 1.18em;
     padding: 0.1em 0.24em !important;
     color: #fff !important;
     background-color: var(--rgko12-brown) !important;
@@ -1166,15 +1157,16 @@
     font-weight: 700 !important;
     line-height: 1.1 !important;
     vertical-align: 0.06em;
+    word-break: keep-all;
   }
   .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc外字]) {
-    display: inline-flex;
-    align-items: center;
+    display: inline-flex !important;
+    align-items: center !important;
     justify-content: center;
     font-size: 0.8em !important;
     font-weight: 700;
     line-height: 1.08 !important;
-    vertical-align: middle;
+    vertical-align: -0.08em !important;
     white-space: nowrap;
   }
   .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc外字][data-sc-fill]) {
@@ -1187,6 +1179,7 @@
     border-radius: 999px;
   }
   .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global(.gloss-rgko-numeric-marker) {
+    display: inline-flex !important;
     min-width: 1.18em;
     height: 1.18em;
     color: #fff !important;
