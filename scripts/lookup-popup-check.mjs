@@ -120,25 +120,34 @@ async function popupMetrics(page) {
     const glossaryItem = document.querySelector(".lookup-glossary");
     const glossaryDictionary = document.querySelector(".lookup-glossary-dict");
     const pitchList = document.querySelector(".pitch-list");
+    const glossaryGroupFor = (dictionary) => Array.from(document.querySelectorAll(".lookup-glossary-group"))
+      .find((node) => node instanceof HTMLElement && node.dataset.dictionary === dictionary);
+    const groupQuery = (dictionary, selector) => glossaryGroupFor(dictionary)?.querySelector(selector) ?? null;
     const explicitChinese = document.querySelector('.lookup-glossary-content [data-sc-class="probe-sgkk-zh"]');
     const inferredChinese = document.querySelector('.lookup-glossary-content [data-sc-class="probe-inferred-zh"]');
     const kanjiJapanese = document.querySelector('.lookup-glossary-content [data-sc-class="probe-kanji-ja"]');
     const ambiguousHan = document.querySelector('.lookup-glossary-content [data-sc-class="probe-ambiguous-han-ja"]');
     const dictionaryFont = document.querySelector('.lookup-glossary-content [data-sc-class="probe-dict-font"]');
-    const cjkBadge = document.querySelector(".lookup-glossary-content [data-sc\u5916\u5b57][data-sc\u5de6\u4e38]");
-    const cjkPartOfSpeech = document.querySelector(".lookup-glossary-content [data-sc\u54c1\u8a5e][data-sc\u6d3b\u7528]");
-    const rgkoRank = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-rank"]');
-    const rgkoHeadword = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-headword"]');
-    const rgkoRedHeadword = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-red-headword"]');
-    const rgkoBoldHeadword = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-bold-headword"]');
-    const rgkoPosBox = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-pos-box"]');
-    const rgkoPosReading = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-pos-reading"]');
-    const rgkoNumber = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-number"]');
-    const rgkoBlueLabel = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-blue-label"]');
-    const rgkoBlackLabel = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-black-label"]');
-    const rgkoExampleLabel = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-example-label"]');
-    const numericMarkerMain = document.querySelector(".lookup-glossary-content .gloss-numeric-marker-main");
-    const numericMarkerInline = document.querySelector(".lookup-glossary-content .gloss-numeric-marker-inline");
+    const cjkBadge = groupQuery("Jitendex.org [probe]", "[data-sc\u5916\u5b57][data-sc\u5de6\u4e38]");
+    const cjkPartOfSpeech = groupQuery("Jitendex.org [probe]", "[data-sc\u54c1\u8a5e][data-sc\u6d3b\u7528]");
+    const rgkoRank = groupQuery("RGKO12 [probe]", '[data-sc-class="probe-rgko-rank"]');
+    const rgkoHeadword = groupQuery("RGKO12 [probe]", '[data-sc-class="probe-rgko-headword"]');
+    const rgkoRedHeadword = groupQuery("RGKO12 [probe]", '[data-sc-class="probe-rgko-red-headword"]');
+    const rgkoBoldHeadword = groupQuery("RGKO12 [probe]", '[data-sc-class="probe-rgko-bold-headword"]');
+    const rgkoPosBox = groupQuery("RGKO12 [probe]", '[data-sc-class="probe-rgko-pos-box"]');
+    const rgkoPosReading = groupQuery("RGKO12 [probe]", '[data-sc-class="probe-rgko-pos-reading"]');
+    const rgkoNumber = groupQuery("RGKO12 [probe]", '[data-sc-class="probe-rgko-number"]');
+    const rgkoBlueLabel = groupQuery("RGKO12 [probe]", '[data-sc-class="probe-rgko-blue-label"]');
+    const rgkoBlackLabel = groupQuery("RGKO12 [probe]", '[data-sc-class="probe-rgko-black-label"]');
+    const rgkoExampleLabel = groupQuery("RGKO12 [probe]", '[data-sc-class="probe-rgko-example-label"]');
+    const meikyoRect = groupQuery("Meikyo3 [probe]", '[data-sc-class="probe-meikyo-rect"]');
+    const meikyoFilledRect = groupQuery("Meikyo3 [probe]", '[data-sc-class="probe-meikyo-filled-rect"]');
+    const daijisenRect = groupQuery("Daijisen2 [probe]", '[data-sc-class="probe-daijisen-rect"]');
+    const daijisenCircle = groupQuery("Daijisen2 [probe]", '[data-sc-class="probe-daijisen-circle"]');
+    const daijisenLogoGroup = groupQuery("Daijisen2 [probe]", '[data-sc-class="probe-daijisen-logo-group"]');
+    const daijisenLogo = groupQuery("Daijisen2 [probe]", '[data-sc-class="probe-daijisen-logo"]');
+    const numericMarkerMain = groupQuery("No CSS Dictionary [probe]", ".gloss-numeric-marker-main");
+    const numericMarkerInline = groupQuery("No CSS Dictionary [probe]", ".gloss-numeric-marker-inline");
     const mediaCaption = document.querySelector(".lookup-glossary-content .gloss-media-caption");
     const redirectLink = document.querySelector(".lookup-glossary-content a[data-lookup-redirect]");
     const loadedMediaPlaceholder = Array.from(document.querySelectorAll(".lookup-glossary-content .gloss-media-placeholder[data-media-status='loaded']"))
@@ -259,6 +268,9 @@ async function popupMetrics(page) {
       })(),
       glossaryGroups: document.querySelectorAll(".lookup-glossary-group").length,
       openGlossaryGroups: document.querySelectorAll(".lookup-glossary-group[open]").length,
+      dictionaryStyleKinds: Object.fromEntries(Array.from(document.querySelectorAll(".lookup-glossary-group"))
+        .filter((node) => node instanceof HTMLElement)
+        .map((node) => [node.dataset.dictionary ?? "", node.dataset.dictionaryStyleKind ?? ""])),
       compactGlossariesClass: document.querySelector(".lookup-content")?.classList.contains("compact-glossaries") ?? false,
       compactPitchClass: document.querySelector(".lookup-content")?.classList.contains("compact-pitch") ?? false,
       expressionTags: Array.from(document.querySelectorAll(".lookup-glossary-group > .lookup-tags .lookup-tag")).map((node) => node.textContent ?? ""),
@@ -313,6 +325,20 @@ async function popupMetrics(page) {
       rgkoBlackLabelBackground: rgkoBlackLabel instanceof HTMLElement ? getComputedStyle(rgkoBlackLabel).backgroundColor : "",
       rgkoExampleLabelColor: rgkoExampleLabel instanceof HTMLElement ? getComputedStyle(rgkoExampleLabel).color : "",
       rgkoExampleLabelBackground: rgkoExampleLabel instanceof HTMLElement ? getComputedStyle(rgkoExampleLabel).backgroundColor : "",
+      meikyoRectClasses: meikyoRect instanceof HTMLElement ? Array.from(meikyoRect.classList).join(" ") : "",
+      meikyoRectBorderStyle: meikyoRect instanceof HTMLElement ? getComputedStyle(meikyoRect).borderTopStyle : "",
+      meikyoRectBorderColor: meikyoRect instanceof HTMLElement ? getComputedStyle(meikyoRect).borderTopColor : "",
+      meikyoRectBackground: meikyoRect instanceof HTMLElement ? getComputedStyle(meikyoRect).backgroundColor : "",
+      meikyoFilledRectBackground: meikyoFilledRect instanceof HTMLElement ? getComputedStyle(meikyoFilledRect).backgroundColor : "",
+      meikyoFilledRectColor: meikyoFilledRect instanceof HTMLElement ? getComputedStyle(meikyoFilledRect).color : "",
+      daijisenRectClasses: daijisenRect instanceof HTMLElement ? Array.from(daijisenRect.classList).join(" ") : "",
+      daijisenRectBorderStyle: daijisenRect instanceof HTMLElement ? getComputedStyle(daijisenRect).borderTopStyle : "",
+      daijisenRectBorderColor: daijisenRect instanceof HTMLElement ? getComputedStyle(daijisenRect).borderTopColor : "",
+      daijisenCircleBorderStyle: daijisenCircle instanceof HTMLElement ? getComputedStyle(daijisenCircle).borderTopStyle : "",
+      daijisenCircleBorderRadius: daijisenCircle instanceof HTMLElement ? getComputedStyle(daijisenCircle).borderTopLeftRadius : "",
+      daijisenLogoGroupBackground: daijisenLogoGroup instanceof HTMLElement ? getComputedStyle(daijisenLogoGroup).backgroundColor : "",
+      daijisenLogoBackground: daijisenLogo instanceof HTMLElement ? getComputedStyle(daijisenLogo).backgroundColor : "",
+      daijisenLogoColor: daijisenLogo instanceof HTMLElement ? getComputedStyle(daijisenLogo).color : "",
       noCssCjkBadgeColor: noCssCjkBadge instanceof HTMLElement ? getComputedStyle(noCssCjkBadge).color : "",
       noCssCjkBadgeBorderStyle: noCssCjkBadge instanceof HTMLElement ? getComputedStyle(noCssCjkBadge).borderTopStyle : "",
       numericMarkerCount: document.querySelectorAll(".lookup-glossary-content .gloss-numeric-marker").length,
@@ -584,6 +610,7 @@ async function main() {
     assert(ready.dictionaryStyledTransform === "none" && ready.dictionaryStyledZoom === "1", "Dictionary CSS sanitizer should block imported transform and zoom overrides.", ready);
     assert(ready.cjkBadgeColor === "rgb(16, 154, 47)" && ready.cjkBadgeBorderColor === "rgb(16, 154, 47)" && ready.cjkBadgeBorderRadius === "8px", "Dictionary CSS should match CJK structured data hooks such as data-sc外字.", ready);
     assert(ready.cjkPartOfSpeechColor === "rgb(74, 138, 222)" && Number.parseInt(ready.cjkPartOfSpeechFontWeight, 10) >= 700, "Dictionary CSS should match CJK structured data hooks such as data-sc活用.", ready);
+    assert(ready.dictionaryStyleKinds["RGKO12 [probe]"] === "rgko12" && ready.dictionaryStyleKinds["Meikyo3 [probe]"] === "styled" && ready.dictionaryStyleKinds["Daijisen2 [probe]"] === "styled" && ready.dictionaryStyleKinds["No CSS Dictionary [probe]"] === "none", "Popup should classify dictionary style resources before applying fallback marker styles.", ready);
     assert(Number.parseFloat(ready.rgkoHeadwordFontSize) > Number.parseFloat(ready.glossaryFontSize) && /Yu Gothic UI|Meiryo|Hiragino Sans|Segoe UI|Arial|sans-serif/i.test(ready.rgkoHeadwordFontFamily), "RGKO headword text should get the HSA-like sans font and larger title size.", ready);
     assert(Number.parseFloat(ready.rgkoRankFontSize) < Number.parseFloat(ready.glossaryFontSize) && ready.rgkoRankColor === "rgb(232, 74, 74)", "RGKO rank markers should use the smaller red title-side treatment.", ready);
     assert(ready.rgkoRedHeadwordColor === "rgb(232, 74, 74)" && Number.parseInt(ready.rgkoRedHeadwordFontWeight, 10) >= 800, "RGKO red headword text should be heavy and red.", ready);
@@ -595,6 +622,11 @@ async function main() {
     assert(/Yu Gothic UI|Meiryo|Hiragino Sans|Segoe UI|Arial|sans-serif/i.test(ready.rgkoNumberFontFamily), "RGKO numeric markers should use a UI/Japanese sans font.", ready);
     assert(ready.rgkoBlueLabelColor === "rgb(255, 255, 255)" && ready.rgkoBlackLabelColor === "rgb(255, 255, 255)" && ready.rgkoExampleLabelColor === "rgb(255, 255, 255)", "RGKO filled blue, black, and example labels should render readable white text.", ready);
     assert(ready.rgkoBlueLabelBackground !== "rgba(0, 0, 0, 0)" && ready.rgkoBlackLabelBackground !== "rgba(0, 0, 0, 0)" && ready.rgkoExampleLabelBackground !== "rgba(0, 0, 0, 0)", "RGKO filled labels should keep visible backgrounds.", ready);
+    assert(!ready.meikyoRectClasses.split(/\s+/).includes("gloss-rgko-numeric-marker") && ready.meikyoRectBorderStyle === "solid" && ready.meikyoRectBorderColor === "rgb(51, 42, 27)" && ready.meikyoRectBackground !== "rgb(16, 154, 47)", "Meikyo-like rectangle markers should keep dictionary CSS and not receive RGKO marker styling.", ready);
+    assert(ready.meikyoFilledRectBackground === "rgb(51, 42, 27)" && ready.meikyoFilledRectColor === "rgb(255, 255, 255)", "Meikyo-like filled rectangle markers should keep dictionary-provided fill colors.", ready);
+    assert(!ready.daijisenRectClasses.split(/\s+/).includes("gloss-rgko-numeric-marker") && ready.daijisenRectBorderStyle === "solid" && ready.daijisenRectBorderColor === "rgb(68, 68, 68)", "Daijisen-like rectangle markers should keep dictionary CSS and not receive RGKO marker styling.", ready);
+    assert(ready.daijisenCircleBorderStyle === "solid" && ready.daijisenCircleBorderRadius === "10px", "Daijisen-like circle markers should keep rounded dictionary styling.", ready);
+    assert(ready.daijisenLogoGroupBackground === "rgb(48, 48, 48)" && ready.daijisenLogoBackground === "rgb(255, 255, 255)" && ready.daijisenLogoColor === "rgb(51, 42, 27)", "Daijisen-like supplemental labels should keep dictionary logo styling.", ready);
     assert(ready.noCssCjkBadgeColor !== "rgb(16, 154, 47)" && ready.noCssCjkBadgeBorderStyle === "none", "Dictionary CSS should stay scoped to the matching dictionary group.", ready);
     assert(ready.numericMarkerCount >= 2, "Structured text numeric markers should receive HSW marker classes.", ready);
     assert(ready.numericMarkerMainColor === "rgb(255, 255, 255)" && ready.numericMarkerInlineColor === "rgb(255, 255, 255)", "Numeric markers should render white digits.", ready);
@@ -613,7 +645,7 @@ async function main() {
     assert(ready.text.includes("education") && ready.text.includes("place"), "Ready popup should render glossary definition tags.", ready);
     assert(ready.headerActions >= 1, "Ready popup should render HSA-style header actions.", ready);
     assert(ready.importPopupSettings.width === ready.renderPopupSettings.width && ready.importPopupSettings.scale === ready.renderPopupSettings.scale, "Default probe import and render popup settings should match.", ready);
-    assert(ready.importedDictionaryRecords.length === 2 && ready.importedDictionaryRecords.some((record) => record.styleSource === ""), "Probe import metadata should include CSS and no-CSS dictionaries.", ready);
+    assert(ready.importedDictionaryRecords.length === 5 && ready.importedDictionaryRecords.some((record) => record.styleSource === ""), "Probe import metadata should include CSS and no-CSS dictionaries.", ready);
     assert(ready.audioButtons >= 1 && ready.audioDisabled, "Word audio button should render as a disabled boundary.", ready);
     assert(ready.audioTitle.includes("No enabled"), "Disabled audio affordance should describe missing configuration.", ready);
     assert(ready.frequencyGroups >= 1 && ready.frequencyDictLabels.includes("Freq Probe") && ready.text.includes("120"), "Ready popup should render frequency as dictionary pills.", ready);

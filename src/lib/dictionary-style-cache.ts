@@ -3,6 +3,8 @@ import { invoke, isTauri } from "@tauri-apps/api/core";
 export interface DictionaryStyleResource {
   css: string;
   source: string;
+  title?: string;
+  revision?: string;
 }
 
 const dictionaryStyleCache = new Map<string, Promise<DictionaryStyleResource>>();
@@ -32,6 +34,6 @@ export async function preloadCachedDictionaryStyles(dictionaries: string[]): Pro
 }
 
 async function invokeDictionaryStyles(dictionary: string): Promise<DictionaryStyleResource> {
-  if (!isTauri()) return { css: "", source: dictionary };
+  if (!isTauri()) return { css: "", source: dictionary, title: dictionary, revision: "" };
   return invoke<DictionaryStyleResource>("dictionary_styles", { dictionary });
 }

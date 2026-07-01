@@ -189,6 +189,8 @@ pub struct DictionaryMediaResource {
 pub struct DictionaryStyleResource {
     pub css: String,
     pub source: String,
+    pub title: String,
+    pub revision: String,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -1690,6 +1692,8 @@ fn load_dictionary_styles(
         return Ok(DictionaryStyleResource {
             css: String::new(),
             source: entry.dict_id.clone(),
+            title: entry.title.clone(),
+            revision: entry.revision.clone(),
         });
     }
     if !styles_path.is_file() {
@@ -1704,6 +1708,8 @@ fn load_dictionary_styles(
     Ok(DictionaryStyleResource {
         css,
         source: entry.dict_id.clone(),
+        title: entry.title.clone(),
+        revision: entry.revision.clone(),
     })
 }
 
@@ -3406,10 +3412,12 @@ mod tests {
 
         let by_id = load_dictionary_styles(&manifest, "abc").unwrap();
         assert_eq!(by_id.source, "abc:term");
+        assert_eq!(by_id.title, "Readable Dictionary");
         assert!(by_id.css.contains("rgb(1, 2, 3)"));
 
         let by_title = load_dictionary_styles(&manifest, "Readable Dictionary").unwrap();
         assert_eq!(by_title.css, by_id.css);
+        assert_eq!(by_title.revision, by_id.revision);
 
         let _ = fs::remove_dir_all(root);
     }
@@ -3422,12 +3430,14 @@ mod tests {
 
         let mut entry = manifest_entry("abc", 0);
         entry.internal_path = dict_dir.to_string_lossy().into_owned();
+        let title = entry.title.clone();
         let manifest = DictionaryManifest {
             dictionaries: vec![entry],
         };
 
         let styles = load_dictionary_styles(&manifest, "abc").unwrap();
         assert_eq!(styles.source, "abc:term");
+        assert_eq!(styles.title, title);
         assert_eq!(styles.css, "");
 
         let _ = fs::remove_dir_all(root);

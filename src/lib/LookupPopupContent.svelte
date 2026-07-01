@@ -11,6 +11,7 @@
   import type { AnkiAddNoteResult, AnkiDictionaryMediaRef, AnkiFieldPreview, AnkiNoteRequest, AnkiSettings, AnkiStoreBookCoverResult, AnkiStoreMediaResult, AnkiStoreRemoteAudioResult, AnkiStoreSasayakiAudioResult, DictResult, LookupAnkiPayload, ReaderSelection, SasayakiPlaybackCue, WordAudioPlaybackResult, WordAudioResolveRequest } from "./types";
 
   type SasayakiPopupAction = "replayCue" | "togglePlayback" | "playForward";
+  type DictionaryStyleKind = "rgko12" | "styled" | "none";
 
   let {
     popupId,
@@ -104,6 +105,7 @@
   let previousRestoreScrollSignal: number | null = null;
   let contentRoot: HTMLDivElement | null = null;
   let dictionaryStyleCss = $state("");
+  let dictionaryStyleKinds = $state<Record<string, DictionaryStyleKind>>({});
   let ankiPreviewKey = $state("");
   let ankiActionKey = $state("");
   let ankiActionState = $state<"idle" | "adding" | "added" | "duplicate" | "error">("idle");
@@ -412,6 +414,7 @@
   async function loadScopedDictionaryStyles(dictionaries: string[], scopedStyleRequestId: number, lookupRequestId: number) {
     if (dictionaries.length === 0) {
       dictionaryStyleCss = "";
+      dictionaryStyleKinds = {};
       if (lookupRequestId > 0) markLookupPerformance(lookupRequestId, "styles-ready", { dictionaryCount: 0 });
       return;
     }
@@ -420,15 +423,40 @@
       loadDictionaryStyles?.(dictionary) ?? loadCachedDictionaryStyles(dictionary)
     )));
     if (scopedStyleRequestId !== styleRequestId) return;
+    const nextStyleKinds: Record<string, DictionaryStyleKind> = {};
     const chunks = resources.flatMap((resource, index) => (
-      resource.status === "fulfilled" && resource.value.css.trim()
-        ? [scopeDictionaryCss(resource.value.css, popupId, dictionaries[index])]
-        : []
+      dictionaryStyleChunks(resource, dictionaries[index], nextStyleKinds)
     ));
     if (scopedStyleRequestId === styleRequestId) {
+      dictionaryStyleKinds = nextStyleKinds;
       dictionaryStyleCss = chunks.filter(Boolean).join("\n");
       if (lookupRequestId > 0) markLookupPerformance(lookupRequestId, "styles-ready", { dictionaryCount: dictionaries.length });
     }
+  }
+
+  function dictionaryStyleChunks(
+    resource: PromiseSettledResult<DictionaryStyleResource>,
+    dictionary: string,
+    nextStyleKinds: Record<string, DictionaryStyleKind>,
+  ): string[] {
+    if (resource.status !== "fulfilled") {
+      nextStyleKinds[dictionary] = "styled";
+      return [];
+    }
+    nextStyleKinds[dictionary] = dictionaryStyleKind(resource.value);
+    return resource.value.css.trim()
+      ? [scopeDictionaryCss(resource.value.css, popupId, dictionary)]
+      : [];
+  }
+
+  function dictionaryStyleKind(resource: DictionaryStyleResource): DictionaryStyleKind {
+    if (!resource.css.trim()) return "none";
+    const metadata = `${resource.revision ?? ""} ${resource.title ?? ""} ${resource.source ?? ""}`.toLowerCase();
+    return metadata.includes("rgko12") ? "rgko12" : "styled";
+  }
+
+  function dictionaryStyleKindFor(dictionary: string): DictionaryStyleKind {
+    return dictionaryStyleKinds[dictionary] ?? "styled";
   }
 
   async function addAnki(result: DictResult, resultIndex: number, key: string) {
@@ -876,7 +904,12 @@
             </div>
           {/if}
           {#each rendered.glossaryGroups as group, groupIndex}
-            <details class="lookup-glossary-group" data-dictionary={group.dictionary} open={glossaryGroupOpen(group.dictionary, groupIndex)}>
+            <details
+              class="lookup-glossary-group"
+              data-dictionary={group.dictionary}
+              data-dictionary-style-kind={dictionaryStyleKindFor(group.dictionary)}
+              open={glossaryGroupOpen(group.dictionary, groupIndex)}
+            >
               <summary class="lookup-glossary-dict">{group.dictionary}</summary>
               {#if dictionarySettings.showExpressionTags && group.termTags.length > 0}
                 <div class="lookup-tags">
@@ -1040,43 +1073,43 @@
   .lookup-glossary-content :global(a[data-lookup-redirect]) { border-bottom: 0 !important; cursor: pointer; text-decoration: none !important; }
   .lookup-glossary-content :global(a[data-lookup-redirect]:hover) { text-decoration: none !important; }
   .lookup-glossary-content :global(rt) { color: var(--lookup-entry-text); font-size: 0.72em; }
-  .lookup-glossary-content :global([data-sc-headword]),
-  .lookup-glossary-content :global([data-sc-headword] > [data-sc-em]),
-  .lookup-glossary-content :global([data-sc-rank_num]),
-  .lookup-glossary-content :global([data-sc-ws]),
-  .lookup-glossary-content :global([data-sc-p-o-s]),
-  .lookup-glossary-content :global([data-sc-bs]),
-  .lookup-glossary-content :global([data-sc-bc]),
-  .lookup-glossary-content :global([data-sc外字]),
-  .lookup-glossary-content :global([data-sc使い分け]) {
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-headword]),
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-headword] > [data-sc-em]),
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-rank_num]),
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-ws]),
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-p-o-s]),
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-bs]),
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-bc]),
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc外字]),
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc使い分け]) {
     font-family: "Yu Gothic UI", "Meiryo", "Hiragino Sans", "Segoe UI", Arial, sans-serif;
   }
-  .lookup-glossary-content :global([data-sc-headword]) {
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-headword]) {
     font-size: 1.33em !important;
     font-weight: 900 !important;
     line-height: 1.12 !important;
   }
-  .lookup-glossary-content :global([data-sc-headword] > [data-sc-em]),
-  .lookup-glossary-content :global([data-sc-headword] [data-sc-b]),
-  .lookup-glossary-content :global([data-sc-meaning][data-scコラム] [data-sc-b]) {
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-headword] > [data-sc-em]),
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-headword] [data-sc-b]),
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-meaning][data-scコラム] [data-sc-b]) {
     font-weight: 900 !important;
   }
-  .lookup-glossary-content :global([data-sc-b]),
-  .lookup-glossary-content :global([data-sc-num]) {
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-b]),
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-num]) {
     font-weight: 700 !important;
   }
-  .lookup-glossary-content :global([data-sc-rank_num]) {
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-rank_num]) {
     color: var(--rgko12-red) !important;
     font-size: 0.5em !important;
     font-weight: 400 !important;
     vertical-align: middle;
   }
-  .lookup-glossary-content :global([data-sc-acc]) {
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-acc]) {
     font-family: "Yu Gothic UI", "Meiryo", "Hiragino Sans", "Segoe UI", Arial, sans-serif;
     font-size: 0.67em !important;
     font-weight: 400 !important;
   }
-  .lookup-glossary-content :global([data-sc-ws]) {
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-ws]) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1090,15 +1123,15 @@
     vertical-align: 0.05em;
     word-break: keep-all;
   }
-  .lookup-glossary-content :global([data-sc-p-o-s]) {
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-p-o-s]) {
     margin-inline-start: 0.18em;
     font-size: 0.72em !important;
     font-weight: 600;
     line-height: 1 !important;
     vertical-align: 0.08em;
   }
-  .lookup-glossary-content :global([data-sc-bs]),
-  .lookup-glossary-content :global([data-sc-bc]) {
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-bs]),
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-bc]) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1111,17 +1144,17 @@
     vertical-align: 0.08em;
     word-break: keep-all;
   }
-  .lookup-glossary-content :global([data-sc-bs]) { border-radius: 0.2em; }
-  .lookup-glossary-content :global([data-sc-bs][data-sc-blue]) { background-color: var(--rgko12-blue) !important; }
-  .lookup-glossary-content :global([data-sc-bs][data-sc-gray]) { background-color: var(--rgko12-gray) !important; }
-  .lookup-glossary-content :global([data-sc-bc]) {
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-bs]) { border-radius: 0.2em; }
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-bs][data-sc-blue]) { background-color: var(--rgko12-blue) !important; }
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-bs][data-sc-gray]) { background-color: var(--rgko12-gray) !important; }
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-bc]) {
     border-radius: 0.7em;
     font-size: 0.72em !important;
     padding: 0.14em 0.28em !important;
   }
-  .lookup-glossary-content :global([data-sc-bc][data-sc-red]) { background-color: var(--rgko12-red) !important; }
-  .lookup-glossary-content :global([data-sc-bc][data-sc-gray]) { background-color: var(--rgko12-gray) !important; }
-  .lookup-glossary-content :global([data-sc使い分け]) {
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-bc][data-sc-red]) { background-color: var(--rgko12-red) !important; }
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-bc][data-sc-gray]) { background-color: var(--rgko12-gray) !important; }
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc使い分け]) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1134,7 +1167,7 @@
     line-height: 1.1 !important;
     vertical-align: 0.06em;
   }
-  .lookup-glossary-content :global([data-sc外字]) {
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc外字]) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1144,7 +1177,7 @@
     vertical-align: middle;
     white-space: nowrap;
   }
-  .lookup-glossary-content :global([data-sc外字][data-sc-fill]) {
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc外字][data-sc-fill]) {
     min-width: 1.18em;
     height: 1.18em;
     padding: 0 0.2em !important;
@@ -1153,7 +1186,7 @@
     border: 1px solid var(--rgko12-blue);
     border-radius: 999px;
   }
-  .lookup-glossary-content :global(.gloss-rgko-numeric-marker) {
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global(.gloss-rgko-numeric-marker) {
     min-width: 1.18em;
     height: 1.18em;
     color: #fff !important;
@@ -1164,8 +1197,8 @@
     font-weight: 800 !important;
     line-height: 1 !important;
   }
-  .lookup-glossary-content :global([data-sc-blue].gloss-rgko-numeric-marker),
-  .lookup-glossary-content :global([data-sc-blue] .gloss-rgko-numeric-marker) {
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-blue].gloss-rgko-numeric-marker),
+  .lookup-glossary-group[data-dictionary-style-kind="rgko12"] .lookup-glossary-content :global([data-sc-blue] .gloss-rgko-numeric-marker) {
     background-color: var(--rgko12-blue) !important;
     border-color: var(--rgko12-blue) !important;
   }
@@ -1174,6 +1207,13 @@
     box-sizing: border-box;
     align-items: center;
     justify-content: center;
+    text-align: center;
+    vertical-align: -0.12em;
+    white-space: nowrap;
+  }
+  .lookup-glossary-content :global(.gloss-numeric-marker-main) { margin-inline-end: 0.14em; }
+  .lookup-glossary-content :global(.gloss-numeric-marker-inline) { vertical-align: 0.02em; }
+  .lookup-glossary-group[data-dictionary-style-kind="none"] .lookup-glossary-content :global(.gloss-numeric-marker) {
     min-width: 1.24em;
     height: 1.34em;
     padding: 0 0.24em !important;
@@ -1185,12 +1225,9 @@
     font-size: 0.86em !important;
     font-weight: 700 !important;
     line-height: 1 !important;
-    text-align: center;
-    vertical-align: -0.12em;
-    white-space: nowrap;
   }
-  .lookup-glossary-content :global(.gloss-numeric-marker-main) { min-width: 1.34em; height: 1.42em; margin-inline-end: 0.14em; }
-  .lookup-glossary-content :global(.gloss-numeric-marker-inline) { min-width: 1.02em; height: 1.08em; padding: 0 0.18em !important; font-size: 0.72em !important; vertical-align: 0.02em; }
+  .lookup-glossary-group[data-dictionary-style-kind="none"] .lookup-glossary-content :global(.gloss-numeric-marker-main) { min-width: 1.34em; height: 1.42em; }
+  .lookup-glossary-group[data-dictionary-style-kind="none"] .lookup-glossary-content :global(.gloss-numeric-marker-inline) { min-width: 1.02em; height: 1.08em; padding: 0 0.18em !important; font-size: 0.72em !important; }
   .lookup-glossary-content :global(.gloss-media-caption),
   .lookup-glossary-content :global([data-sc-m-caption]) {
     display: block;

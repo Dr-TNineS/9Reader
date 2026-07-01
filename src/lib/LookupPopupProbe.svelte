@@ -45,6 +45,9 @@
   });
   const importedDictionaryRecords = [
     { dictId: "jitendex-probe", title: "Jitendex.org [probe]", styleSource: "probe:jank-css" },
+    { dictId: "rgko12-probe", title: "RGKO12 [probe]", styleSource: "probe:rgko12" },
+    { dictId: "meikyo3-probe", title: "Meikyo3 [probe]", styleSource: "probe:meikyo3" },
+    { dictId: "daijisen2-probe", title: "Daijisen2 [probe]", styleSource: "probe:daijisen2" },
     { dictId: "nocss-probe", title: "No CSS Dictionary [probe]", styleSource: "" },
   ];
   const dictionarySettings = normalizeDictionarySettings({
@@ -118,61 +121,6 @@
         },
         {
           tag: "div",
-          data: { class: "probe-rgko-head-row" },
-          content: [
-            { tag: "span", data: { class: "probe-rgko-rank", rank_num: "" }, content: "1" },
-            {
-              tag: "span",
-              data: { class: "probe-rgko-headword", headword: "" },
-              content: [
-                { tag: "span", data: { class: "probe-rgko-red-headword", em: "" }, content: "\u307b\u3057" },
-                " ",
-                { tag: "span", data: { class: "probe-rgko-bold-headword", b: "" }, content: "\u3010\u661f\u3011" },
-              ],
-            },
-            " ",
-            { tag: "span", data: { class: "probe-rgko-pos-box", ws: "" }, content: "\u540d" },
-            { tag: "span", data: { class: "probe-rgko-pos-reading", "p-o-s": "" }, content: "\u30db\u30b7" },
-          ],
-        },
-        {
-          tag: "div",
-          data: { class: "probe-rgko-meaning-row" },
-          content: [
-            { tag: "span", data: { class: "probe-rgko-number", "\u5916\u5b57": "", fill: "" }, content: "1" },
-            "\u5730\u7403\u306e\u5916\u306b\u3042\u3063\u3066\u3001\u591c\u3001\u7a7a\u306b\u5c0f\u3055\u304f\u304b\u304c\u3084\u3044\u3066\u898b\u3048\u308b\u3082\u306e\u3002",
-          ],
-        },
-        {
-          tag: "div",
-          data: { class: "probe-rgko-label-row" },
-          content: [
-            { tag: "span", data: { class: "probe-rgko-example-label", "\u4f7f\u3044\u5206\u3051": "" }, content: "\u4f8b" },
-            " ",
-            { tag: "span", data: { class: "probe-rgko-blue-label", bs: "", blue: "" }, content: "\u719f\u8a9e" },
-            " ",
-            { tag: "span", data: { class: "probe-rgko-black-label", bc: "" }, content: "\u9ed2" },
-          ],
-        },
-        {
-          tag: "div",
-          data: { class: "probe-numeric-marker-row" },
-          content: [
-            { tag: "span", data: { rect: "", fill: "" }, content: "1" },
-            " main numeric marker",
-          ],
-        },
-        {
-          tag: "div",
-          data: { class: "probe-inline-numeric-marker-row" },
-          content: [
-            "inline ",
-            { tag: "span", data: { rect: "", fill: "", small: "" }, content: "1" },
-            " numeric marker",
-          ],
-        },
-        {
-          tag: "div",
           data: { class: "probe-cjk-hooks" },
           content: [
             { tag: "span", data: { "\u5916\u5b57": "", "\u5de6\u4e38": "" }, content: "\u53c2\u8003" },
@@ -227,12 +175,114 @@
       ],
     },
   ]);
+  const rgkoGlossaryText = JSON.stringify([
+    {
+      type: "structured-content",
+      content: [
+        {
+          tag: "div",
+          data: { class: "probe-rgko-head-row" },
+          content: [
+            { tag: "span", data: { class: "probe-rgko-rank", rank_num: "" }, content: "1" },
+            {
+              tag: "span",
+              data: { class: "probe-rgko-headword", headword: "" },
+              content: [
+                { tag: "span", data: { class: "probe-rgko-red-headword", em: "" }, content: "\u307b\u3057" },
+                " ",
+                { tag: "span", data: { class: "probe-rgko-bold-headword", b: "" }, content: "\u3010\u661f\u3011" },
+              ],
+            },
+            " ",
+            { tag: "span", data: { class: "probe-rgko-pos-box", ws: "" }, content: "\u540d" },
+            { tag: "span", data: { class: "probe-rgko-pos-reading", "p-o-s": "" }, content: "\u30db\u30b7" },
+          ],
+        },
+        {
+          tag: "div",
+          data: { class: "probe-rgko-meaning-row" },
+          content: [
+            { tag: "span", data: { class: "probe-rgko-number", "\u5916\u5b57": "", fill: "" }, content: "1" },
+            "\u5730\u7403\u306e\u5916\u306b\u3042\u3063\u3066\u3001\u591c\u3001\u7a7a\u306b\u5c0f\u3055\u304f\u304b\u304c\u3084\u3044\u3066\u898b\u3048\u308b\u3082\u306e\u3002",
+          ],
+        },
+        {
+          tag: "div",
+          data: { class: "probe-rgko-label-row" },
+          content: [
+            { tag: "span", data: { class: "probe-rgko-example-label", "\u4f7f\u3044\u5206\u3051": "" }, content: "\u4f8b" },
+            " ",
+            { tag: "span", data: { class: "probe-rgko-blue-label", bs: "", blue: "" }, content: "\u719f\u8a9e" },
+            " ",
+            { tag: "span", data: { class: "probe-rgko-black-label", bc: "" }, content: "\u9ed2" },
+          ],
+        },
+      ],
+    },
+  ]);
+  const meikyoGlossaryText = JSON.stringify([
+    {
+      type: "structured-content",
+      content: [
+        {
+          tag: "div",
+          data: { class: "probe-meikyo-row" },
+          content: [
+            { tag: "span", data: { class: "probe-meikyo-rect", rect: "" }, content: "1" },
+            " styled Meikyo rectangle ",
+            { tag: "span", data: { class: "probe-meikyo-filled-rect", rect: "", fill: "" }, content: "2" },
+          ],
+        },
+      ],
+    },
+  ]);
+  const daijisenGlossaryText = JSON.stringify([
+    {
+      type: "structured-content",
+      content: [
+        {
+          tag: "div",
+          data: { class: "probe-daijisen-row" },
+          content: [
+            { tag: "span", data: { class: "probe-daijisen-rect", rect: "" }, content: "1" },
+            " styled Daijisen rectangle ",
+            { tag: "span", data: { class: "probe-daijisen-circle", circle: "" }, content: "2" },
+            " ",
+            {
+              tag: "span",
+              data: { class: "probe-daijisen-logo-group", "\u88dc\u8db3\u30ed\u30b4-g": "" },
+              content: [
+                { tag: "span", data: { class: "probe-daijisen-logo", "\u88dc\u8db3\u30ed\u30b4": "" }, content: "\u88dc\u8a18" },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ]);
   const noCssGlossaryText = JSON.stringify([
     {
       type: "structured-content",
       content: [
         "plain dictionary entry without imported CSS ",
         { tag: "span", data: { "\u5916\u5b57": "", "\u5de6\u4e38": "" }, content: "\u53c2\u8003" },
+        {
+          tag: "div",
+          data: { class: "probe-nocss-numeric-marker-row" },
+          content: [
+            { tag: "span", data: { class: "probe-nocss-numeric-main", rect: "", fill: "" }, content: "1" },
+            " main numeric marker",
+          ],
+        },
+        {
+          tag: "div",
+          data: { class: "probe-nocss-inline-numeric-marker-row" },
+          content: [
+            "inline ",
+            { tag: "span", data: { class: "probe-nocss-numeric-inline", rect: "", fill: "", small: "" }, content: "1" },
+            " numeric marker",
+          ],
+        },
       ],
     },
   ]);
@@ -243,6 +293,9 @@
     glossary: [
       { dict: "Jitendex.org [probe]", text: structuredGlossaryText, termTags: "n common", definitionTags: "education" },
       { dict: "Jitendex.org [probe]", text: "academy; lesson context", definitionTags: "place" },
+      { dict: "RGKO12 [probe]", text: rgkoGlossaryText, definitionTags: "rgko" },
+      { dict: "Meikyo3 [probe]", text: meikyoGlossaryText, definitionTags: "meikyo" },
+      { dict: "Daijisen2 [probe]", text: daijisenGlossaryText, definitionTags: "daijisen" },
       { dict: "No CSS Dictionary [probe]", text: noCssGlossaryText, definitionTags: "plain" },
       { dict: "JMdict [probe]", text: glossaryText, termTags: "n" },
     ],
@@ -675,18 +728,87 @@
     if (dictionary === "No CSS Dictionary [probe]") {
       return {
         source: "probe:nocss",
+        title: dictionary,
+        revision: "",
         css: "",
       };
     }
     if (dictionary === "JMdict [probe]") {
       return {
         source: "probe",
+        title: dictionary,
+        revision: "",
         css: `li { margin-left: 2px; }`,
       };
     }
-    if (dictionary !== "Jitendex.org [probe]") return { source: dictionary, css: "" };
+    if (dictionary === "RGKO12 [probe]") {
+      return {
+        source: "probe:rgko12",
+        title: dictionary,
+        revision: "rgko12;probe",
+        css: `
+          .probe-rgko-head-row { color: inherit; }
+          [data-sc-em] { color: rgb(232, 74, 74); }
+        `,
+      };
+    }
+    if (dictionary === "Meikyo3 [probe]") {
+      return {
+        source: "probe:meikyo3",
+        title: dictionary,
+        revision: "meikyo3;probe",
+        css: `
+          span[data-sc-rect] {
+            padding: 0.1em;
+            border: 1px solid rgb(51, 42, 27);
+            border-radius: 2px;
+            color: rgb(51, 42, 27);
+          }
+          span[data-sc-rect][data-sc-fill] {
+            color: rgb(255, 255, 255);
+            background-color: rgb(51, 42, 27);
+            border-color: rgb(51, 42, 27);
+          }
+        `,
+      };
+    }
+    if (dictionary === "Daijisen2 [probe]") {
+      return {
+        source: "probe:daijisen2",
+        title: dictionary,
+        revision: "daijisen2;probe",
+        css: `
+          span[data-sc-rect] {
+            padding: 0.1em;
+            border: 1px solid rgb(68, 68, 68);
+            border-radius: 2px;
+            color: rgb(51, 42, 27);
+          }
+          span[data-sc-circle] {
+            padding: 0.06em 0.1em;
+            border: 1px solid rgb(68, 68, 68);
+            border-radius: 10px;
+            color: rgb(51, 42, 27);
+          }
+          span[data-sc\u88dc\u8db3\u30ed\u30b4-g] {
+            background-color: rgb(48, 48, 48);
+            border-radius: 3px;
+            padding: 0.09em 0.25em;
+          }
+          span[data-sc\u88dc\u8db3\u30ed\u30b4] {
+            color: rgb(51, 42, 27);
+            background-color: rgb(255, 255, 255);
+            border-block: 1px solid rgb(48, 48, 48);
+            padding: 0.04em 0.08em;
+          }
+        `,
+      };
+    }
+    if (dictionary !== "Jitendex.org [probe]") return { source: dictionary, title: dictionary, revision: "", css: "" };
     return {
       source: "probe",
+      title: dictionary,
+      revision: "jitendex;probe",
       css: `
         @import url("https://example.invalid/bad.css");
         body { background: rgb(255, 0, 0); }
