@@ -334,13 +334,16 @@ export function payloadWithStoredBookCover(
 
 const ANKI_GLOSSARY_STYLE = `<style>
 .yomitan-glossary [data-sc-red]{color:#ff3333}
-.yomitan-glossary .gloss-image-link{display:inline-block;max-width:100%;text-decoration:none;color:inherit}
-.yomitan-glossary .gloss-image-container{display:inline-flex;max-width:100%;align-items:center;justify-content:center;vertical-align:middle}
-.yomitan-glossary .gloss-image{display:block;max-width:100%;max-height:180px;object-fit:contain}
+.yomitan-glossary .gloss-image-link{display:inline-block;position:relative;max-width:100%;line-height:1;text-decoration:none;color:inherit}
+.yomitan-glossary .gloss-image-container{display:inline-block;position:relative;max-width:100%;max-height:100vh;overflow:hidden;line-height:0;vertical-align:top;white-space:nowrap}
+.yomitan-glossary .gloss-image-sizer{display:inline-block;width:0;font-size:0;vertical-align:top}
+.yomitan-glossary .gloss-image-background{position:absolute;inset:0;display:none;background-color:currentColor}
+.yomitan-glossary .gloss-image-container-overlay{position:absolute;inset:0;display:table;table-layout:fixed;color:rgba(128,128,128,.8);line-height:1.4;white-space:normal}
+.yomitan-glossary .gloss-media-placeholder[data-has-aspect-ratio="true"] .gloss-image{position:absolute;inset:0;width:100%;height:100%}
+.yomitan-glossary .gloss-media-placeholder[data-size-units="em"] .gloss-image{max-width:100%;max-height:100%}
+.yomitan-glossary .gloss-image{display:inline-block;max-width:100%;max-height:180px;border:0;outline:0;vertical-align:top;object-fit:contain}
 .yomitan-glossary [data-sc-img][data-sc-class="gaiji"]{display:inline-block;line-height:1;vertical-align:-.12em}
 .yomitan-glossary [data-sc-img][data-sc-class="gaiji"] .gloss-image-link{display:inline-block!important;padding:0!important;border:0!important;background:transparent!important;vertical-align:baseline}
-.yomitan-glossary [data-sc-img][data-sc-class="gaiji"] .gloss-image-container{display:inline-flex!important;width:1.15em!important;height:1.15em!important;margin-inline-end:.15em;vertical-align:-.15em}
-.yomitan-glossary [data-sc-img][data-sc-class="gaiji"] .gloss-image{width:100%!important;height:100%!important;max-width:1.15em!important;max-height:1.15em!important;object-fit:contain}
 </style>`;
 const COMPACT_GLOSSARY_STYLE = "<style>.yomitan-glossary ol,.yomitan-glossary ul{margin:.2em 0;padding-left:1.25em}.yomitan-glossary li{margin:.1em 0}.yomitan-glossary p{margin:.15em 0}</style>";
 

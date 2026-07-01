@@ -214,6 +214,15 @@ function renderStructuredImage(record: Record<string, unknown>, dictionary: stri
     : typeof record.src === "string"
       ? record.src
       : "";
+  const width = finiteNumber(record.width) ?? 100;
+  const height = finiteNumber(record.height) ?? 100;
+  const preferredWidth = finiteNumber(record.preferredWidth);
+  const preferredHeight = finiteNumber(record.preferredHeight);
+  const invAspectRatio = preferredWidth && preferredHeight
+    ? preferredHeight / preferredWidth
+    : height / width;
+  const usedWidth = preferredWidth
+    ?? (preferredHeight ? preferredHeight / invAspectRatio : width);
   const title = typeof record.title === "string" ? record.title : path;
   const alt = typeof record.alt === "string" ? record.alt : title;
   const dataAttrs = structuredDataAttributes(record);
@@ -223,13 +232,44 @@ function renderStructuredImage(record: Record<string, unknown>, dictionary: stri
   const dictionaryAttr = dictionary ? ` data-media-dictionary="${escapeAttribute(dictionary)}"` : "";
   const titleAttr = title ? ` title="${escapeAttribute(title)}"` : "";
   const displayAlt = resolved?.alt ?? alt;
+  const nodeData = record.data && typeof record.data === "object" ? record.data as Record<string, unknown> : {};
+  const imageRendering = typeof record.imageRendering === "string" ? record.imageRendering : record.pixelated ? "pixelated" : "auto";
+  const appearance = typeof record.appearance === "string" ? record.appearance : "auto";
+  const background = typeof record.background === "boolean" ? String(record.background) : "true";
+  const collapsed = typeof record.collapsed === "boolean" ? String(record.collapsed) : "false";
+  const collapsible = typeof record.collapsible === "boolean" ? String(record.collapsible) : "true";
+  const hasExplicitDimensions = preferredWidth !== null
+    || preferredHeight !== null
+    || finiteNumber(record.width) !== null
+    || finiteNumber(record.height) !== null;
+  const dimensionAttrs = [
+    `data-has-aspect-ratio="true"`,
+    `data-image-rendering="${escapeAttribute(imageRendering)}"`,
+    `data-appearance="${escapeAttribute(appearance)}"`,
+    `data-background="${background}"`,
+    `data-collapsed="${collapsed}"`,
+    `data-collapsible="${collapsible}"`,
+    `data-has-explicit-dimensions="${hasExplicitDimensions}"`,
+    `data-used-width="${escapeAttribute(String(usedWidth))}"`,
+    `data-inv-aspect-ratio="${escapeAttribute(String(invAspectRatio))}"`,
+    typeof record.verticalAlign === "string" ? `data-vertical-align="${escapeAttribute(record.verticalAlign)}"` : "",
+    typeof record.sizeUnits === "string" ? `data-size-units="${escapeAttribute(record.sizeUnits)}"` : "",
+  ].filter(Boolean).join(" ");
+  const containerStyles = [
+    `width:${usedWidth}em`,
+    typeof record.border === "string" && isSafeStructuredStyleValue(record.border) ? `border:${record.border}` : "",
+    typeof record.borderRadius === "string" && isSafeStructuredStyleValue(record.borderRadius) ? `border-radius:${record.borderRadius}` : "",
+    typeof record.verticalAlign === "string" && isSafeStructuredStyleValue(record.verticalAlign) ? `vertical-align:${record.verticalAlign}` : "",
+  ].filter(Boolean).join(";");
   const image = resolved
     ? `<img class="gloss-image gloss-media-image" src="${escapeAttribute(resolved.src)}" alt="${escapeAttribute(displayAlt)}">`
-    : `<span class="gloss-media-label">${escapeHtml(alt || "Dictionary media")}</span>`;
-  const gaijiStyle = isGaijiImageRecord(record)
-    ? ` style="width:1.15em !important;height:1.15em !important;margin-inline-end:0.15em;vertical-align:-0.15em;"`
-    : "";
-  return `<span${dataAttrs.length ? ` ${dataAttrs.join(" ")}` : ""}><a class="gloss-image-link gloss-media-placeholder"${pathAttr}${dictionaryAttr}${titleAttr}${statusAttr}><span class="gloss-image-container"${gaijiStyle}>${image}</span></a></span>`;
+    : `<span class="gloss-media-label">${escapeHtml((typeof nodeData.alt === "string" ? nodeData.alt : alt) || "Dictionary media")}</span>`;
+  const sizer = `<span class="gloss-image-sizer" style="padding-top:${escapeAttribute(String(invAspectRatio * 100))}%"></span>`;
+  const backgroundNode = `<span class="gloss-image-background"></span>`;
+  const overlayNode = `<span class="gloss-image-container-overlay"></span>`;
+  const dataPathAttr = path ? ` data-path="${escapeAttribute(path)}"` : "";
+  const containerTitle = title ? ` title="${escapeAttribute(title)}"` : "";
+  return `<span${dataAttrs.length ? ` ${dataAttrs.join(" ")}` : ""}><a class="gloss-image-link gloss-media-placeholder"${pathAttr}${dictionaryAttr}${dataPathAttr}${titleAttr}${statusAttr} ${dimensionAttrs}><span class="gloss-image-container"${containerTitle} style="${escapeAttribute(containerStyles)}">${sizer}${backgroundNode}${overlayNode}${image}</span></a></span>`;
 }
 
 function renderText(text: string, language: string | null = null): string {
@@ -332,7 +372,7 @@ function structuredStyleAttribute(record: Record<string, unknown>): string {
     const property = toKebabCase(rawProperty);
     if (!isSafeStructuredStyleProperty(property)) continue;
 
-    const value = structuredStyleValue(rawValue);
+    const value = structuredStyleValueForProperty(property, rawValue);
     if (!value || !isSafeStructuredStyleValue(value)) continue;
     declarations.push(`${property}: ${value}`);
   }
@@ -359,6 +399,13 @@ function structuredStyleValue(value: unknown): string {
   return value.trim().replace(/\s+/g, " ");
 }
 
+function structuredStyleValueForProperty(property: string, value: unknown): string {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return property.startsWith("margin-") ? `${value}em` : String(value);
+  }
+  return structuredStyleValue(value);
+}
+
 function isSafeStructuredStyleValue(value: string): boolean {
   if (!value || value.length > 120) return false;
   if (/[;{}<>]/.test(value)) return false;
@@ -371,6 +418,10 @@ function isSafeStructuredStyleValue(value: string): boolean {
   return true;
 }
 
+function finiteNumber(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) && value > 0 ? value : null;
+}
+
 function structuredDataAttributes(record: Record<string, unknown>): string[] {
   const attrs: string[] = [];
   const data = record.data;
@@ -381,13 +432,6 @@ function structuredDataAttributes(record: Record<string, unknown>): string[] {
     }
   }
   return attrs;
-}
-
-function isGaijiImageRecord(record: Record<string, unknown>): boolean {
-  const data = record.data;
-  if (!data || typeof data !== "object") return false;
-  const fields = data as Record<string, unknown>;
-  return fields.gaiji !== undefined || fields.class === "gaiji";
 }
 
 function structuredRedirectTarget(record: Record<string, unknown>): string {
@@ -539,32 +583,92 @@ function sanitizeDictionaryCssBody(body: string): string {
       const separator = declaration.indexOf(":");
       if (separator <= 0) return false;
       const property = declaration.slice(0, separator).trim().toLowerCase();
-      return !isUnsafeDictionaryCssProperty(property);
+      const value = declaration.slice(separator + 1).trim();
+      return isSafeDictionaryCssDeclaration(property, value);
     })
     .join(";");
 }
 
-function isUnsafeDictionaryCssProperty(property: string): boolean {
-  return property === "font-size"
-    || property === "width"
-    || property === "height"
-    || property === "min-width"
-    || property === "min-height"
-    || property === "max-width"
-    || property === "max-height"
-    || property === "position"
-    || property === "inset"
-    || property === "top"
-    || property === "right"
-    || property === "bottom"
-    || property === "left"
-    || property === "transform"
-    || property === "translate"
-    || property === "scale"
-    || property === "rotate"
-    || property === "zoom"
-    || property === "writing-mode"
-    || property === "line-height";
+function isSafeDictionaryCssDeclaration(property: string, value: string): boolean {
+  if (!value || !isSafeDictionaryCssValue(value)) return false;
+  if (UNSAFE_DICTIONARY_CSS_PROPERTIES.has(property)) return false;
+  if (property === "position") return /^(?:static|relative)$/i.test(value);
+  if (BOX_OFFSET_PROPERTIES.has(property)) return isBoundedCssLength(value, 4, 64, true);
+  if (FONT_SIZE_PROPERTIES.has(property)) return isBoundedCssLength(value, 2, 32, false);
+  if (BOX_SIZE_PROPERTIES.has(property)) return isBoundedCssLength(value, 32, 256, false) || cleanCssValue(value) === "auto";
+  if (property === "line-height") return isSafeLineHeight(value);
+  if (property === "vertical-align") return isSafeVerticalAlign(value);
+  return true;
+}
+
+function isSafeDictionaryCssValue(value: string): boolean {
+  if (!value || value.length > 240) return false;
+  if (/[;{}<>]/.test(value)) return false;
+  if (/url\s*\(|image-set\s*\(|cross-fade\s*\(|paint\s*\(|expression\s*\(|behavior\s*:|-moz-binding/i.test(value)) {
+    return false;
+  }
+  return true;
+}
+
+const UNSAFE_DICTIONARY_CSS_PROPERTIES = new Set([
+  "inset",
+  "transform",
+  "translate",
+  "scale",
+  "rotate",
+  "zoom",
+  "filter",
+  "backdrop-filter",
+  "clip-path",
+  "content",
+  "animation",
+  "animation-name",
+  "transition",
+  "writing-mode",
+  "z-index",
+  "float",
+  "clear",
+  "contain",
+  "container",
+  "container-name",
+  "container-type",
+]);
+
+const BOX_OFFSET_PROPERTIES = new Set(["top", "right", "bottom", "left"]);
+const FONT_SIZE_PROPERTIES = new Set(["font-size"]);
+const BOX_SIZE_PROPERTIES = new Set(["width", "height", "min-width", "min-height", "max-width", "max-height"]);
+
+function isBoundedCssLength(value: string, maxEm: number, maxPx: number, allowNegative: boolean): boolean {
+  const normalized = cleanCssValue(value);
+  const match = normalized.match(/^(-?\d+(?:\.\d+)?)(px|em|rem|%)$/);
+  if (!match) return normalized === "0";
+  const amount = Number(match[1]);
+  if (!Number.isFinite(amount)) return false;
+  if (!allowNegative && amount < 0) return false;
+  const absolute = Math.abs(amount);
+  if (match[2] === "px") return absolute <= maxPx;
+  if (match[2] === "%") return absolute <= 100;
+  return absolute <= maxEm;
+}
+
+function isSafeLineHeight(value: string): boolean {
+  const normalized = cleanCssValue(value);
+  if (normalized === "normal") return true;
+  if (/^\d+(?:\.\d+)?$/.test(normalized)) {
+    const amount = Number(normalized);
+    return amount >= 0.75 && amount <= 2.5;
+  }
+  return isBoundedCssLength(normalized, 2.5, 48, false);
+}
+
+function isSafeVerticalAlign(value: string): boolean {
+  const normalized = cleanCssValue(value);
+  if (/^(?:baseline|sub|super|text-top|text-bottom|middle|top|bottom)$/.test(normalized)) return true;
+  return isBoundedCssLength(normalized, 2, 32, true);
+}
+
+function cleanCssValue(value: string): string {
+  return value.trim().replace(/\s*!important\s*$/i, "").toLowerCase();
 }
 
 function matchingBrace(css: string, open: number): number {

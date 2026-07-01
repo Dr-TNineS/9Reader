@@ -89,6 +89,9 @@
     tag: "img",
     path,
     alt,
+    width: 1.15,
+    height: 1.15,
+    sizeUnits: "em",
     data: { img: "", gaiji: "", class: "gaiji", alt, src: path },
   });
   const structuredGlossaryText = JSON.stringify([
@@ -170,7 +173,7 @@
         mk3Gaiji("gaiji/ws\u4e00.svg", "white square one"),
         mk3Gaiji("gaiji/bs\u4e8c.svg", "black square two"),
         mk3Gaiji("gaiji/\u53c2\u7167.svg", "reference arrow"),
-        { type: "image", path: "gaiji/\u53c2\u80031.svg", alt: "reference gaiji", data: { img: "", gaiji: "", class: "gaiji", alt: "reference gaiji", src: "gaiji/\u53c2\u80031.svg" } },
+        { type: "image", path: "gaiji/\u53c2\u80031.svg", alt: "reference gaiji", width: 1.15, height: 1.15, sizeUnits: "em", data: { img: "", gaiji: "", class: "gaiji", alt: "reference gaiji", src: "gaiji/\u53c2\u80031.svg" } },
         { type: "image", path: "gaiji/参考.svg", alt: "reference gaiji" },
       ],
     },

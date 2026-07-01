@@ -38,6 +38,15 @@
             ". ",
             { tag: "a", content: "redirected", data: { query: "redirected" } },
             ". Child lookup target appears here.",
+            {
+              tag: "div",
+              data: { class: "probe-page-marker-row" },
+              content: [
+                { tag: "span", data: { class: "probe-page-marker", rect: "", fill: "" }, content: "1" },
+                " visible page marker ",
+                { tag: "span", data: { class: "probe-page-inline-marker", rect: "", fill: "", small: "" }, content: "2" },
+              ],
+            },
           ]),
         },
       ],

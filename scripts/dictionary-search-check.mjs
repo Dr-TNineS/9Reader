@@ -50,6 +50,8 @@ async function metrics(page) {
     const root = document.querySelector('[data-popup-id="dictionary-search-root"]');
     const rootContent = document.querySelector('[data-popup-id="dictionary-search-root"] .lookup-content');
     const rootExpression = document.querySelector('[data-popup-id="dictionary-search-root"] .lookup-expression');
+    const rootMarker = document.querySelector('[data-popup-id="dictionary-search-root"] [data-sc-class="probe-page-marker"]');
+    const rootInlineMarker = document.querySelector('[data-popup-id="dictionary-search-root"] [data-sc-class="probe-page-inline-marker"]');
     const childPopup = document.querySelector('.lookup-pop:not([data-popup-id="dictionary-search-root"])');
     const childContent = document.querySelector('.lookup-pop:not([data-popup-id="dictionary-search-root"]) .lookup-content');
     const childExpression = document.querySelector('.lookup-pop:not([data-popup-id="dictionary-search-root"]) .lookup-expression');
@@ -57,6 +59,21 @@ async function metrics(page) {
     const panelRect = panel instanceof HTMLElement ? panel.getBoundingClientRect() : null;
     const resultRect = result instanceof HTMLElement ? result.getBoundingClientRect() : null;
     const childRect = childPopup instanceof HTMLElement ? childPopup.getBoundingClientRect() : null;
+    const markerMetrics = (node) => {
+      if (!(node instanceof HTMLElement)) return null;
+      const row = node.closest('[data-sc-class="probe-page-marker-row"]');
+      if (!(row instanceof HTMLElement)) return null;
+      const markerRect = node.getBoundingClientRect();
+      const rowRect = row.getBoundingClientRect();
+      return {
+        text: node.textContent?.trim() ?? "",
+        color: getComputedStyle(node).color,
+        background: getComputedStyle(node).backgroundColor,
+        height: markerRect.height,
+        centerDelta: Math.abs((markerRect.top + markerRect.bottom) / 2 - (rowRect.top + rowRect.bottom) / 2),
+        rowHeight: rowRect.height,
+      };
+    };
     return {
       text: document.body.textContent ?? "",
       navLabels: Array.from(document.querySelectorAll(".side-nav button .nav-copy span")).map((node) => node.textContent ?? ""),
@@ -84,6 +101,8 @@ async function metrics(page) {
       popupScaleControls: document.querySelectorAll('[aria-label="Popup scale"]').length,
       rootScale: rootContent instanceof HTMLElement ? getComputedStyle(rootContent).getPropertyValue("--popup-scale").trim() : "",
       rootExpressionFontSize: rootExpression instanceof HTMLElement ? Number.parseFloat(getComputedStyle(rootExpression).fontSize) : 0,
+      rootMarker: markerMetrics(rootMarker),
+      rootInlineMarker: markerMetrics(rootInlineMarker),
       childScale: childContent instanceof HTMLElement ? getComputedStyle(childContent).getPropertyValue("--popup-scale").trim() : "",
       childExpressionFontSize: childExpression instanceof HTMLElement ? Number.parseFloat(getComputedStyle(childExpression).fontSize) : 0,
     };
@@ -185,6 +204,9 @@ async function main() {
     assert(state.closeButtons === 0 && state.sasayakiButtons === 0, "Root frame should hide close and Sasayaki controls.", state);
     assert(state.rootHistoryButtons === 0, "Root frame should not expose a popup action bar.", state);
     assert(state.rootScale === "1.15" && Math.abs(state.rootExpressionFontSize - 29.9) < 0.2, "Root frame should use shared lookup popup scale.", state);
+    assert(state.rootMarker?.text === "1" && state.rootInlineMarker?.text === "2", "Dictionary page mode should render structured marker text.", state);
+    assert(state.rootMarker.color === "rgb(255, 255, 255)" && state.rootMarker.background !== "rgba(0, 0, 0, 0)", "Dictionary page mode should keep filled marker text visible.", state);
+    assert(state.rootMarker.centerDelta <= Math.max(4, state.rootMarker.rowHeight * 0.4) && state.rootInlineMarker.centerDelta <= Math.max(4, state.rootInlineMarker.rowHeight * 0.4), "Dictionary page mode should keep structured markers aligned inline.", state);
     assert(state.popupScaleControls === 0, "Dictionary Search should not expose a scale control.", state);
 
     await page.getByRole("button", { name: "Clear search" }).click();

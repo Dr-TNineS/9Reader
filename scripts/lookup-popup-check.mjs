@@ -575,6 +575,19 @@ async function scrollFirstMediaPlaceholderIntoView(page) {
   });
 }
 
+async function scrollMediaPlaceholdersIntoView(page, minimumLoaded = 1) {
+  const count = await page.locator(".lookup-glossary-content .gloss-media-placeholder").count();
+  for (let index = 0; index < count; index += 1) {
+    await page.locator(".lookup-glossary-content .gloss-media-placeholder").nth(index).evaluate((placeholder) => {
+      placeholder.scrollIntoView({ block: "center", inline: "nearest" });
+    });
+    await page.waitForTimeout(20);
+  }
+  await page.waitForFunction((minimum) => (
+    document.querySelectorAll(".lookup-glossary-content .gloss-media-placeholder[data-media-status='loaded']").length >= minimum
+  ), minimumLoaded);
+}
+
 async function main() {
   const vite = spawn(
     process.platform === "win32" ? "cmd.exe" : "npm",
@@ -618,10 +631,7 @@ async function main() {
       const target = document.querySelector(".lookup-glossary-content .gloss-sc-div");
       return target instanceof HTMLElement && getComputedStyle(target).color === "rgb(123, 210, 145)";
     });
-    await scrollFirstMediaPlaceholderIntoView(page);
-    await page.waitForFunction(() => (
-      document.querySelectorAll(".lookup-glossary-content .gloss-media-placeholder[data-media-status='loaded']").length >= 2
-    ));
+    await scrollMediaPlaceholdersIntoView(page, 6);
     const ready = await popupMetrics(page);
     assert(Math.abs(ready.popup.width - 320) <= 1 && Math.abs(ready.popup.height - 250) <= 1, "Default popup outer frame should be 320 x 250.", ready);
     assert(ready.text.includes("school"), "Ready popup should render expression.", ready);
