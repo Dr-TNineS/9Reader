@@ -109,6 +109,10 @@ export function createSettingsState(persistence: SettingsPersistence = browserSe
     updateReaderAppearance({ [field]: normalizeHexColor(color, readerAppearance[field]) });
   }
 
+  function updateReaderAppearanceSettings(update: Partial<ReaderAppearance>) {
+    updateReaderAppearance(update);
+  }
+
   function setReopenLastBookOnStartup(enabled: boolean) {
     advancedSettings = { ...advancedSettings, reopenLastBookOnStartup: enabled };
     persistence.saveAdvancedSettings(advancedSettings);
@@ -191,6 +195,7 @@ export function createSettingsState(persistence: SettingsPersistence = browserSe
     setReaderTheme,
     setReaderInterface,
     setReaderAppearanceColor,
+    updateReaderAppearanceSettings,
     setReopenLastBookOnStartup,
     updateAdvancedSettings,
     setLookupPopupWidth,

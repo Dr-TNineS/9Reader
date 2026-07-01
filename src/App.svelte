@@ -196,6 +196,15 @@
 
   let tocEntries = $derived(meta ? flattenToc(meta.toc, meta) : []);
   let chapterBookInfo = $derived(meta?.book_info.chapter_info[chapterIndex] ?? null);
+  let readerTitle = $derived(
+    tocEntries.find((entry) => entry.chapterIndex === chapterIndex)?.label ?? meta?.title ?? "",
+  );
+  let readerDisplayProgressText = $derived(readerProgressText());
+  let readerBottomProgressText = $derived(
+    settings.readerAppearance.alwaysShowProgress || settings.readerAppearance.showProgressTop
+      ? ""
+      : readerDisplayProgressText,
+  );
   let ankiTemplateOptions = $derived(ankiHandlebarOptions(dictionaryList.map((dictionary) => dictionary.title)));
   let readingStatisticsBottomText = $derived(
     settings.advancedSettings.enableReadingStatistics && readingStatisticsState
@@ -386,6 +395,19 @@
       (chapterInfo?.current_total ?? 0) +
       (chapterInfo?.chapter_count ?? 0) * clampUnit(progress),
     ));
+  }
+
+  function readerProgressText(): string {
+    const appearance = settings.readerAppearance;
+    const parts: string[] = [];
+    const current = currentReaderProgress?.bookReadChars ?? chapterBookInfo?.current_total ?? 0;
+    const total = meta?.book_info.character_count ?? 0;
+    if (appearance.showCharacters) parts.push(total > 0 ? `${current} / ${total}` : `${current}`);
+    if (appearance.showPercentage) {
+      const percent = total > 0 ? (current / total) * 100 : 0;
+      parts.push(`${percent.toFixed(2)}%`);
+    }
+    return parts.join(" ");
   }
 
   function currentReadingStatisticsCharacter(): number {
@@ -2880,6 +2902,7 @@
       onSetReaderTheme={settings.setReaderTheme}
       onSetReaderInterface={settings.setReaderInterface}
       onSetReaderAppearanceColor={settings.setReaderAppearanceColor}
+      onReaderAppearanceSettingsChange={settings.updateReaderAppearanceSettings}
       onSetReopenLastBookOnStartup={settings.setReopenLastBookOnStartup}
       onAdvancedSettingsChange={settings.updateAdvancedSettings}
       onSetGlobalLookupEnabled={setGlobalLookupEnabled}
@@ -2958,6 +2981,8 @@
       initialProgress={readerInitialProgress}
       chapterStartChars={chapterBookInfo?.current_total ?? 0}
       totalBookChars={meta?.book_info.character_count ?? 0}
+      {readerTitle}
+      readerAppearance={settings.readerAppearance}
       appearancePalette={settings.appearancePalette}
       lookupHighlightCount={readerLookupHighlightCount}
       lookupHighlightSignal={readerLookupHighlightSignal}
@@ -3031,6 +3056,8 @@
       statisticsTracking={readingStatisticsState?.isTracking ?? false}
       showStatisticsToggle={settings.advancedSettings.showReadingStatisticsToggle}
       statisticsText={readingStatisticsBottomText}
+      showReaderBackButton={settings.readerAppearance.showReaderBackButton}
+      bottomProgressText={readerBottomProgressText}
     />
     {#if sasayakiAudioSrc}
       <audio

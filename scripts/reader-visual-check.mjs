@@ -66,6 +66,9 @@ async function readerMetrics(page) {
     const totalPages = Math.max(1, Math.round(contentMaxScroll / pageSize) + 1);
     const blockImage = rct.querySelector("img.block-img");
     const blockImageRect = blockImage?.getBoundingClientRect();
+    const rubyAnnotation = rct.querySelector("rt");
+    const paragraph = rct.querySelector("p:not(.align-center)") ?? rct.querySelector("p");
+    const controlsText = document.querySelector(".ctrls")?.textContent ?? "";
 
     function visibleTextMinTop(scrollTop) {
       rv.scrollTop = scrollTop;
@@ -100,7 +103,19 @@ async function readerMetrics(page) {
       scrollLimit,
       paddingLeft: Number.parseFloat(style.paddingLeft),
       paddingRight: Number.parseFloat(style.paddingRight),
+      paddingTop: Number.parseFloat(style.paddingTop),
+      paddingBottom: Number.parseFloat(style.paddingBottom),
+      fontSize: Number.parseFloat(style.fontSize),
+      lineHeight: Number.parseFloat(style.lineHeight),
+      letterSpacing: Number.parseFloat(style.letterSpacing),
+      paragraphMarginBlockEnd: paragraph instanceof HTMLElement
+        ? getComputedStyle(paragraph).marginBlockEnd
+        : "",
       writingMode: style.writingMode,
+      textAlign: style.textAlign,
+      rubyDisplay: rubyAnnotation instanceof HTMLElement ? getComputedStyle(rubyAnnotation).display : "",
+      blockImageFilter: blockImage instanceof HTMLElement ? getComputedStyle(blockImage).filter : "",
+      controlsText,
       horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth,
       previousPageTop,
       lastPageTop,
@@ -747,8 +762,8 @@ async function main() {
 
     assert(desktop.writingMode === "vertical-rl", "Reader should use vertical writing mode.", desktop);
     assert(desktop.totalPages >= 4, "Reader fixture should produce multiple pages.", desktop);
-    assert(desktop.paddingLeft >= 39 && desktop.paddingLeft <= 73, "Left padding is outside baseline bounds.", desktop);
-    assert(desktop.paddingRight >= 39 && desktop.paddingRight <= 73, "Right padding is outside baseline bounds.", desktop);
+    assert(desktop.paddingLeft >= 70 && desktop.paddingLeft <= 105, "Left padding is outside HSA-aligned baseline bounds.", desktop);
+    assert(desktop.paddingRight >= 70 && desktop.paddingRight <= 105, "Right padding is outside HSA-aligned baseline bounds.", desktop);
     assert(desktop.scrollLimit + 1 >= desktop.contentMaxScroll, "Scroll tail should allow reaching aligned final page.", desktop);
     assert(desktop.blockImage && desktop.blockImage.height > 200, "Fixture cover image should render as a block image.", desktop);
     assert(
@@ -758,6 +773,39 @@ async function main() {
       "Last page text top should align with the previous page.",
       desktop,
     );
+
+    await page.goto(probeUrl({
+      fontSize: "30",
+      hideFurigana: "true",
+      horizontalPadding: "14",
+      verticalPadding: "8",
+      bottomSafeAreaDp: "40",
+      justifyText: "true",
+      blurImages: "true",
+      layoutAdvanced: "true",
+      lineHeight: "1.8",
+      characterSpacing: "4",
+      paragraphSpacing: "1.2",
+      alwaysShowProgress: "false",
+      showProgressTop: "false",
+      showReaderBackButton: "false",
+      statisticsControls: "1",
+    }));
+    const customizedReader = await readerMetrics(page);
+    assert(customizedReader.totalPages >= desktop.totalPages, "Customized reader layout should remain paginated.", { desktop, customizedReader });
+    assert(customizedReader.fontSize === 30, "Reader font size setting should apply to content.", customizedReader);
+    assert(customizedReader.lineHeight > 50, "Reader line-height setting should scale with font size.", customizedReader);
+    assert(customizedReader.paddingLeft > desktop.paddingLeft, "Horizontal padding setting should increase content inset.", { desktop, customizedReader });
+    assert(customizedReader.paddingTop > desktop.paddingTop, "Vertical padding setting should increase top inset.", { desktop, customizedReader });
+    assert(customizedReader.paddingBottom > desktop.paddingBottom, "Bottom safe area should increase bottom inset.", { desktop, customizedReader });
+    assert(customizedReader.rubyDisplay === "none", "Hide Furigana should hide ruby annotations.", customizedReader);
+    assert(customizedReader.textAlign === "justify", "Justify Text should apply to reader content.", customizedReader);
+    assert(customizedReader.paragraphMarginBlockEnd !== "0px", "Paragraph spacing should apply to normal reader paragraphs.", customizedReader);
+    assert(customizedReader.blockImageFilter.includes("blur"), "Blur Images should apply to block images.", customizedReader);
+    assert(customizedReader.controlsText.includes("100 / 200 50.00%"), "Bottom progress text should render when progress is configured for bottom chrome.", customizedReader);
+    assert(!customizedReader.controlsText.includes("Esc"), "Reader back button should hide when disabled.", customizedReader);
+
+    await page.goto(url);
 
     await page.reload();
     await page.locator(".rv.ready").waitFor({ timeout: 10000 });

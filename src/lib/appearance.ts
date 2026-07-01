@@ -1,5 +1,6 @@
 export type ReaderTheme = "light" | "dark" | "sepia" | "custom";
 export type ReaderInterfaceTheme = "system" | "light" | "dark";
+export type ReaderViewMode = "paginated" | "continuous" | "visualNovel";
 export type ReaderAppearanceColorField =
   | "customBackgroundColor"
   | "customTextColor"
@@ -19,6 +20,26 @@ export type ReaderAppearance = {
   sasayakiLightBackgroundColor: string;
   sasayakiDarkTextColor: string;
   sasayakiDarkBackgroundColor: string;
+  verticalWriting: boolean;
+  fontSize: number;
+  hideFurigana: boolean;
+  viewMode: ReaderViewMode;
+  horizontalPadding: number;
+  verticalPadding: number;
+  bottomSafeAreaDp: number;
+  avoidPageBreak: boolean;
+  justifyText: boolean;
+  blurImages: boolean;
+  layoutAdvanced: boolean;
+  lineHeight: number;
+  characterSpacing: number;
+  paragraphSpacing: number;
+  showTitle: boolean;
+  showCharacters: boolean;
+  showPercentage: boolean;
+  alwaysShowProgress: boolean;
+  showProgressTop: boolean;
+  showReaderBackButton: boolean;
 };
 
 export type ReaderAppearancePalette = {
@@ -46,6 +67,12 @@ export type ReaderAppearancePalette = {
 const APPEARANCE_KEY = "hoshi_reader_appearance";
 const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
 const SASAYAKI_BACKGROUND_ALPHA = 0.4;
+export const READER_FONT_SIZE = { min: 10, max: 60, step: 1 } as const;
+export const READER_LAYOUT_PADDING = { min: 0, max: 50, step: 1 } as const;
+export const READER_BOTTOM_SAFE_AREA = { min: 18, max: 72, step: 2 } as const;
+export const READER_LINE_HEIGHT = { min: 1, max: 2.5, step: 0.05 } as const;
+export const READER_CHARACTER_SPACING = { min: -10, max: 10, step: 1 } as const;
+export const READER_PARAGRAPH_SPACING = { min: 0, max: 3, step: 0.1 } as const;
 
 export const readerBodyFont = "\"Yu Mincho\", \"Hiragino Mincho Pro\", \"MS Mincho\", serif";
 
@@ -59,6 +86,26 @@ export const defaultReaderAppearance: ReaderAppearance = {
   sasayakiLightBackgroundColor: "#87ceeb",
   sasayakiDarkTextColor: "#ffffff",
   sasayakiDarkBackgroundColor: "#87ceeb",
+  verticalWriting: true,
+  fontSize: 22,
+  hideFurigana: false,
+  viewMode: "paginated",
+  horizontalPadding: 5,
+  verticalPadding: 0,
+  bottomSafeAreaDp: 18,
+  avoidPageBreak: false,
+  justifyText: false,
+  blurImages: false,
+  layoutAdvanced: false,
+  lineHeight: 1.65,
+  characterSpacing: 0,
+  paragraphSpacing: 0,
+  showTitle: true,
+  showCharacters: true,
+  showPercentage: true,
+  alwaysShowProgress: true,
+  showProgressTop: true,
+  showReaderBackButton: true,
 };
 
 export const readerThemeLabels: Record<ReaderTheme, string> = {
@@ -92,6 +139,23 @@ function isReaderInterfaceTheme(theme: unknown): theme is ReaderInterfaceTheme {
   return theme === "system" || theme === "light" || theme === "dark";
 }
 
+function normalizeBoolean(value: unknown, fallback: boolean): boolean {
+  return typeof value === "boolean" ? value : fallback;
+}
+
+function snapNumber(value: number, min: number, max: number, step: number): number {
+  const clamped = Math.min(max, Math.max(min, value));
+  const snapped = min + Math.round((clamped - min) / step) * step;
+  const decimals = Math.max(0, `${step}`.split(".")[1]?.length ?? 0);
+  return Number(Math.min(max, Math.max(min, snapped)).toFixed(decimals));
+}
+
+function normalizeNumber(value: unknown, fallback: number, min: number, max: number, step: number): number {
+  return typeof value === "number" && Number.isFinite(value)
+    ? snapNumber(value, min, max, step)
+    : fallback;
+}
+
 export function normalizeHexColor(value: unknown, fallback: string): string {
   return typeof value === "string" && HEX_COLOR_PATTERN.test(value)
     ? value.toLowerCase()
@@ -109,6 +173,26 @@ export function normalizeReaderAppearance(value: Partial<ReaderAppearance> = {})
     sasayakiLightBackgroundColor: normalizeHexColor(value.sasayakiLightBackgroundColor, defaultReaderAppearance.sasayakiLightBackgroundColor),
     sasayakiDarkTextColor: normalizeHexColor(value.sasayakiDarkTextColor, defaultReaderAppearance.sasayakiDarkTextColor),
     sasayakiDarkBackgroundColor: normalizeHexColor(value.sasayakiDarkBackgroundColor, defaultReaderAppearance.sasayakiDarkBackgroundColor),
+    verticalWriting: normalizeBoolean(value.verticalWriting, defaultReaderAppearance.verticalWriting),
+    fontSize: normalizeNumber(value.fontSize, defaultReaderAppearance.fontSize, READER_FONT_SIZE.min, READER_FONT_SIZE.max, READER_FONT_SIZE.step),
+    hideFurigana: normalizeBoolean(value.hideFurigana, defaultReaderAppearance.hideFurigana),
+    viewMode: value.viewMode === "paginated" ? value.viewMode : defaultReaderAppearance.viewMode,
+    horizontalPadding: normalizeNumber(value.horizontalPadding, defaultReaderAppearance.horizontalPadding, READER_LAYOUT_PADDING.min, READER_LAYOUT_PADDING.max, READER_LAYOUT_PADDING.step),
+    verticalPadding: normalizeNumber(value.verticalPadding, defaultReaderAppearance.verticalPadding, READER_LAYOUT_PADDING.min, READER_LAYOUT_PADDING.max, READER_LAYOUT_PADDING.step),
+    bottomSafeAreaDp: normalizeNumber(value.bottomSafeAreaDp, defaultReaderAppearance.bottomSafeAreaDp, READER_BOTTOM_SAFE_AREA.min, READER_BOTTOM_SAFE_AREA.max, READER_BOTTOM_SAFE_AREA.step),
+    avoidPageBreak: normalizeBoolean(value.avoidPageBreak, defaultReaderAppearance.avoidPageBreak),
+    justifyText: normalizeBoolean(value.justifyText, defaultReaderAppearance.justifyText),
+    blurImages: normalizeBoolean(value.blurImages, defaultReaderAppearance.blurImages),
+    layoutAdvanced: normalizeBoolean(value.layoutAdvanced, defaultReaderAppearance.layoutAdvanced),
+    lineHeight: normalizeNumber(value.lineHeight, defaultReaderAppearance.lineHeight, READER_LINE_HEIGHT.min, READER_LINE_HEIGHT.max, READER_LINE_HEIGHT.step),
+    characterSpacing: normalizeNumber(value.characterSpacing, defaultReaderAppearance.characterSpacing, READER_CHARACTER_SPACING.min, READER_CHARACTER_SPACING.max, READER_CHARACTER_SPACING.step),
+    paragraphSpacing: normalizeNumber(value.paragraphSpacing, defaultReaderAppearance.paragraphSpacing, READER_PARAGRAPH_SPACING.min, READER_PARAGRAPH_SPACING.max, READER_PARAGRAPH_SPACING.step),
+    showTitle: normalizeBoolean(value.showTitle, defaultReaderAppearance.showTitle),
+    showCharacters: normalizeBoolean(value.showCharacters, defaultReaderAppearance.showCharacters),
+    showPercentage: normalizeBoolean(value.showPercentage, defaultReaderAppearance.showPercentage),
+    alwaysShowProgress: normalizeBoolean(value.alwaysShowProgress, defaultReaderAppearance.alwaysShowProgress),
+    showProgressTop: normalizeBoolean(value.showProgressTop, defaultReaderAppearance.showProgressTop),
+    showReaderBackButton: normalizeBoolean(value.showReaderBackButton, defaultReaderAppearance.showReaderBackButton),
   };
 }
 

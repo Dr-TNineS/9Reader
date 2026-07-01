@@ -53,6 +53,7 @@
     onSetReaderTheme,
     onSetReaderInterface,
     onSetReaderAppearanceColor,
+    onReaderAppearanceSettingsChange,
     onSetReopenLastBookOnStartup,
     onAdvancedSettingsChange,
     onSetGlobalLookupEnabled,
@@ -130,6 +131,7 @@
     onSetReaderTheme: (theme: ReaderTheme) => void;
     onSetReaderInterface: (theme: ReaderInterfaceTheme) => void;
     onSetReaderAppearanceColor: (field: ReaderAppearanceColorField, color: string) => void;
+    onReaderAppearanceSettingsChange: (update: Partial<ReaderAppearance>) => void;
     onSetReopenLastBookOnStartup: (enabled: boolean) => void;
     onAdvancedSettingsChange: (update: Partial<AdvancedSettings>) => void;
     onSetGlobalLookupEnabled: (enabled: boolean) => void;
@@ -411,6 +413,7 @@
         onThemeChange={onSetReaderTheme}
         onInterfaceChange={onSetReaderInterface}
         onAppearanceColorChange={onSetReaderAppearanceColor}
+        onAppearanceSettingsChange={onReaderAppearanceSettingsChange}
         popupSettings={lookupPopupSettings}
         onPopupWidthChange={onSetLookupPopupWidth}
         onPopupHeightChange={onSetLookupPopupHeight}

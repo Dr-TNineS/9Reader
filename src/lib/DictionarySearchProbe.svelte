@@ -86,6 +86,7 @@
     onSetReaderTheme={() => {}}
     onSetReaderInterface={() => {}}
     onSetReaderAppearanceColor={() => {}}
+    onReaderAppearanceSettingsChange={() => {}}
     onSetReopenLastBookOnStartup={() => {}}
     onAdvancedSettingsChange={() => {}}
     onSetLookupPopupWidth={(width) => lookupPopupSettings = { ...lookupPopupSettings, width }}

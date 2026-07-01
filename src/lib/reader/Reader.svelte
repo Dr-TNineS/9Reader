@@ -1,7 +1,7 @@
 ﻿<script lang="ts">
   import { untrack } from "svelte";
   import { countChars, createWalker, getTotalChars, isVertical, rawOffsetForReaderChars, readerCharOffsetForRange, readerRangeForOffsets, textEndOffsets } from "../reader";
-  import type { ReaderAppearancePalette } from "../appearance";
+  import { defaultReaderAppearance, normalizeReaderAppearance, type ReaderAppearance, type ReaderAppearancePalette } from "../appearance";
   import {
     defaultKeyboardShortcutBindings,
     defaultKeyboardShortcutSettings,
@@ -28,6 +28,8 @@
     initialProgress = 0,
     chapterStartChars = 0,
     totalBookChars = 0,
+    readerTitle = "",
+    readerAppearance = defaultReaderAppearance as ReaderAppearance,
     appearancePalette = undefined as ReaderAppearancePalette | undefined,
     lookupHighlightCount = 0,
     lookupHighlightSignal = 0,
@@ -93,15 +95,57 @@
   let layoutRun = 0;
   let resizeRun = 0;
   let contentMaxScroll = 0;
+  let activeLayoutKey = "";
   let lookupHighlightRects = $state<OverlayRect[]>([]);
   let lookupHighlightText = $state("");
   let sasayakiHighlightRects = $state<OverlayRect[]>([]);
   let sasayakiHighlightText = $state("");
 
+  let normalizedAppearance = $derived(normalizeReaderAppearance(readerAppearance));
+  let progressText = $derived(readerProgressText());
+  let topProgressText = $derived(progressText && (normalizedAppearance.alwaysShowProgress || normalizedAppearance.showProgressTop) ? progressText : "");
   let styleVars = $derived(`--page-width:${pageWidth}px;--page-height:${pageHeight}px`);
+  let readerStyleVars = $derived([
+    styleVars,
+    `--reader-font-size:${normalizedAppearance.fontSize}px`,
+    `--reader-line-height:${normalizedAppearance.lineHeight}`,
+    `--reader-horizontal-padding:${normalizedAppearance.horizontalPadding}vw`,
+    `--reader-vertical-padding:${normalizedAppearance.verticalPadding}vh`,
+    `--reader-bottom-safe-area:${normalizedAppearance.bottomSafeAreaDp}px`,
+    `--reader-character-spacing:${normalizedAppearance.characterSpacing / 100}em`,
+    `--reader-paragraph-spacing:${normalizedAppearance.paragraphSpacing}em`,
+  ].join(";"));
   let themeVars = $derived(appearancePalette
     ? `--reader-bg:${appearancePalette.readerBackground};--reader-text:${appearancePalette.readerText};--reader-info:${appearancePalette.readerInfo};--lookup-highlight-color:${appearancePalette.lookupHighlight};--sasayaki-highlight-text:${appearancePalette.sasayakiHighlightText};--sasayaki-highlight-background:${appearancePalette.sasayakiHighlightBackground};--app-border:${appearancePalette.appBorder}`
     : "");
+
+  function readerProgressText(): string {
+    const parts: string[] = [];
+    const total = totalBookChars || charCount;
+    if (normalizedAppearance.showCharacters) {
+      parts.push(total > 0 ? `${bookReadChars} / ${total}` : `${bookReadChars}`);
+    }
+    if (normalizedAppearance.showPercentage) {
+      parts.push(`${bookPercent.toFixed(2)}%`);
+    }
+    return parts.join(" ");
+  }
+
+  function appearanceLayoutKey(): string {
+    return [
+      normalizedAppearance.fontSize,
+      normalizedAppearance.hideFurigana,
+      normalizedAppearance.horizontalPadding,
+      normalizedAppearance.verticalPadding,
+      normalizedAppearance.bottomSafeAreaDp,
+      normalizedAppearance.avoidPageBreak,
+      normalizedAppearance.justifyText,
+      normalizedAppearance.blurImages,
+      normalizedAppearance.lineHeight,
+      normalizedAppearance.characterSpacing,
+      normalizedAppearance.paragraphSpacing,
+    ].join(":");
+  }
 
   function readerDebugEnabled(): boolean {
     return typeof localStorage !== "undefined" && localStorage.getItem("hoshi_reader_debug") === "1";
@@ -259,15 +303,17 @@
     if (!layoutReady || !contentEl) return;
     const chapterReadChars = Math.max(0, Math.min(charCount, chapterCharsBeforeViewport()));
     const total = Math.max(0, totalBookChars || 0);
-    bookReadChars = Math.max(0, Math.min(total || chapterStartChars + charCount, chapterStartChars + chapterReadChars));
-    bookPercent = total > 0 ? (bookReadChars / total) * 100 : 0;
+    const nextBookReadChars = Math.max(0, Math.min(total || chapterStartChars + charCount, chapterStartChars + chapterReadChars));
+    const nextBookPercent = total > 0 ? (nextBookReadChars / total) * 100 : 0;
+    bookReadChars = nextBookReadChars;
+    bookPercent = nextBookPercent;
     onProgressChange({
       chapterIndex,
       chapterProgress: charCount > 0 ? chapterReadChars / charCount : 0,
       chapterReadChars,
-      bookReadChars,
+      bookReadChars: nextBookReadChars,
       totalBookChars: total,
-      percent: bookPercent,
+      percent: nextBookPercent,
     });
   }
 
@@ -1328,8 +1374,10 @@
   }
 
   $effect.pre(() => {
-    if (content !== activeContent) {
+    const layoutKey = appearanceLayoutKey();
+    if (content !== activeContent || layoutKey !== activeLayoutKey) {
       activeContent = content;
+      activeLayoutKey = layoutKey;
       layoutReady = false;
       initializing = true;
       scrollTailTop = 0;
@@ -1430,14 +1478,27 @@
 <svelte:window onkeydown={handleKey} onkeyup={handleKeyUp} onblur={handleWindowBlur} />
 
 <div class="rc" style={themeVars}>
-  <div class="rh">
-    <span>
-      {bookReadChars}/{totalBookChars || charCount}c | {bookPercent.toFixed(2)}%
-    </span>
-  </div>
+  {#if (normalizedAppearance.showTitle && readerTitle) || topProgressText}
+    <div class="rh" data-progress-position={normalizedAppearance.showProgressTop ? "top" : "bottom"}>
+      {#if normalizedAppearance.showTitle && readerTitle}
+        <span class="reader-title">{readerTitle}</span>
+      {/if}
+      {#if topProgressText}
+        <span class="reader-progress">{topProgressText}</span>
+      {/if}
+    </div>
+  {/if}
 
   <div bind:this={containerEl} class="rv" class:ready={layoutReady} onscroll={onScroll}>
-    <div bind:this={contentEl} class="rct" style={styleVars}>
+    <div
+      bind:this={contentEl}
+      class="rct"
+      class:hide-furigana={normalizedAppearance.hideFurigana}
+      class:avoid-page-break={normalizedAppearance.avoidPageBreak}
+      class:justify-text={normalizedAppearance.justifyText}
+      class:blur-images={normalizedAppearance.blurImages}
+      style={readerStyleVars}
+    >
       {@html content}
     </div>
     {#if scrollTailTop > 0}
@@ -1478,6 +1539,8 @@
   .rh {
     display: flex;
     align-items: center;
+    justify-content: center;
+    gap: 12px;
     padding: 3px 10px;
     font-size: 10px;
     color: var(--reader-info, #999999);
@@ -1485,6 +1548,22 @@
     border-bottom: 1px solid var(--app-border, #333333);
     flex-shrink: 0;
     user-select: none;
+  }
+
+  .reader-title,
+  .reader-progress {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .reader-title {
+    max-width: min(52vw, 520px);
+  }
+
+  .reader-progress {
+    font-variant-numeric: tabular-nums;
   }
 
   .rv {
@@ -1538,12 +1617,10 @@
   }
 
   .rct {
-    --font-size: 22px;
-    --line-height: 1.65;
-    --safe-top: clamp(24px, 3.4vh, 42px);
-    --safe-bottom: clamp(32px, 5.2vh, 64px);
-    --safe-left: clamp(40px, 2.5vw, 72px);
-    --safe-right: clamp(40px, 2.5vw, 72px);
+    --safe-top: calc(clamp(24px, 3.4vh, 42px) + var(--reader-vertical-padding, 0vh) / 2);
+    --safe-bottom: calc(clamp(32px, 5.2vh, 64px) + var(--reader-vertical-padding, 0vh) / 2 + var(--reader-bottom-safe-area, 18px));
+    --safe-left: calc(clamp(40px, 2.5vw, 72px) + var(--reader-horizontal-padding, 5vw) / 2);
+    --safe-right: calc(clamp(40px, 2.5vw, 72px) + var(--reader-horizontal-padding, 5vw) / 2);
     --content-height: max(1px, calc(var(--page-height, 100vh) - var(--safe-top) - var(--safe-bottom)));
     --column-gap: calc(var(--safe-top) + var(--safe-bottom));
 
@@ -1563,11 +1640,16 @@
     overflow-wrap: anywhere;
     word-break: normal;
     font-family: var(--reader-body-font, "Yu Mincho", "Hiragino Mincho Pro", "MS Mincho", serif);
-    font-size: var(--font-size);
-    line-height: var(--line-height);
+    font-size: var(--reader-font-size, 22px);
+    line-height: var(--reader-line-height, 1.65);
+    letter-spacing: var(--reader-character-spacing, 0em);
     text-indent: 0;
     background: var(--reader-bg, #000);
     color: var(--reader-text, #fff);
+  }
+
+  .rct.justify-text {
+    text-align: justify;
   }
 
   .rct :global(*) {
@@ -1592,6 +1674,10 @@
   .rct :global(a) {
     color: inherit;
     text-decoration: none;
+  }
+
+  .rct :global(p) {
+    margin-block-end: var(--reader-paragraph-spacing, 0em);
   }
 
   .rct :global(.align-center) {
@@ -1712,6 +1798,10 @@
     object-fit: contain;
   }
 
+  .rct.blur-images :global(img:not(.gaiji):not(.gaiji-line)) {
+    filter: blur(6px);
+  }
+
   .rct :global(img.gaiji) {
     display: inline-block;
     width: 1em;
@@ -1766,12 +1856,23 @@
     -webkit-column-break-inside: avoid !important;
   }
 
+  .rct.avoid-page-break :global(p),
+  .rct.avoid-page-break :global(li) {
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+  }
+
   .rct :global(ruby) {
     ruby-align: center;
   }
 
   .rct :global(rt) {
     font-size: 0.5em;
+  }
+
+  .rct.hide-furigana :global(rt),
+  .rct.hide-furigana :global(rp) {
+    display: none;
   }
 
 </style>

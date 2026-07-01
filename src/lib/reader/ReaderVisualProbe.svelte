@@ -36,7 +36,14 @@
   const readerInterface = interfaceParam === "system" || interfaceParam === "light" || interfaceParam === "dark"
     ? interfaceParam
     : defaultReaderAppearance.interface;
-  const appearancePalette = readerAppearancePalette(normalizeReaderAppearance({
+
+  function numberParam(name: string, fallback: number): number {
+    if (!params.has(name)) return fallback;
+    const value = Number(params.get(name));
+    return Number.isFinite(value) ? value : fallback;
+  }
+
+  const readerAppearance = normalizeReaderAppearance({
     ...defaultReaderAppearance,
     theme,
     interface: readerInterface,
@@ -47,7 +54,26 @@
     sasayakiLightBackgroundColor: params.get("sasayakiLightBackgroundColor") ?? defaultReaderAppearance.sasayakiLightBackgroundColor,
     sasayakiDarkTextColor: params.get("sasayakiDarkTextColor") ?? defaultReaderAppearance.sasayakiDarkTextColor,
     sasayakiDarkBackgroundColor: params.get("sasayakiDarkBackgroundColor") ?? defaultReaderAppearance.sasayakiDarkBackgroundColor,
-  }), params.get("systemDark") === "true");
+    fontSize: numberParam("fontSize", defaultReaderAppearance.fontSize),
+    hideFurigana: params.get("hideFurigana") === "true",
+    horizontalPadding: numberParam("horizontalPadding", defaultReaderAppearance.horizontalPadding),
+    verticalPadding: numberParam("verticalPadding", defaultReaderAppearance.verticalPadding),
+    bottomSafeAreaDp: numberParam("bottomSafeAreaDp", defaultReaderAppearance.bottomSafeAreaDp),
+    avoidPageBreak: params.get("avoidPageBreak") === "true",
+    justifyText: params.get("justifyText") === "true",
+    blurImages: params.get("blurImages") === "true",
+    layoutAdvanced: params.get("layoutAdvanced") === "true",
+    lineHeight: numberParam("lineHeight", defaultReaderAppearance.lineHeight),
+    characterSpacing: numberParam("characterSpacing", defaultReaderAppearance.characterSpacing),
+    paragraphSpacing: numberParam("paragraphSpacing", defaultReaderAppearance.paragraphSpacing),
+    showTitle: params.get("showTitle") !== "false",
+    showCharacters: params.get("showCharacters") !== "false",
+    showPercentage: params.get("showPercentage") !== "false",
+    alwaysShowProgress: params.get("alwaysShowProgress") !== "false",
+    showProgressTop: params.get("showProgressTop") !== "false",
+    showReaderBackButton: params.get("showReaderBackButton") !== "false",
+  });
+  const appearancePalette = readerAppearancePalette(readerAppearance, params.get("systemDark") === "true");
 
   const imageSvg = encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" width="360" height="520" viewBox="0 0 360 520">
@@ -273,6 +299,8 @@
   chapterStartChars={chapters[chapterIndex].startChars}
   {totalBookChars}
   {startAtEnd}
+  readerTitle={`Probe Chapter ${chapterIndex + 1}`}
+  {readerAppearance}
   {appearancePalette}
   onNextChapter={nextChapter}
   onPrevChapter={previousChapterAtEnd}
@@ -302,6 +330,8 @@
     statisticsTracking={statisticsTracking}
     showStatisticsToggle={true}
     {statisticsText}
+    showReaderBackButton={readerAppearance.showReaderBackButton}
+    bottomProgressText={!readerAppearance.alwaysShowProgress && !readerAppearance.showProgressTop ? "100 / 200 50.00%" : ""}
   />
   {#if statisticsOpen}
     <ReaderStatisticsPanel
@@ -335,6 +365,7 @@
   data-sentence-offset={lastSelection?.sentenceOffset ?? -1}
   data-selection-count={selectionCount}
   data-back-events={backEvents}
+  data-show-reader-back-button={readerAppearance.showReaderBackButton}
   data-anchor-x={lastSelection?.anchorRect?.x ?? lastSelection?.rect.x ?? -1}
   data-anchor-y={lastSelection?.anchorRect?.y ?? lastSelection?.rect.y ?? -1}
 >

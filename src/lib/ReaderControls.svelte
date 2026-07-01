@@ -15,6 +15,8 @@
     statisticsTracking = false,
     showStatisticsToggle = false,
     statisticsText = "",
+    showReaderBackButton = true,
+    bottomProgressText = "",
   }: {
     onPrevChapter: () => void;
     onNextChapter: () => void;
@@ -31,6 +33,8 @@
     statisticsTracking?: boolean;
     showStatisticsToggle?: boolean;
     statisticsText?: string;
+    showReaderBackButton?: boolean;
+    bottomProgressText?: string;
   } = $props();
 </script>
 
@@ -69,7 +73,12 @@
       <span class="statistics-text">{statisticsText}</span>
     {/if}
   {/if}
-  <button onclick={onBackToShelf}>Esc</button>
+  {#if bottomProgressText}
+    <span class="progress-text">{bottomProgressText}</span>
+  {/if}
+  {#if showReaderBackButton}
+    <button onclick={onBackToShelf}>Esc</button>
+  {/if}
 </div>
 
 <style>
@@ -77,10 +86,10 @@
   .ctrls button { padding: 4px 10px; background: var(--app-control); color: var(--app-text); border: 1px solid var(--app-border); border-radius: 3px; cursor: pointer; font-size: 12px; }
   .ctrls button:hover { background: var(--app-control-hover); }
   .ctrls button.available { border-color: var(--app-primary); }
-  .statistics-text { max-width: min(34vw, 260px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--app-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .statistics-text, .progress-text { max-width: min(34vw, 260px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--app-muted); font-size: 12px; font-variant-numeric: tabular-nums; }
   @media (max-width: 560px) {
     .ctrls { justify-content: flex-start; overflow-x: auto; }
     .ctrls button { flex: 0 0 auto; }
-    .statistics-text { flex: 0 0 auto; max-width: 180px; }
+    .statistics-text, .progress-text { flex: 0 0 auto; max-width: 180px; }
   }
 </style>

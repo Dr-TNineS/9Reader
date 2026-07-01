@@ -20,6 +20,21 @@
       interface: "light",
       customBackgroundColor: "invalid",
       customTextColor: "#ABCDEF",
+      fontSize: 999,
+      hideFurigana: true,
+      viewMode: "continuous",
+      horizontalPadding: -10,
+      verticalPadding: 99,
+      bottomSafeAreaDp: 19,
+      lineHeight: 9,
+      characterSpacing: -99,
+      paragraphSpacing: 9,
+      showTitle: false,
+      showCharacters: false,
+      showPercentage: false,
+      alwaysShowProgress: false,
+      showProgressTop: false,
+      showReaderBackButton: false,
     }),
     saveReaderAppearance: (appearance) => savedAppearances = [...savedAppearances, appearance],
     loadAdvancedSettings: () => ({
@@ -47,6 +62,7 @@
     onThemeChange={settings.setReaderTheme}
     onInterfaceChange={settings.setReaderInterface}
     onAppearanceColorChange={settings.setReaderAppearanceColor}
+    onAppearanceSettingsChange={settings.updateReaderAppearanceSettings}
     popupSettings={settings.lookupPopupSettings}
     onPopupWidthChange={settings.setLookupPopupWidth}
     onPopupHeightChange={settings.setLookupPopupHeight}
@@ -79,6 +95,26 @@
     data-sasayaki-light-background={settings.readerAppearance.sasayakiLightBackgroundColor}
     data-sasayaki-dark-text={settings.readerAppearance.sasayakiDarkTextColor}
     data-sasayaki-dark-background={settings.readerAppearance.sasayakiDarkBackgroundColor}
+    data-vertical-writing={settings.readerAppearance.verticalWriting}
+    data-font-size={settings.readerAppearance.fontSize}
+    data-hide-furigana={settings.readerAppearance.hideFurigana}
+    data-view-mode={settings.readerAppearance.viewMode}
+    data-horizontal-padding={settings.readerAppearance.horizontalPadding}
+    data-vertical-padding={settings.readerAppearance.verticalPadding}
+    data-bottom-safe-area={settings.readerAppearance.bottomSafeAreaDp}
+    data-avoid-page-break={settings.readerAppearance.avoidPageBreak}
+    data-justify-text={settings.readerAppearance.justifyText}
+    data-blur-images={settings.readerAppearance.blurImages}
+    data-layout-advanced={settings.readerAppearance.layoutAdvanced}
+    data-line-height={settings.readerAppearance.lineHeight}
+    data-character-spacing={settings.readerAppearance.characterSpacing}
+    data-paragraph-spacing={settings.readerAppearance.paragraphSpacing}
+    data-show-title={settings.readerAppearance.showTitle}
+    data-show-characters={settings.readerAppearance.showCharacters}
+    data-show-percentage={settings.readerAppearance.showPercentage}
+    data-always-show-progress={settings.readerAppearance.alwaysShowProgress}
+    data-show-progress-top={settings.readerAppearance.showProgressTop}
+    data-show-reader-back-button={settings.readerAppearance.showReaderBackButton}
     data-reopen={settings.advancedSettings.reopenLastBookOnStartup}
     data-statistics-enabled={settings.advancedSettings.enableReadingStatistics}
     data-statistics-autostart={settings.advancedSettings.readingStatisticsAutostartMode}

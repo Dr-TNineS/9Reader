@@ -117,6 +117,7 @@
     onSetReaderTheme={() => {}}
     onSetReaderInterface={() => {}}
     onSetReaderAppearanceColor={() => {}}
+    onReaderAppearanceSettingsChange={() => {}}
     onSetReopenLastBookOnStartup={() => {}}
     onAdvancedSettingsChange={() => {}}
     onSetGlobalLookupEnabled={() => {}}

@@ -51,6 +51,26 @@ async function state(page) {
     sasayakiLightBackground: element.getAttribute("data-sasayaki-light-background"),
     sasayakiDarkText: element.getAttribute("data-sasayaki-dark-text"),
     sasayakiDarkBackground: element.getAttribute("data-sasayaki-dark-background"),
+    verticalWriting: element.getAttribute("data-vertical-writing"),
+    fontSize: Number(element.getAttribute("data-font-size")),
+    hideFurigana: element.getAttribute("data-hide-furigana"),
+    viewMode: element.getAttribute("data-view-mode"),
+    horizontalPadding: Number(element.getAttribute("data-horizontal-padding")),
+    verticalPadding: Number(element.getAttribute("data-vertical-padding")),
+    bottomSafeArea: Number(element.getAttribute("data-bottom-safe-area")),
+    avoidPageBreak: element.getAttribute("data-avoid-page-break"),
+    justifyText: element.getAttribute("data-justify-text"),
+    blurImages: element.getAttribute("data-blur-images"),
+    layoutAdvanced: element.getAttribute("data-layout-advanced"),
+    lineHeight: Number(element.getAttribute("data-line-height")),
+    characterSpacing: Number(element.getAttribute("data-character-spacing")),
+    paragraphSpacing: Number(element.getAttribute("data-paragraph-spacing")),
+    showTitle: element.getAttribute("data-show-title"),
+    showCharacters: element.getAttribute("data-show-characters"),
+    showPercentage: element.getAttribute("data-show-percentage"),
+    alwaysShowProgress: element.getAttribute("data-always-show-progress"),
+    showProgressTop: element.getAttribute("data-show-progress-top"),
+    showReaderBackButton: element.getAttribute("data-show-reader-back-button"),
     reopen: element.getAttribute("data-reopen"),
     statisticsEnabled: element.getAttribute("data-statistics-enabled"),
     statisticsAutostart: element.getAttribute("data-statistics-autostart"),
@@ -109,6 +129,37 @@ async function main() {
     assert(current.customBackground === "#ffffff", "Invalid loaded custom background should fall back safely.", current);
     assert(current.customText === "#abcdef", "Loaded custom text color should normalize to lowercase.", current);
     assert(current.sasayakiLightBackground === "#87ceeb" && current.sasayakiDarkText === "#ffffff", "Missing Sasayaki colors should use HSA defaults.", current);
+    assert(
+      current.verticalWriting === "true" &&
+        current.fontSize === 60 &&
+        current.hideFurigana === "true" &&
+        current.viewMode === "paginated" &&
+        current.horizontalPadding === 0 &&
+        current.verticalPadding === 50 &&
+        current.bottomSafeArea === 20 &&
+        current.lineHeight === 2.5 &&
+        current.characterSpacing === -10 &&
+        current.paragraphSpacing === 3,
+      "Reader text/layout settings should normalize HSA-aligned defaults and bounds while keeping unimplemented modes paginated.",
+      current,
+    );
+    assert(
+      current.showTitle === "false" &&
+        current.showCharacters === "false" &&
+        current.showPercentage === "false" &&
+        current.alwaysShowProgress === "false" &&
+        current.showProgressTop === "false" &&
+        current.showReaderBackButton === "false",
+      "Reader display settings should preserve loaded booleans.",
+      current,
+    );
+    assert(await page.getByLabel("Text settings").count() === 1, "Text settings section should render.");
+    assert(await page.getByLabel("Layout settings").count() === 1, "Layout settings section should render.");
+    assert(await page.getByLabel("Display settings").count() === 1, "Display settings section should render.");
+    assert(await page.getByRole("radio", { name: "Horizontal 未实现", exact: true }).isDisabled(), "Horizontal placeholder should be disabled.");
+    assert(await page.getByRole("radio", { name: "Continuous 未实现", exact: true }).isDisabled(), "Continuous placeholder should be disabled.");
+    assert(await page.getByRole("radio", { name: "VN 未实现", exact: true }).isDisabled(), "VN placeholder should be disabled.");
+    assert(await page.getByRole("button", { name: /未实现/ }).first().isDisabled(), "Unimplemented placeholder controls should be disabled.");
     assert(current.savedAdvanced === "", "Controller should not rewrite Advanced settings during startup.", current);
     assert(current.popupWidth === 320 && current.popupHeight === 250 && current.popupScale === 1, "Controller should expose loaded popup settings.", current);
     assert(current.savedPopup.length === 0, "Controller should not rewrite popup settings during startup.", current);
@@ -213,6 +264,77 @@ async function main() {
     await darkTheme.click();
     current = await state(page);
     assert(current.savedAppearances === "dark,sepia,light,custom,custom,custom,custom,custom,custom,custom,dark", "Repeated theme and custom changes should persist in order.", current);
+
+    await page.getByLabel("Font size", { exact: true }).evaluate((input) => {
+      input.value = "21";
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    await page.getByLabel("Hide furigana", { exact: true }).setChecked(false);
+    await page.getByLabel("Horizontal padding", { exact: true }).evaluate((input) => {
+      input.value = "12";
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    await page.getByLabel("Vertical padding", { exact: true }).evaluate((input) => {
+      input.value = "8";
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    await page.getByLabel("Bottom safe area", { exact: true }).evaluate((input) => {
+      input.value = "32";
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    await page.getByLabel("Justify text", { exact: true }).setChecked(true);
+    await page.getByLabel("Blur images", { exact: true }).setChecked(true);
+    await page.getByLabel("Advanced layout", { exact: true }).setChecked(true);
+    await page.getByLabel("Line height", { exact: true }).evaluate((input) => {
+      input.value = "1.75";
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    await page.getByLabel("Character spacing", { exact: true }).evaluate((input) => {
+      input.value = "4";
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    await page.getByLabel("Paragraph spacing", { exact: true }).evaluate((input) => {
+      input.value = "1.2";
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    await page.getByLabel("Show title", { exact: true }).setChecked(true);
+    await page.getByLabel("Show character count", { exact: true }).setChecked(true);
+    await page.getByLabel("Show percentage", { exact: true }).setChecked(true);
+    await page.getByLabel("Always show progress", { exact: true }).setChecked(false);
+    await page.getByRole("radio", { name: "Bottom", exact: true }).click();
+    await page.getByLabel("Show back button", { exact: true }).setChecked(true);
+    current = await state(page);
+    assert(
+      current.fontSize === 21 &&
+        current.hideFurigana === "false" &&
+        current.horizontalPadding === 12 &&
+        current.verticalPadding === 8 &&
+        current.bottomSafeArea === 32 &&
+        current.justifyText === "true" &&
+        current.blurImages === "true" &&
+        current.layoutAdvanced === "true" &&
+        current.lineHeight === 1.75 &&
+        current.characterSpacing === 4 &&
+        current.paragraphSpacing === 1.2,
+      "Reader text/layout controls should update and normalize state.",
+      current,
+    );
+    assert(
+      current.showTitle === "true" &&
+        current.showCharacters === "true" &&
+        current.showPercentage === "true" &&
+        current.alwaysShowProgress === "false" &&
+        current.showProgressTop === "false" &&
+        current.showReaderBackButton === "true",
+      "Reader display controls should update state.",
+      current,
+    );
+    assert(
+      current.savedAppearanceJson.at(-1)?.showReaderBackButton === true &&
+        current.savedAppearanceJson.at(-1)?.paragraphSpacing === 1.2,
+      "Reader appearance setting changes should persist through the shared controller.",
+      current,
+    );
 
     await page.getByLabel("Popup width").evaluate((input) => {
       input.value = "684";
