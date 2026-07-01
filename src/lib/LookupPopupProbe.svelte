@@ -117,6 +117,23 @@
         },
         {
           tag: "div",
+          data: { class: "probe-numeric-marker-row" },
+          content: [
+            { tag: "span", data: { rect: "", fill: "" }, content: "1" },
+            " main numeric marker",
+          ],
+        },
+        {
+          tag: "div",
+          data: { class: "probe-inline-numeric-marker-row" },
+          content: [
+            "inline ",
+            { tag: "span", data: { rect: "", fill: "", small: "" }, content: "1" },
+            " numeric marker",
+          ],
+        },
+        {
+          tag: "div",
           data: { class: "probe-cjk-hooks" },
           content: [
             { tag: "span", data: { "\u5916\u5b57": "", "\u5de6\u4e38": "" }, content: "\u53c2\u8003" },
@@ -161,6 +178,7 @@
           ],
         },
         { tag: "img", path: "images/school.svg", alt: "school icon" },
+        { tag: "div", data: { class: "probe-media-caption", mCaption: "" }, content: "school icon caption" },
         mk3Gaiji("gaiji/bs\u4e00.svg", "black square one"),
         mk3Gaiji("gaiji/ws\u4e00.svg", "white square one"),
         mk3Gaiji("gaiji/bs\u4e8c.svg", "black square two"),

@@ -188,14 +188,15 @@ function renderStructuredContent(
 
   const explicitLanguage = typeof record.lang === "string" ? normalizedLanguage(record.lang) : null;
   const nextLanguage = explicitLanguage ?? language;
+  const rawContent = typeof record.content !== "undefined" ? record.content : record.text;
   const content = renderStructuredContent(
-    typeof record.content !== "undefined" ? record.content : record.text,
+    rawContent,
     safeTag,
     dictionary,
     options,
     nextLanguage,
   );
-  const attributes = structuredAttributes(record, safeTag);
+  const attributes = structuredAttributes(record, safeTag, rawContent, parentTag);
   const html = `<${safeTag}${attributes}>${content}</${safeTag}>`;
   if (safeTag === "table") return `<div class="gloss-sc-table-container">${html}</div>`;
   return html;
@@ -249,8 +250,8 @@ function safeStructuredTag(tag: string): string {
   return allowed.has(tag) ? tag : "span";
 }
 
-function structuredAttributes(record: Record<string, unknown>, tag: string): string {
-  const classes = [`gloss-sc-${tag}`];
+function structuredAttributes(record: Record<string, unknown>, tag: string, content: unknown = undefined, parentTag = ""): string {
+  const classes = [`gloss-sc-${tag}`, ...structuredPresentationClasses(record, tag, content, parentTag)];
   const attrs = [`class="${classes.join(" ")}"`];
   if (tag === "a") {
     const href = typeof record.href === "string" ? record.href : "";
@@ -275,6 +276,41 @@ function structuredAttributes(record: Record<string, unknown>, tag: string): str
   if (style) attrs.push(`style="${escapeAttribute(style)}"`);
 
   return attrs.length ? ` ${attrs.join(" ")}` : "";
+}
+
+function structuredPresentationClasses(record: Record<string, unknown>, tag: string, content: unknown, parentTag: string): string[] {
+  const classes: string[] = [];
+  if (tag === "span" && isStructuredNumericMarker(record, content)) {
+    classes.push("gloss-numeric-marker");
+    classes.push(isInlineStructuredNumericMarker(record, parentTag) ? "gloss-numeric-marker-inline" : "gloss-numeric-marker-main");
+  }
+  if (isStructuredMediaCaption(record)) classes.push("gloss-media-caption");
+  return classes;
+}
+
+function isStructuredNumericMarker(record: Record<string, unknown>, content: unknown): boolean {
+  const keys = structuredDataKeySet(record);
+  if (!keys.has("rect") && !(keys.has("外字") && (keys.has("左丸") || keys.has("全丸")))) return false;
+  return /^[0-9０-９一二三四五六七八九十]+$/u.test(structuredPlainText(content).trim());
+}
+
+function isInlineStructuredNumericMarker(record: Record<string, unknown>, parentTag: string): boolean {
+  const keys = structuredDataKeySet(record);
+  return keys.has("small") || parentTag === "span";
+}
+
+function isStructuredMediaCaption(record: Record<string, unknown>): boolean {
+  return structuredDataKeySet(record).has("m-caption");
+}
+
+function structuredDataKeySet(record: Record<string, unknown>): Set<string> {
+  const keys = new Set<string>();
+  const data = record.data;
+  if (!data || typeof data !== "object") return keys;
+  for (const key of Object.keys(data as Record<string, unknown>)) {
+    keys.add(toStructuredDataKey(key));
+  }
+  return keys;
 }
 
 function structuredStyleAttribute(record: Record<string, unknown>): string {

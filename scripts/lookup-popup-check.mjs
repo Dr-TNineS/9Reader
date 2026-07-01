@@ -127,6 +127,12 @@ async function popupMetrics(page) {
     const dictionaryFont = document.querySelector('.lookup-glossary-content [data-sc-class="probe-dict-font"]');
     const cjkBadge = document.querySelector(".lookup-glossary-content [data-sc\u5916\u5b57][data-sc\u5de6\u4e38]");
     const cjkPartOfSpeech = document.querySelector(".lookup-glossary-content [data-sc\u54c1\u8a5e][data-sc\u6d3b\u7528]");
+    const numericMarkerMain = document.querySelector(".lookup-glossary-content .gloss-numeric-marker-main");
+    const numericMarkerInline = document.querySelector(".lookup-glossary-content .gloss-numeric-marker-inline");
+    const mediaCaption = document.querySelector(".lookup-glossary-content .gloss-media-caption");
+    const redirectLink = document.querySelector(".lookup-glossary-content a[data-lookup-redirect]");
+    const loadedMediaPlaceholder = Array.from(document.querySelectorAll(".lookup-glossary-content .gloss-media-placeholder[data-media-status='loaded']"))
+      .find((node) => node instanceof HTMLElement && !node.closest('[data-sc-img][data-sc-class="gaiji"]'));
     const noCssCjkBadge = Array.from(document.querySelectorAll("[data-sc\u5916\u5b57][data-sc\u5de6\u4e38]"))
       .find((node) => node instanceof HTMLElement && node.closest("[data-dictionary]")?.getAttribute("data-dictionary") === "No CSS Dictionary [probe]");
     const rect = popup instanceof HTMLElement
@@ -252,6 +258,9 @@ async function popupMetrics(page) {
       renderPopupSettings: JSON.parse(state?.getAttribute("data-render-popup-settings") ?? "{}"),
       importedDictionaryRecords: JSON.parse(state?.getAttribute("data-imported-dictionary-records") ?? "[]"),
       redirectLinks: document.querySelectorAll(".lookup-glossary-content a[data-lookup-redirect]").length,
+      redirectTextDecorationLine: redirectLink instanceof HTMLElement ? getComputedStyle(redirectLink).textDecorationLine : "",
+      redirectBorderBottomStyle: redirectLink instanceof HTMLElement ? getComputedStyle(redirectLink).borderBottomStyle : "",
+      redirectBorderBottomWidth: redirectLink instanceof HTMLElement ? getComputedStyle(redirectLink).borderBottomWidth : "",
       canGoBack: !document.querySelector(".lookup-pop[data-popup-id='root'] button[aria-label='Back']")?.hasAttribute("disabled"),
       canGoForward: !document.querySelector(".lookup-pop[data-popup-id='root'] button[aria-label='Forward']")?.hasAttribute("disabled"),
       resultsScrollTop: document.querySelector(".lookup-pop[data-popup-id='root'] .lookup-results")?.scrollTop ?? 0,
@@ -274,6 +283,16 @@ async function popupMetrics(page) {
       cjkPartOfSpeechFontWeight: cjkPartOfSpeech instanceof HTMLElement ? getComputedStyle(cjkPartOfSpeech).fontWeight : "",
       noCssCjkBadgeColor: noCssCjkBadge instanceof HTMLElement ? getComputedStyle(noCssCjkBadge).color : "",
       noCssCjkBadgeBorderStyle: noCssCjkBadge instanceof HTMLElement ? getComputedStyle(noCssCjkBadge).borderTopStyle : "",
+      numericMarkerCount: document.querySelectorAll(".lookup-glossary-content .gloss-numeric-marker").length,
+      numericMarkerMainColor: numericMarkerMain instanceof HTMLElement ? getComputedStyle(numericMarkerMain).color : "",
+      numericMarkerMainFontFamily: numericMarkerMain instanceof HTMLElement ? getComputedStyle(numericMarkerMain).fontFamily : "",
+      numericMarkerMainHeight: numericMarkerMain instanceof HTMLElement ? numericMarkerMain.getBoundingClientRect().height : 0,
+      numericMarkerInlineColor: numericMarkerInline instanceof HTMLElement ? getComputedStyle(numericMarkerInline).color : "",
+      numericMarkerInlineHeight: numericMarkerInline instanceof HTMLElement ? numericMarkerInline.getBoundingClientRect().height : 0,
+      loadedMediaBorderStyle: loadedMediaPlaceholder instanceof HTMLElement ? getComputedStyle(loadedMediaPlaceholder).borderTopStyle : "",
+      loadedMediaPaddingTop: loadedMediaPlaceholder instanceof HTMLElement ? getComputedStyle(loadedMediaPlaceholder).paddingTop : "",
+      mediaCaptionFontSize: mediaCaption instanceof HTMLElement ? getComputedStyle(mediaCaption).fontSize : "",
+      mediaCaptionFontFamily: mediaCaption instanceof HTMLElement ? getComputedStyle(mediaCaption).fontFamily : "",
       structuredInlineColor: safeInlineStyle instanceof HTMLElement ? getComputedStyle(safeInlineStyle).color : "",
       structuredInlineFontWeight: safeInlineStyle instanceof HTMLElement ? getComputedStyle(safeInlineStyle).fontWeight : "",
       structuredInlineFontSize: safeInlineStyle instanceof HTMLElement ? getComputedStyle(safeInlineStyle).fontSize : "",
@@ -517,8 +536,11 @@ async function main() {
     assert(ready.mediaErrors === 0 && ready.mediaLoading === 0, "Successful dictionary media should not remain loading or error.", ready);
     assert(ready.mediaImageMaxHeight === "180px", "Dictionary media image should be constrained inside the popup.", ready);
     assert(ready.gaijiImageMaxHeight !== "180px" && ready.gaijiContainerWidth !== "" && Number.parseFloat(ready.gaijiContainerWidth) < 32, "MK3 gaiji SVG media should stay inline and small rather than rendering as block media cards.", ready);
+    assert(ready.loadedMediaBorderStyle === "none" && ready.loadedMediaPaddingTop === "0px", "Loaded dictionary media should not keep placeholder card borders or padding.", ready);
+    assert(Number.parseFloat(ready.mediaCaptionFontSize) < Number.parseFloat(ready.glossaryFontSize) && /Segoe UI|Arial|sans-serif/i.test(ready.mediaCaptionFontFamily), "Dictionary media captions should render smaller in a UI/sans font.", ready);
     assert(ready.glossaryGroups >= 2, "Ready popup should group glossary entries by dictionary.", ready);
     assert(ready.redirectLinks >= 1, "Ready popup should render dictionary cross-reference links.", ready);
+    assert(ready.redirectTextDecorationLine === "none" && (ready.redirectBorderBottomStyle === "none" || ready.redirectBorderBottomWidth === "0px"), "Dictionary redirect links should not render an underline or dotted bottom border.", ready);
     assert(!ready.canGoBack && !ready.canGoForward, "Root popup should start without redirect history.", ready);
     assert(ready.dictionaryStyleTags >= 1, "Ready popup should inject scoped dictionary CSS.", ready);
     assert(ready.dictionaryStyledColor === "rgb(123, 210, 145)", "Dictionary CSS should affect glossary content.", ready);
@@ -531,6 +553,10 @@ async function main() {
     assert(ready.cjkBadgeColor === "rgb(16, 154, 47)" && ready.cjkBadgeBorderColor === "rgb(16, 154, 47)" && ready.cjkBadgeBorderRadius === "8px", "Dictionary CSS should match CJK structured data hooks such as data-sc外字.", ready);
     assert(ready.cjkPartOfSpeechColor === "rgb(74, 138, 222)" && Number.parseInt(ready.cjkPartOfSpeechFontWeight, 10) >= 700, "Dictionary CSS should match CJK structured data hooks such as data-sc活用.", ready);
     assert(ready.noCssCjkBadgeColor !== "rgb(16, 154, 47)" && ready.noCssCjkBadgeBorderStyle === "none", "Dictionary CSS should stay scoped to the matching dictionary group.", ready);
+    assert(ready.numericMarkerCount >= 2, "Structured text numeric markers should receive HSW marker classes.", ready);
+    assert(ready.numericMarkerMainColor === "rgb(255, 255, 255)" && ready.numericMarkerInlineColor === "rgb(255, 255, 255)", "Numeric markers should render white digits.", ready);
+    assert(/Segoe UI|Arial|sans-serif/i.test(ready.numericMarkerMainFontFamily), "Numeric markers should use a UI/sans digit font.", ready);
+    assert(ready.numericMarkerMainHeight > ready.numericMarkerInlineHeight, "Main numeric markers should be taller than inline markers.", ready);
     assert(ready.structuredInlineColor === "rgb(30, 144, 255)", "Structured glossary inline color should be preserved for Yomitan style objects.", ready);
     assert(Number.parseInt(ready.structuredInlineFontWeight, 10) >= 700, "Structured glossary inline font weight should be preserved.", ready);
     assert(ready.structuredInlineFontSize === "16.8px", "Structured glossary inline font size should be preserved.", ready);

@@ -1037,12 +1037,45 @@
   .lookup-glossary-content :global(th) { background: var(--lookup-entry-bg); color: var(--lookup-entry-text); font-weight: 600; }
   .lookup-glossary-content :global(.gloss-sc-table-container) { display: block; max-width: 100%; overflow-x: auto; }
   .lookup-glossary-content :global(a) { color: var(--app-primary, #d0bcff); }
-  .lookup-glossary-content :global(a[data-lookup-redirect]) { border-bottom: 1px dotted currentColor; cursor: pointer; text-decoration: none; }
+  .lookup-glossary-content :global(a[data-lookup-redirect]) { border-bottom: 0 !important; cursor: pointer; text-decoration: none !important; }
+  .lookup-glossary-content :global(a[data-lookup-redirect]:hover) { text-decoration: none !important; }
   .lookup-glossary-content :global(rt) { color: var(--lookup-entry-text); font-size: 0.72em; }
+  .lookup-glossary-content :global(.gloss-numeric-marker) {
+    display: inline-flex !important;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.24em;
+    height: 1.34em;
+    padding: 0 0.24em !important;
+    color: #fff !important;
+    background: #303030 !important;
+    border: 0 !important;
+    border-radius: 2px !important;
+    font-family: "Segoe UI", Arial, sans-serif !important;
+    font-size: 0.86em !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    text-align: center;
+    vertical-align: -0.12em;
+    white-space: nowrap;
+  }
+  .lookup-glossary-content :global(.gloss-numeric-marker-main) { min-width: 1.34em; height: 1.42em; margin-inline-end: 0.14em; }
+  .lookup-glossary-content :global(.gloss-numeric-marker-inline) { min-width: 1.02em; height: 1.08em; padding: 0 0.18em !important; font-size: 0.72em !important; vertical-align: 0.02em; }
+  .lookup-glossary-content :global(.gloss-media-caption),
+  .lookup-glossary-content :global([data-sc-m-caption]) {
+    display: block;
+    margin-top: calc(2px * var(--popup-scale, 1));
+    color: var(--lookup-entry-text);
+    font-family: system-ui, "Segoe UI", Arial, sans-serif;
+    font-size: 0.78em !important;
+    line-height: 1.35 !important;
+  }
   .lookup-glossary-content :global(.gloss-media-placeholder) { display: inline-block; max-width: 100%; padding: calc(4px * var(--popup-scale, 1)) calc(7px * var(--popup-scale, 1)); border: 1px dashed var(--app-border, #333333); border-radius: calc(4px * var(--popup-scale, 1)); color: var(--lookup-entry-text); background: var(--lookup-entry-bg); font-size: calc(11px * var(--popup-scale, 1)); text-decoration: none; }
   .lookup-glossary-content :global(.gloss-image-container) { display: inline-flex; max-width: 100%; align-items: center; justify-content: center; vertical-align: middle; }
   .lookup-glossary-content :global(.gloss-media-placeholder-loading) { color: var(--app-text, #fff); border-color: var(--app-muted, #999999); }
-  .lookup-glossary-content :global(.gloss-media-placeholder-loaded) { display: block; padding: calc(2px * var(--popup-scale, 1)); border-style: solid; }
+  .lookup-glossary-content :global(.gloss-media-placeholder[data-media-status="loaded"]),
+  .lookup-glossary-content :global(.gloss-media-placeholder-loaded) { padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; color: inherit; font-size: inherit; text-decoration: none !important; }
   .lookup-glossary-content :global(.gloss-media-placeholder-error) { color: var(--app-error, #ffb4ab); border-color: var(--app-error, #ffb4ab); }
   .lookup-glossary-content :global(.gloss-media-image) { display: block; max-width: 100%; max-height: calc(180px * var(--popup-scale, 1)); object-fit: contain; }
   .lookup-glossary-content :global([data-sc-img][data-sc-class="gaiji"]) { display: inline-block; line-height: 1; vertical-align: -0.12em; }
