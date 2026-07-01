@@ -1018,7 +1018,7 @@
   .lookup-glossary-dict { color: var(--lookup-entry-text); font-size: calc(10px * var(--popup-scale, 1)); cursor: pointer; }
   .lookup-glossary-list { margin: 0; padding-left: 1.25em; }
   .lookup-glossary-list > li { margin: calc(4px * var(--popup-scale, 1)) 0; }
-  .lookup-glossary-content { min-width: 0; background: var(--lookup-entry-bg); color: var(--lookup-entry-text); font-family: var(--reader-body-font, "Yu Mincho", "Hiragino Mincho Pro", "MS Mincho", serif); font-size: calc(15px * var(--popup-scale, 1)); line-height: 1.4; }
+  .lookup-glossary-content { --text-color: var(--lookup-entry-text); --background-color: var(--lookup-entry-bg); --background-color-light: var(--lookup-entry-bg); --rgko12-blue: #4a8ade; --rgko12-green: #109a2f; --rgko12-red: #e84a4a; --rgko12-brown: #976b33; --rgko12-gray: #666666; min-width: 0; background: var(--lookup-entry-bg); color: var(--lookup-entry-text); font-family: var(--reader-body-font, "Yu Mincho", "Hiragino Mincho Pro", "MS Mincho", serif); font-size: calc(15px * var(--popup-scale, 1)); line-height: 1.4; }
   .lookup-glossary-content :global([lang|="ja"]) { font-family: var(--reader-body-font, "Yu Mincho", "Hiragino Mincho Pro", "MS Mincho", serif); }
   .lookup-glossary-content :global([lang|="zh"]) { font-family: "Microsoft YaHei", "Microsoft JhengHei", "SimSun", "Noto Sans CJK SC", "Noto Sans CJK TC", system-ui, sans-serif; }
   .compact-glossaries .lookup-glossary { gap: calc(1px * var(--popup-scale, 1)); line-height: 1.28; }
@@ -1040,6 +1040,135 @@
   .lookup-glossary-content :global(a[data-lookup-redirect]) { border-bottom: 0 !important; cursor: pointer; text-decoration: none !important; }
   .lookup-glossary-content :global(a[data-lookup-redirect]:hover) { text-decoration: none !important; }
   .lookup-glossary-content :global(rt) { color: var(--lookup-entry-text); font-size: 0.72em; }
+  .lookup-glossary-content :global([data-sc-headword]),
+  .lookup-glossary-content :global([data-sc-headword] > [data-sc-em]),
+  .lookup-glossary-content :global([data-sc-rank_num]),
+  .lookup-glossary-content :global([data-sc-ws]),
+  .lookup-glossary-content :global([data-sc-p-o-s]),
+  .lookup-glossary-content :global([data-sc-bs]),
+  .lookup-glossary-content :global([data-sc-bc]),
+  .lookup-glossary-content :global([data-sc外字]),
+  .lookup-glossary-content :global([data-sc使い分け]) {
+    font-family: "Yu Gothic UI", "Meiryo", "Hiragino Sans", "Segoe UI", Arial, sans-serif;
+  }
+  .lookup-glossary-content :global([data-sc-headword]) {
+    font-size: 1.33em !important;
+    font-weight: 900 !important;
+    line-height: 1.12 !important;
+  }
+  .lookup-glossary-content :global([data-sc-headword] > [data-sc-em]),
+  .lookup-glossary-content :global([data-sc-headword] [data-sc-b]),
+  .lookup-glossary-content :global([data-sc-meaning][data-scコラム] [data-sc-b]) {
+    font-weight: 900 !important;
+  }
+  .lookup-glossary-content :global([data-sc-b]),
+  .lookup-glossary-content :global([data-sc-num]) {
+    font-weight: 700 !important;
+  }
+  .lookup-glossary-content :global([data-sc-rank_num]) {
+    color: var(--rgko12-red) !important;
+    font-size: 0.5em !important;
+    font-weight: 400 !important;
+    vertical-align: middle;
+  }
+  .lookup-glossary-content :global([data-sc-acc]) {
+    font-family: "Yu Gothic UI", "Meiryo", "Hiragino Sans", "Segoe UI", Arial, sans-serif;
+    font-size: 0.67em !important;
+    font-weight: 400 !important;
+  }
+  .lookup-glossary-content :global([data-sc-ws]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.08em 0.22em !important;
+    color: var(--lookup-entry-text);
+    border: 1px solid currentColor;
+    border-radius: 0.18em;
+    font-size: 0.82em !important;
+    font-weight: 700 !important;
+    line-height: 1.15 !important;
+    vertical-align: 0.05em;
+    word-break: keep-all;
+  }
+  .lookup-glossary-content :global([data-sc-p-o-s]) {
+    margin-inline-start: 0.18em;
+    font-size: 0.72em !important;
+    font-weight: 600;
+    line-height: 1 !important;
+    vertical-align: 0.08em;
+  }
+  .lookup-glossary-content :global([data-sc-bs]),
+  .lookup-glossary-content :global([data-sc-bc]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.08em 0.24em !important;
+    color: #fff !important;
+    background-color: #303030 !important;
+    font-size: 0.82em !important;
+    font-weight: 700 !important;
+    line-height: 1.15 !important;
+    vertical-align: 0.08em;
+    word-break: keep-all;
+  }
+  .lookup-glossary-content :global([data-sc-bs]) { border-radius: 0.2em; }
+  .lookup-glossary-content :global([data-sc-bs][data-sc-blue]) { background-color: var(--rgko12-blue) !important; }
+  .lookup-glossary-content :global([data-sc-bs][data-sc-gray]) { background-color: var(--rgko12-gray) !important; }
+  .lookup-glossary-content :global([data-sc-bc]) {
+    border-radius: 0.7em;
+    font-size: 0.72em !important;
+    padding: 0.14em 0.28em !important;
+  }
+  .lookup-glossary-content :global([data-sc-bc][data-sc-red]) { background-color: var(--rgko12-red) !important; }
+  .lookup-glossary-content :global([data-sc-bc][data-sc-gray]) { background-color: var(--rgko12-gray) !important; }
+  .lookup-glossary-content :global([data-sc使い分け]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.1em 0.24em !important;
+    color: #fff !important;
+    background-color: var(--rgko12-brown) !important;
+    border-radius: 0.2em;
+    font-size: 0.8em !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+    vertical-align: 0.06em;
+  }
+  .lookup-glossary-content :global([data-sc外字]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em !important;
+    font-weight: 700;
+    line-height: 1.08 !important;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  .lookup-glossary-content :global([data-sc外字][data-sc-fill]) {
+    min-width: 1.18em;
+    height: 1.18em;
+    padding: 0 0.2em !important;
+    color: #fff !important;
+    background-color: var(--rgko12-blue);
+    border: 1px solid var(--rgko12-blue);
+    border-radius: 999px;
+  }
+  .lookup-glossary-content :global(.gloss-rgko-numeric-marker) {
+    min-width: 1.18em;
+    height: 1.18em;
+    color: #fff !important;
+    background-color: var(--rgko12-green) !important;
+    border-color: var(--rgko12-green) !important;
+    font-family: "Yu Gothic UI", "Meiryo", "Hiragino Sans", "Segoe UI", Arial, sans-serif !important;
+    font-size: 0.82em !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+  }
+  .lookup-glossary-content :global([data-sc-blue].gloss-rgko-numeric-marker),
+  .lookup-glossary-content :global([data-sc-blue] .gloss-rgko-numeric-marker) {
+    background-color: var(--rgko12-blue) !important;
+    border-color: var(--rgko12-blue) !important;
+  }
   .lookup-glossary-content :global(.gloss-numeric-marker) {
     display: inline-flex !important;
     box-sizing: border-box;

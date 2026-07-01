@@ -106,7 +106,7 @@ async function popupMetrics(page) {
     const popup = document.querySelector(".lookup-pop");
     const results = document.querySelector(".lookup-results");
     const state = document.querySelector(".probe-state");
-    const styledGlossary = document.querySelector(".lookup-glossary-content .gloss-sc-div");
+    const styledGlossary = document.querySelector('.lookup-glossary-content [data-sc-class="probe-sanitizer-target"]');
     const safeInlineStyle = document.querySelector('.lookup-glossary-content [data-sc-class="probe-inline-style-safe"]');
     const unsafeInlineStyle = document.querySelector('.lookup-glossary-content [data-sc-class="probe-inline-style-unsafe"]');
     const head = document.querySelector(".lookup-head");
@@ -127,6 +127,16 @@ async function popupMetrics(page) {
     const dictionaryFont = document.querySelector('.lookup-glossary-content [data-sc-class="probe-dict-font"]');
     const cjkBadge = document.querySelector(".lookup-glossary-content [data-sc\u5916\u5b57][data-sc\u5de6\u4e38]");
     const cjkPartOfSpeech = document.querySelector(".lookup-glossary-content [data-sc\u54c1\u8a5e][data-sc\u6d3b\u7528]");
+    const rgkoRank = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-rank"]');
+    const rgkoHeadword = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-headword"]');
+    const rgkoRedHeadword = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-red-headword"]');
+    const rgkoBoldHeadword = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-bold-headword"]');
+    const rgkoPosBox = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-pos-box"]');
+    const rgkoPosReading = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-pos-reading"]');
+    const rgkoNumber = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-number"]');
+    const rgkoBlueLabel = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-blue-label"]');
+    const rgkoBlackLabel = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-black-label"]');
+    const rgkoExampleLabel = document.querySelector('.lookup-glossary-content [data-sc-class="probe-rgko-example-label"]');
     const numericMarkerMain = document.querySelector(".lookup-glossary-content .gloss-numeric-marker-main");
     const numericMarkerInline = document.querySelector(".lookup-glossary-content .gloss-numeric-marker-inline");
     const mediaCaption = document.querySelector(".lookup-glossary-content .gloss-media-caption");
@@ -281,6 +291,28 @@ async function popupMetrics(page) {
       cjkBadgeBorderRadius: cjkBadge instanceof HTMLElement ? getComputedStyle(cjkBadge).borderTopLeftRadius : "",
       cjkPartOfSpeechColor: cjkPartOfSpeech instanceof HTMLElement ? getComputedStyle(cjkPartOfSpeech).color : "",
       cjkPartOfSpeechFontWeight: cjkPartOfSpeech instanceof HTMLElement ? getComputedStyle(cjkPartOfSpeech).fontWeight : "",
+      rgkoRankFontSize: rgkoRank instanceof HTMLElement ? getComputedStyle(rgkoRank).fontSize : "",
+      rgkoRankColor: rgkoRank instanceof HTMLElement ? getComputedStyle(rgkoRank).color : "",
+      rgkoHeadwordFontFamily: rgkoHeadword instanceof HTMLElement ? getComputedStyle(rgkoHeadword).fontFamily : "",
+      rgkoHeadwordFontSize: rgkoHeadword instanceof HTMLElement ? getComputedStyle(rgkoHeadword).fontSize : "",
+      rgkoRedHeadwordColor: rgkoRedHeadword instanceof HTMLElement ? getComputedStyle(rgkoRedHeadword).color : "",
+      rgkoRedHeadwordFontWeight: rgkoRedHeadword instanceof HTMLElement ? getComputedStyle(rgkoRedHeadword).fontWeight : "",
+      rgkoBoldHeadwordFontWeight: rgkoBoldHeadword instanceof HTMLElement ? getComputedStyle(rgkoBoldHeadword).fontWeight : "",
+      rgkoPosBoxBorderStyle: rgkoPosBox instanceof HTMLElement ? getComputedStyle(rgkoPosBox).borderTopStyle : "",
+      rgkoPosBoxBorderWidth: rgkoPosBox instanceof HTMLElement ? getComputedStyle(rgkoPosBox).borderTopWidth : "",
+      rgkoPosBoxFontSize: rgkoPosBox instanceof HTMLElement ? getComputedStyle(rgkoPosBox).fontSize : "",
+      rgkoPosReadingFontSize: rgkoPosReading instanceof HTMLElement ? getComputedStyle(rgkoPosReading).fontSize : "",
+      rgkoNumberMarkerClasses: rgkoNumber instanceof HTMLElement ? Array.from(rgkoNumber.classList).join(" ") : "",
+      rgkoNumberColor: rgkoNumber instanceof HTMLElement ? getComputedStyle(rgkoNumber).color : "",
+      rgkoNumberBackground: rgkoNumber instanceof HTMLElement ? getComputedStyle(rgkoNumber).backgroundColor : "",
+      rgkoNumberBorderRadius: rgkoNumber instanceof HTMLElement ? getComputedStyle(rgkoNumber).borderTopLeftRadius : "",
+      rgkoNumberFontFamily: rgkoNumber instanceof HTMLElement ? getComputedStyle(rgkoNumber).fontFamily : "",
+      rgkoBlueLabelColor: rgkoBlueLabel instanceof HTMLElement ? getComputedStyle(rgkoBlueLabel).color : "",
+      rgkoBlueLabelBackground: rgkoBlueLabel instanceof HTMLElement ? getComputedStyle(rgkoBlueLabel).backgroundColor : "",
+      rgkoBlackLabelColor: rgkoBlackLabel instanceof HTMLElement ? getComputedStyle(rgkoBlackLabel).color : "",
+      rgkoBlackLabelBackground: rgkoBlackLabel instanceof HTMLElement ? getComputedStyle(rgkoBlackLabel).backgroundColor : "",
+      rgkoExampleLabelColor: rgkoExampleLabel instanceof HTMLElement ? getComputedStyle(rgkoExampleLabel).color : "",
+      rgkoExampleLabelBackground: rgkoExampleLabel instanceof HTMLElement ? getComputedStyle(rgkoExampleLabel).backgroundColor : "",
       noCssCjkBadgeColor: noCssCjkBadge instanceof HTMLElement ? getComputedStyle(noCssCjkBadge).color : "",
       noCssCjkBadgeBorderStyle: noCssCjkBadge instanceof HTMLElement ? getComputedStyle(noCssCjkBadge).borderTopStyle : "",
       numericMarkerCount: document.querySelectorAll(".lookup-glossary-content .gloss-numeric-marker").length,
@@ -552,6 +584,17 @@ async function main() {
     assert(ready.dictionaryStyledTransform === "none" && ready.dictionaryStyledZoom === "1", "Dictionary CSS sanitizer should block imported transform and zoom overrides.", ready);
     assert(ready.cjkBadgeColor === "rgb(16, 154, 47)" && ready.cjkBadgeBorderColor === "rgb(16, 154, 47)" && ready.cjkBadgeBorderRadius === "8px", "Dictionary CSS should match CJK structured data hooks such as data-sc外字.", ready);
     assert(ready.cjkPartOfSpeechColor === "rgb(74, 138, 222)" && Number.parseInt(ready.cjkPartOfSpeechFontWeight, 10) >= 700, "Dictionary CSS should match CJK structured data hooks such as data-sc活用.", ready);
+    assert(Number.parseFloat(ready.rgkoHeadwordFontSize) > Number.parseFloat(ready.glossaryFontSize) && /Yu Gothic UI|Meiryo|Hiragino Sans|Segoe UI|Arial|sans-serif/i.test(ready.rgkoHeadwordFontFamily), "RGKO headword text should get the HSA-like sans font and larger title size.", ready);
+    assert(Number.parseFloat(ready.rgkoRankFontSize) < Number.parseFloat(ready.glossaryFontSize) && ready.rgkoRankColor === "rgb(232, 74, 74)", "RGKO rank markers should use the smaller red title-side treatment.", ready);
+    assert(ready.rgkoRedHeadwordColor === "rgb(232, 74, 74)" && Number.parseInt(ready.rgkoRedHeadwordFontWeight, 10) >= 800, "RGKO red headword text should be heavy and red.", ready);
+    assert(Number.parseInt(ready.rgkoBoldHeadwordFontWeight, 10) >= 800, "RGKO bracketed kanji headword text should keep its bold treatment.", ready);
+    assert(ready.rgkoPosBoxBorderStyle === "solid" && Number.parseFloat(ready.rgkoPosBoxBorderWidth) > 0, "RGKO part-of-speech marker should render as a boxed label.", ready);
+    assert(Number.parseFloat(ready.rgkoPosReadingFontSize) < Number.parseFloat(ready.rgkoPosBoxFontSize), "RGKO katakana POS reading should be smaller than the boxed POS marker.", ready);
+    assert(ready.rgkoNumberMarkerClasses.split(/\s+/).includes("gloss-rgko-numeric-marker") && !ready.rgkoNumberMarkerClasses.split(/\s+/).includes("gloss-numeric-marker"), "RGKO numeric markers should use the RGKO class instead of the dark MK3 square marker class.", ready);
+    assert(ready.rgkoNumberColor === "rgb(255, 255, 255)" && ready.rgkoNumberBackground === "rgb(16, 154, 47)" && ready.rgkoNumberBorderRadius !== "2px", "RGKO filled numeric markers should show white text on a green rounded marker.", ready);
+    assert(/Yu Gothic UI|Meiryo|Hiragino Sans|Segoe UI|Arial|sans-serif/i.test(ready.rgkoNumberFontFamily), "RGKO numeric markers should use a UI/Japanese sans font.", ready);
+    assert(ready.rgkoBlueLabelColor === "rgb(255, 255, 255)" && ready.rgkoBlackLabelColor === "rgb(255, 255, 255)" && ready.rgkoExampleLabelColor === "rgb(255, 255, 255)", "RGKO filled blue, black, and example labels should render readable white text.", ready);
+    assert(ready.rgkoBlueLabelBackground !== "rgba(0, 0, 0, 0)" && ready.rgkoBlackLabelBackground !== "rgba(0, 0, 0, 0)" && ready.rgkoExampleLabelBackground !== "rgba(0, 0, 0, 0)", "RGKO filled labels should keep visible backgrounds.", ready);
     assert(ready.noCssCjkBadgeColor !== "rgb(16, 154, 47)" && ready.noCssCjkBadgeBorderStyle === "none", "Dictionary CSS should stay scoped to the matching dictionary group.", ready);
     assert(ready.numericMarkerCount >= 2, "Structured text numeric markers should receive HSW marker classes.", ready);
     assert(ready.numericMarkerMainColor === "rgb(255, 255, 255)" && ready.numericMarkerInlineColor === "rgb(255, 255, 255)", "Numeric markers should render white digits.", ready);

@@ -280,17 +280,27 @@ function structuredAttributes(record: Record<string, unknown>, tag: string, cont
 
 function structuredPresentationClasses(record: Record<string, unknown>, tag: string, content: unknown, parentTag: string): string[] {
   const classes: string[] = [];
-  if (tag === "span" && isStructuredNumericMarker(record, content)) {
+  if (tag === "span" && isStructuredRectNumericMarker(record, content)) {
     classes.push("gloss-numeric-marker");
     classes.push(isInlineStructuredNumericMarker(record, parentTag) ? "gloss-numeric-marker-inline" : "gloss-numeric-marker-main");
+  }
+  if (tag === "span" && isRgkoStructuredNumericMarker(record, content)) {
+    classes.push("gloss-rgko-numeric-marker");
   }
   if (isStructuredMediaCaption(record)) classes.push("gloss-media-caption");
   return classes;
 }
 
-function isStructuredNumericMarker(record: Record<string, unknown>, content: unknown): boolean {
+function isStructuredRectNumericMarker(record: Record<string, unknown>, content: unknown): boolean {
+  return structuredDataKeySet(record).has("rect") && isStructuredNumericText(content);
+}
+
+function isRgkoStructuredNumericMarker(record: Record<string, unknown>, content: unknown): boolean {
   const keys = structuredDataKeySet(record);
-  if (!keys.has("rect") && !(keys.has("外字") && (keys.has("左丸") || keys.has("全丸")))) return false;
+  return keys.has("外字") && keys.has("fill") && isStructuredNumericText(content);
+}
+
+function isStructuredNumericText(content: unknown): boolean {
   return /^[0-9０-９一二三四五六七八九十]+$/u.test(structuredPlainText(content).trim());
 }
 

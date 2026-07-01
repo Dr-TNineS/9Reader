@@ -93,6 +93,7 @@
       type: "structured-content",
       content: [
         { tag: "div", data: { class: "probe-entry", headword: "school" }, content: "classroom school room" },
+        { tag: "div", data: { class: "probe-sanitizer-target" }, content: "dictionary css sanitizer target" },
         {
           tag: "span",
           data: { class: "probe-inline-style-safe" },
@@ -113,6 +114,44 @@
             "\u76ee",
             { tag: "span", data: { red: "" }, content: "\u3011" },
             "\uff08\u25bd\u773c\uff09",
+          ],
+        },
+        {
+          tag: "div",
+          data: { class: "probe-rgko-head-row" },
+          content: [
+            { tag: "span", data: { class: "probe-rgko-rank", rank_num: "" }, content: "1" },
+            {
+              tag: "span",
+              data: { class: "probe-rgko-headword", headword: "" },
+              content: [
+                { tag: "span", data: { class: "probe-rgko-red-headword", em: "" }, content: "\u307b\u3057" },
+                " ",
+                { tag: "span", data: { class: "probe-rgko-bold-headword", b: "" }, content: "\u3010\u661f\u3011" },
+              ],
+            },
+            " ",
+            { tag: "span", data: { class: "probe-rgko-pos-box", ws: "" }, content: "\u540d" },
+            { tag: "span", data: { class: "probe-rgko-pos-reading", "p-o-s": "" }, content: "\u30db\u30b7" },
+          ],
+        },
+        {
+          tag: "div",
+          data: { class: "probe-rgko-meaning-row" },
+          content: [
+            { tag: "span", data: { class: "probe-rgko-number", "\u5916\u5b57": "", fill: "" }, content: "1" },
+            "\u5730\u7403\u306e\u5916\u306b\u3042\u3063\u3066\u3001\u591c\u3001\u7a7a\u306b\u5c0f\u3055\u304f\u304b\u304c\u3084\u3044\u3066\u898b\u3048\u308b\u3082\u306e\u3002",
+          ],
+        },
+        {
+          tag: "div",
+          data: { class: "probe-rgko-label-row" },
+          content: [
+            { tag: "span", data: { class: "probe-rgko-example-label", "\u4f7f\u3044\u5206\u3051": "" }, content: "\u4f8b" },
+            " ",
+            { tag: "span", data: { class: "probe-rgko-blue-label", bs: "", blue: "" }, content: "\u719f\u8a9e" },
+            " ",
+            { tag: "span", data: { class: "probe-rgko-black-label", bc: "" }, content: "\u9ed2" },
           ],
         },
         {
@@ -677,6 +716,63 @@
         [data-sc\u54c1\u8a5e][data-sc\u6d3b\u7528] {
           color: rgb(74, 138, 222);
           font-weight: bold;
+        }
+        [data-sc-headword] {
+          font-size: 1.333em;
+          font-weight: 900;
+        }
+        [data-sc-em] {
+          color: rgb(232, 74, 74);
+        }
+        [data-sc-headword] > [data-sc-em],
+        [data-sc-headword] [data-sc-b] {
+          font-weight: 900;
+        }
+        [data-sc-rank_num] {
+          font-size: 0.5em;
+          font-weight: normal;
+          color: rgb(232, 74, 74);
+        }
+        [data-sc-ws] {
+          font-size: 0.8em;
+          font-weight: bold;
+          color: var(--text-color);
+          border: 1px solid var(--text-color);
+          border-radius: 0.2em;
+        }
+        [data-sc-p-o-s] {
+          margin-inline-start: 0.125em;
+        }
+        [data-sc-bs] {
+          font-size: 0.8em;
+          font-weight: bold;
+          color: var(--background-color-light, var(--background-color));
+          background-color: var(--text-color);
+          border-radius: 0.2em;
+        }
+        [data-sc-bs][data-sc-blue] {
+          background-color: rgb(74, 138, 222);
+        }
+        [data-sc-bc] {
+          font-size: 0.7em;
+          font-weight: bold;
+          color: var(--background-color-light, var(--background-color));
+          background-color: var(--text-color);
+          border-radius: 0.7em;
+        }
+        [data-sc\u5916\u5b57][data-sc-fill] {
+          font-size: 0.8em;
+          color: var(--background-color-light, var(--background-color));
+          border: 1px solid rgb(74, 138, 222);
+          background-color: rgb(74, 138, 222);
+          border-radius: 8px;
+        }
+        [data-sc\u4f7f\u3044\u5206\u3051] {
+          font-size: 0.8em;
+          font-weight: normal;
+          color: #fff;
+          background-color: rgb(151, 107, 51);
+          border-radius: 0.2em;
         }
       `,
     };
