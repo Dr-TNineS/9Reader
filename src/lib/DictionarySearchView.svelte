@@ -482,7 +482,7 @@
   .dictionary-search-bar input:disabled { opacity: 0.72; }
   .clear-search { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: var(--app-muted); border: 0; border-radius: 6px; cursor: pointer; font-size: 24px; line-height: 1; }
   .clear-search:hover { background: var(--app-control); color: var(--app-text); }
-  .dictionary-search-results { min-width: 0; min-height: 0; flex: 1 1 auto; display: flex; flex-direction: column; background: var(--reader-bg, var(--app-bg)); overflow: hidden; }
+  .dictionary-search-results { min-width: 0; min-height: 0; flex: 1 1 auto; display: flex; flex-direction: column; background: var(--app-bg); overflow: hidden; }
   .dictionary-search-message-block { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 16px; }
   .dictionary-search-message { margin: 0; color: var(--app-muted); font-size: 13px; line-height: 1.4; overflow-wrap: anywhere; }
   .dictionary-search-results > .dictionary-search-message { padding: 12px 16px; }

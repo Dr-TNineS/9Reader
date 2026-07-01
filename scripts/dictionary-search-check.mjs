@@ -49,6 +49,8 @@ async function metrics(page) {
     const search = document.querySelector(".dictionary-search-bar input");
     const root = document.querySelector('[data-popup-id="dictionary-search-root"]');
     const rootContent = document.querySelector('[data-popup-id="dictionary-search-root"] .lookup-content');
+    const rootResults = document.querySelector('[data-popup-id="dictionary-search-root"] .lookup-results');
+    const rootFirstResult = document.querySelector('[data-popup-id="dictionary-search-root"] .lookup-result:first-child');
     const rootExpression = document.querySelector('[data-popup-id="dictionary-search-root"] .lookup-expression');
     const rootMarker = document.querySelector('[data-popup-id="dictionary-search-root"] [data-sc-class="probe-page-marker"]');
     const rootInlineMarker = document.querySelector('[data-popup-id="dictionary-search-root"] [data-sc-class="probe-page-inline-marker"]');
@@ -99,6 +101,14 @@ async function metrics(page) {
       sasayakiButtons: document.querySelectorAll('[data-popup-id="dictionary-search-root"] .lookup-sasayaki-controls button').length,
       rootHistoryButtons: document.querySelectorAll('[data-popup-id="dictionary-search-root"] button[aria-label="Back"], [data-popup-id="dictionary-search-root"] button[aria-label="Forward"]').length,
       popupScaleControls: document.querySelectorAll('[aria-label="Popup scale"]').length,
+      appBackground: result instanceof HTMLElement ? getComputedStyle(result).getPropertyValue("--app-bg").trim() : "",
+      readerBackground: result instanceof HTMLElement ? getComputedStyle(result).getPropertyValue("--reader-bg").trim() : "",
+      resultBackground: result instanceof HTMLElement ? getComputedStyle(result).backgroundColor : "",
+      rootContentBackground: rootContent instanceof HTMLElement ? getComputedStyle(rootContent).backgroundColor : "",
+      rootResultsBackground: rootResults instanceof HTMLElement ? getComputedStyle(rootResults).backgroundColor : "",
+      rootResultsBorderTopStyle: rootResults instanceof HTMLElement ? getComputedStyle(rootResults).borderTopStyle : "",
+      rootResultsBorderTopColor: rootResults instanceof HTMLElement ? getComputedStyle(rootResults).borderTopColor : "",
+      rootFirstResultBorderTopStyle: rootFirstResult instanceof HTMLElement ? getComputedStyle(rootFirstResult).borderTopStyle : "",
       rootScale: rootContent instanceof HTMLElement ? getComputedStyle(rootContent).getPropertyValue("--popup-scale").trim() : "",
       rootExpressionFontSize: rootExpression instanceof HTMLElement ? Number.parseFloat(getComputedStyle(rootExpression).fontSize) : 0,
       rootMarker: markerMetrics(rootMarker),
@@ -203,6 +213,9 @@ async function main() {
     assert(state.rootState === "ready" && state.rootResults === 1, "Ready search should render root results.", state);
     assert(state.closeButtons === 0 && state.sasayakiButtons === 0, "Root frame should hide close and Sasayaki controls.", state);
     assert(state.rootHistoryButtons === 0, "Root frame should not expose a popup action bar.", state);
+    assert(state.resultBackground === "rgb(0, 0, 0)" && state.rootContentBackground === "rgb(255, 255, 255)" && state.rootResultsBackground === "rgb(255, 255, 255)", "Ready dictionary results should keep the inner lookup content background distinct from the outer app background.", state);
+    assert(state.rootResultsBorderTopStyle === "solid" && state.rootResultsBorderTopColor !== "rgb(51, 51, 51)", "Root results should draw the HSA-style outer divider above the first result.", state);
+    assert(state.rootFirstResultBorderTopStyle === "none", "The first dictionary result should not draw the ordinary result separator on top.", state);
     assert(state.rootScale === "1.15" && Math.abs(state.rootExpressionFontSize - 29.9) < 0.2, "Root frame should use shared lookup popup scale.", state);
     assert(state.rootMarker?.text === "1" && state.rootInlineMarker?.text === "2", "Dictionary page mode should render structured marker text.", state);
     assert(state.rootMarker.color === "rgb(255, 255, 255)" && state.rootMarker.background !== "rgba(0, 0, 0, 0)", "Dictionary page mode should keep filled marker text visible.", state);
@@ -241,6 +254,7 @@ async function main() {
     await search(page, "empty");
     state = await metrics(page);
     assert(state.rootState === "empty" && state.rootResults === 0 && !state.text.includes("No dictionary results"), "Empty lookup should leave the result area blank.", state);
+    assert(state.resultBackground === "rgb(0, 0, 0)" && state.rootContentBackground === "" && state.rootResultsBackground === "", "Empty dictionary search should use the outer app background, not the inner lookup result background.", state);
 
     await page.getByRole("button", { name: "lookup ready" }).click();
     await search(page, "school");

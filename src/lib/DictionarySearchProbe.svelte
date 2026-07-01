@@ -167,6 +167,8 @@
     --app-error: #ffb4ab;
     --app-status: #cce8d5;
     --app-shadow: rgba(0, 0, 0, 0.48);
+    --reader-bg: #ffffff;
+    --reader-text: #000000;
   }
   .probe-controls { position: fixed; right: 8px; bottom: 8px; z-index: 500; display: flex; gap: 4px; opacity: 0.01; pointer-events: auto; }
   .probe-state { position: fixed; width: 1px; height: 1px; overflow: hidden; opacity: 0; }

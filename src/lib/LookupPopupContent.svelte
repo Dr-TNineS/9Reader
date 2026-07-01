@@ -797,6 +797,7 @@
 <div
   class="lookup-content"
   class:page-presentation={presentation === "page"}
+  class:ready={lookupState === "ready"}
   class:compact-glossaries={dictionarySettings.compactGlossaries}
   class:compact-pitch={dictionarySettings.compactPitchAccents}
   style={`--popup-scale:${scale}`}
@@ -1002,6 +1003,8 @@
   .lookup-content {
     --lookup-entry-bg: var(--reader-bg, var(--app-bg, #000));
     --lookup-entry-text: var(--reader-text, var(--app-text, #fff));
+    --lookup-outer-bg: var(--app-bg, #000);
+    --lookup-outer-text: var(--app-text, #fff);
 
     display: flex;
     flex: 1 1 auto;
@@ -1011,10 +1014,11 @@
     height: 100%;
     min-width: 0;
     min-height: 0;
-    background: var(--lookup-entry-bg);
-    color: var(--lookup-entry-text);
+    background: var(--lookup-outer-bg);
+    color: var(--lookup-outer-text);
     font-family: var(--reader-body-font, "Yu Mincho", "Hiragino Mincho Pro", "MS Mincho", serif);
   }
+  .lookup-content.ready { background: var(--lookup-entry-bg); color: var(--lookup-entry-text); }
   .lookup-content.page-presentation { gap: 0; }
   .lookup-content.page-presentation .lookup-results { padding: 0 16px 24px; }
   .lookup-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--app-muted, #999999); font-size: 11px; text-transform: uppercase; }
@@ -1026,9 +1030,10 @@
   .lookup-state { color: var(--app-muted, #999999); font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
   .lookup-action { padding: 5px 10px; background: var(--app-primary, #d0bcff); color: var(--app-bg, #000); border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
   .lookup-action:hover { background: var(--app-primary-hover, #c1a9fb); }
-  .lookup-results { display: flex; flex: 1 1 auto; flex-direction: column; gap: calc(8px * var(--popup-scale, 1)); min-height: 0; overflow-y: auto; padding-right: calc(2px * var(--popup-scale, 1)); scrollbar-width: none; -ms-overflow-style: none; }
+  .lookup-results { display: flex; flex: 1 1 auto; flex-direction: column; gap: calc(8px * var(--popup-scale, 1)); min-height: 0; overflow-y: auto; padding-right: calc(2px * var(--popup-scale, 1)); background: var(--lookup-entry-bg); color: var(--lookup-entry-text); border-top: 1px solid color-mix(in srgb, var(--app-border, #333333) 65%, transparent); scrollbar-width: none; -ms-overflow-style: none; }
   .lookup-results::-webkit-scrollbar { display: none; }
-  .lookup-result { display: flex; flex-direction: column; gap: calc(5px * var(--popup-scale, 1)); padding-top: calc(8px * var(--popup-scale, 1)); border-top: 1px solid var(--app-border, #333333); min-width: 0; }
+  .lookup-result { display: flex; flex-direction: column; gap: calc(5px * var(--popup-scale, 1)); padding-top: calc(8px * var(--popup-scale, 1)); min-width: 0; }
+  .lookup-result + .lookup-result { border-top: 1px solid var(--app-border, #333333); }
   .lookup-result-head { display: flex; align-items: flex-start; justify-content: space-between; gap: calc(8px * var(--popup-scale, 1)); min-width: 0; padding-top: calc(2px * var(--popup-scale, 1)); }
   .lookup-expression-wrap { display: flex; align-items: baseline; flex-wrap: wrap; gap: calc(4px * var(--popup-scale, 1)) calc(8px * var(--popup-scale, 1)); min-width: 0; color: var(--lookup-entry-text); line-height: 1.25; overflow-wrap: anywhere; }
   .lookup-expression { min-width: 0; font-size: calc(26px * var(--popup-scale, 1)); line-height: 1.22; overflow-wrap: anywhere; }

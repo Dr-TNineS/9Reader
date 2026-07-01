@@ -1058,7 +1058,17 @@
 <style>
   :global(*) { margin: 0; padding: 0; box-sizing: border-box; }
   :global(body) { background: #202124; color: #e8eaed; font-family: "Segoe UI", sans-serif; overflow: hidden; }
-  .probe { width: 100vw; height: 100vh; position: relative; --lookup-highlight-color: rgba(255, 255, 255, 0.32); }
+  .probe {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    --app-bg: #202124;
+    --app-text: #e8eaed;
+    --app-border: #4b5056;
+    --reader-bg: #111111;
+    --reader-text: #e8eaed;
+    --lookup-highlight-color: rgba(255, 255, 255, 0.32);
+  }
   .probe::before {
     content: "school";
     position: fixed;

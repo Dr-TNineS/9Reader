@@ -114,6 +114,8 @@ async function popupMetrics(page) {
     const audio = document.querySelector(".lookup-audio");
     const controls = document.querySelector(".probe-ctrls");
     const content = document.querySelector(".lookup-content");
+    const firstResult = document.querySelector(".lookup-result:first-child");
+    const secondResult = document.querySelector(".lookup-result:nth-child(2)");
     const expression = document.querySelector(".lookup-expression");
     const reading = document.querySelector(".lookup-reading");
     const glossary = document.querySelector(".lookup-glossary-content");
@@ -267,6 +269,15 @@ async function popupMetrics(page) {
       horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth,
       hasResultsScroller: results instanceof HTMLElement && results.scrollHeight > results.clientHeight,
       resultsScrollbarWidth: results instanceof HTMLElement ? results.offsetWidth - results.clientWidth : 0,
+      appBackground: content instanceof HTMLElement ? getComputedStyle(content).getPropertyValue("--app-bg").trim() : "",
+      readerBackground: content instanceof HTMLElement ? getComputedStyle(content).getPropertyValue("--reader-bg").trim() : "",
+      contentBackground: content instanceof HTMLElement ? getComputedStyle(content).backgroundColor : "",
+      resultsBackground: results instanceof HTMLElement ? getComputedStyle(results).backgroundColor : "",
+      resultsBorderTopStyle: results instanceof HTMLElement ? getComputedStyle(results).borderTopStyle : "",
+      resultsBorderTopColor: results instanceof HTMLElement ? getComputedStyle(results).borderTopColor : "",
+      firstResultBorderTopStyle: firstResult instanceof HTMLElement ? getComputedStyle(firstResult).borderTopStyle : "",
+      secondResultBorderTopStyle: secondResult instanceof HTMLElement ? getComputedStyle(secondResult).borderTopStyle : "",
+      secondResultBorderTopColor: secondResult instanceof HTMLElement ? getComputedStyle(secondResult).borderTopColor : "",
       lookupTextRows: document.querySelectorAll(".lookup-text").length,
       lookupMetaRows: document.querySelectorAll(".lookup-meta").length,
       lookupResultRows: document.querySelectorAll(".lookup-result").length,
@@ -616,6 +627,7 @@ async function main() {
       const metrics = await popupMetrics(page);
       assert(metrics.state === state, "Probe state should match requested state.", metrics);
       assert(metrics.text.includes(text), `Lookup popup should render ${state} text.`, metrics);
+      assert(metrics.contentBackground === "rgb(32, 33, 36)" && metrics.resultsBackground === "", `${state} popup should use the outer app background outside ready results.`, metrics);
       assert(!metrics.horizontalOverflow, `${state} popup should not create horizontal overflow.`, metrics);
     }
 
@@ -655,6 +667,9 @@ async function main() {
     assert(pitchByLabel["pitch 3"]?.moras.filter((mora) => mora.hasFallingEdge).map((mora) => mora.text).join("") === "れ", "Pitch [3] should draw exactly one falling stroke at the third mora.", ready.pitchTransitions);
     assert(ready.actionSlotWidth === "28px", "Scale 1 should keep result-level action slots at 28 px.", ready);
     assert(ready.lookupResultRows >= 5 && ready.text.includes("extra rendered lookup result 5"), "Ready popup should render all backend lookup results, not only the first three.", ready);
+    assert(ready.contentBackground === "rgb(17, 17, 17)" && ready.resultsBackground === "rgb(17, 17, 17)", "Ready popup results should keep the inner lookup content background.", ready);
+    assert(ready.resultsBorderTopStyle === "solid" && ready.resultsBorderTopColor !== ready.secondResultBorderTopColor, "Ready popup should draw the HSA-style outer divider above the first result.", ready);
+    assert(ready.firstResultBorderTopStyle === "none" && ready.secondResultBorderTopStyle === "solid", "Ready popup should reserve ordinary separators for result-to-result boundaries.", ready);
     assert(ready.text.includes("Jitendex.org [probe]"), "Ready popup should render dictionary source.", ready);
     assert(ready.text.includes("No CSS Dictionary [probe]") && ready.text.includes("plain dictionary entry without imported CSS"), "Ready popup should render dictionaries that have no imported CSS.", ready);
     assert(ready.lookupTextRows === 0, "Ready popup should not render the original selected text row.", ready);
