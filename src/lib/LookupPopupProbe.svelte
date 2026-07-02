@@ -828,6 +828,9 @@
           div[data-sc-class~="shikiri"] td[data-sc-td][data-sc-class~="red"] span[data-sc-red] {
             color: rgb(255, 255, 255);
           }
+          .gloss-image-container {
+            display: flex;
+          }
         `,
       };
     }

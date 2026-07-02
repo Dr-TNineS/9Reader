@@ -323,6 +323,20 @@ async function popupMetrics(page) {
         const container = document.querySelector('.lookup-glossary-content [data-sc-img][data-sc-class="gaiji"] .gloss-image-container');
         return container instanceof HTMLElement ? getComputedStyle(container).width : "";
       })(),
+      gaijiContainerDisplay: (() => {
+        const container = document.querySelector('.lookup-glossary-content [data-sc-img][data-sc-class="gaiji"] .gloss-image-container');
+        return container instanceof HTMLElement ? getComputedStyle(container).display : "";
+      })(),
+      gaijiImageWidth: (() => {
+        const image = document.querySelector('.lookup-glossary-content [data-sc-img][data-sc-class="gaiji"] .gloss-media-image');
+        return image instanceof HTMLElement ? getComputedStyle(image).width : "";
+      })(),
+      gaijiContainerImageWidthDelta: (() => {
+        const container = document.querySelector('.lookup-glossary-content [data-sc-img][data-sc-class="gaiji"] .gloss-image-container');
+        const image = document.querySelector('.lookup-glossary-content [data-sc-img][data-sc-class="gaiji"] .gloss-media-image');
+        if (!(container instanceof HTMLElement) || !(image instanceof HTMLElement)) return Number.NaN;
+        return Math.abs(container.getBoundingClientRect().width - image.getBoundingClientRect().width);
+      })(),
       gaijiComputedContainerWidths: Array.from(document.querySelectorAll('.lookup-glossary-content [data-inline-gaiji="true"] .gloss-image-container'))
         .filter((node) => node instanceof HTMLElement)
         .map((node) => getComputedStyle(node).width),
@@ -739,7 +753,17 @@ async function main() {
     assert(ready.gaijiMediaImages >= 6, "Ready popup should hydrate MK3 gaiji SVG media into inline images.", ready);
     assert(ready.mediaErrors === 0 && ready.mediaLoading === 0, "Successful dictionary media should not remain loading or error.", ready);
     assert(ready.mediaImageMaxHeight === "180px", "Dictionary media image should be constrained inside the popup.", ready);
-    assert(ready.gaijiImageMaxHeight !== "180px" && ready.gaijiContainerWidth !== "" && Number.parseFloat(ready.gaijiContainerWidth) < 32, "MK3 gaiji SVG media should stay inline and small rather than rendering as block media cards.", ready);
+    assert(
+      ready.gaijiImageMaxHeight !== "180px"
+        && ready.gaijiContainerWidth !== ""
+        && Number.parseFloat(ready.gaijiContainerWidth) < 32
+        && ready.gaijiImageWidth !== ""
+        && Math.abs(Number.parseFloat(ready.gaijiContainerWidth) - Number.parseFloat(ready.gaijiImageWidth)) < 1
+        && ready.gaijiContainerImageWidthDelta < 1
+        && ready.gaijiContainerDisplay !== "flex",
+      "MK3 gaiji SVG media should stay inline and small rather than rendering as oversized flex/block media cards.",
+      ready,
+    );
     assert(ready.gaijiStructuredUsedWidths.length >= 6 && Math.max(...ready.gaijiStructuredUsedWidths) <= 1.15 && Math.min(...ready.gaijiStructuredUsedWidths) <= 1 && ready.gaijiComputedContainerWidths.every((width) => Number.parseFloat(width) < 32), "MK3 gaiji media without explicit dimensions should keep inline glyph sizing instead of natural image width.", ready);
     assert(
       ready.monochromeSvgAppearance === "monochrome"
