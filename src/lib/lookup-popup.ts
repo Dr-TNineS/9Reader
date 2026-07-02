@@ -214,8 +214,10 @@ function renderStructuredImage(record: Record<string, unknown>, dictionary: stri
     : typeof record.src === "string"
       ? record.src
       : "";
-  const width = finiteNumber(record.width) ?? 100;
-  const height = finiteNumber(record.height) ?? 100;
+  const inlineGaiji = isGaijiImageRecord(record);
+  const fallbackSize = inlineGaiji ? 1 : 100;
+  const width = finiteNumber(record.width) ?? fallbackSize;
+  const height = finiteNumber(record.height) ?? fallbackSize;
   const preferredWidth = finiteNumber(record.preferredWidth);
   const preferredHeight = finiteNumber(record.preferredHeight);
   const invAspectRatio = preferredWidth && preferredHeight
@@ -252,8 +254,9 @@ function renderStructuredImage(record: Record<string, unknown>, dictionary: stri
     `data-has-explicit-dimensions="${hasExplicitDimensions}"`,
     `data-used-width="${escapeAttribute(String(usedWidth))}"`,
     `data-inv-aspect-ratio="${escapeAttribute(String(invAspectRatio))}"`,
+    inlineGaiji ? `data-inline-gaiji="true"` : "",
     typeof record.verticalAlign === "string" ? `data-vertical-align="${escapeAttribute(record.verticalAlign)}"` : "",
-    typeof record.sizeUnits === "string" ? `data-size-units="${escapeAttribute(record.sizeUnits)}"` : "",
+    typeof record.sizeUnits === "string" || inlineGaiji ? `data-size-units="${escapeAttribute(inlineGaiji ? "em" : String(record.sizeUnits))}"` : "",
   ].filter(Boolean).join(" ");
   const containerStyles = [
     `width:${usedWidth}em`,
@@ -420,6 +423,13 @@ function isSafeStructuredStyleValue(value: string): boolean {
 
 function finiteNumber(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) && value > 0 ? value : null;
+}
+
+function isGaijiImageRecord(record: Record<string, unknown>): boolean {
+  const data = record.data;
+  if (!data || typeof data !== "object") return false;
+  const fields = data as Record<string, unknown>;
+  return fields.gaiji !== undefined || fields.class === "gaiji";
 }
 
 function structuredDataAttributes(record: Record<string, unknown>): string[] {
