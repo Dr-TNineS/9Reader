@@ -31,10 +31,10 @@ Main Hibiki files:
 
 Main HSW files for comparison:
 
-- `D:\Hoshi-Reader-Windows\src\lib\reader\Reader.svelte`
-- `D:\Hoshi-Reader-Windows\src\App.svelte`
-- `D:\Hoshi-Reader-Windows\src\lib\LookupPopupContent.svelte`
-- `D:\Hoshi-Reader-Windows\src\lib\lookup-popup.ts`
+- `D:\9Reader\src\lib\reader\Reader.svelte`
+- `D:\9Reader\src\App.svelte`
+- `D:\9Reader\src\lib\LookupPopupContent.svelte`
+- `D:\9Reader\src\lib\lookup-popup.ts`
 
 ## Hibiki Reader Flow
 

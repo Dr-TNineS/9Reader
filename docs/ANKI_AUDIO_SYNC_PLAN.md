@@ -532,7 +532,7 @@ Validation:
   `npm run check:settings-state`, `npm run check:lookup-performance`,
   `npm run check:reader-toc`, and `npm run check:reader-visual`.
 - Passed: `npm run package`, producing `release/Hoshi-Reader-v0.1.0-portable.zip`.
-- Passed: five-second launch smoke of `src-tauri/target/release/hoshi-reader-windows.exe`.
+- Passed: five-second launch smoke of `src-tauri/target/release/9reader.exe`.
 - Not verified: real HSA local-audio database import, real remote word-audio
   source plus AnkiConnect, real media-bearing dictionary combined add-note
   flow, real popup word-audio playback, real word/Sasayaki playback

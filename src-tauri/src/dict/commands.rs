@@ -580,7 +580,7 @@ fn update_updatable_dictionaries(
 
     let client = reqwest::blocking::Client::builder()
         .user_agent(format!(
-            "⑨ Reader/{}",
+            "9reader/{}",
             env!("CARGO_PKG_VERSION")
         ))
         .connect_timeout(Duration::from_secs(15))

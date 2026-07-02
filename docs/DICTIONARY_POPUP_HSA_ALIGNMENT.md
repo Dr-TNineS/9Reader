@@ -262,7 +262,7 @@ Completed validation on 2026-06-23:
 - `npm run build`
 - `npm run check:lookup-popup`
 - `cd src-tauri; cargo test --lib`
-- VS developer-shell `cd /d D:\Hoshi-Reader-Windows\src-tauri && cargo check`
+- VS developer-shell `cd /d D:\9Reader\src-tauri && cargo check`
 
 ### Slice 2C: Legacy ZIP Media Import
 

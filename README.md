@@ -1,18 +1,18 @@
 <div align="center">
  
- # Hoshi Reader Windows
+ # ⑨ Reader
 
-![Language](https://img.shields.io/github/languages/top/Dr-TNineS/Hoshi-Reader-Windows)
+![Language](https://img.shields.io/github/languages/top/Dr-TNineS/9Reader)
 ![Platform](https://img.shields.io/badge/platform-Windows-0078D4)
-![License](https://img.shields.io/github/license/Dr-TNineS/Hoshi-Reader-Windows)
+![License](https://img.shields.io/github/license/Dr-TNineS/9Reader)
 
-Hoshi Reader Windows is a Japanese EPUB reader with Yomitan dictionary support, built for desktop immersion learning on Windows.
+⑨ Reader is a Japanese EPUB reader with Yomitan dictionary support, built for desktop immersion learning on Windows.
 
 It brings together vertical Japanese reading, popup dictionary lookup, AnkiConnect mining, local EPUB library management, and desktop-oriented keyboard and mouse interaction in a Windows/Tauri application.
 
 The reading and lookup experience is primarily aligned with [Hoshi Reader Android](https://github.com/HuangAntimony/Hoshi-Reader-Android), while the desktop UI, panel layout, and interaction design also draw inspiration from [Hoshi Reader Mac](https://github.com/W1ght/Hoshi-Reader-Mac).
 
-> **Work in progress:** Hoshi Reader Windows is actively developed. The core reading, dictionary, and Anki workflow is available, while sync, statistics, Sasayaki audiobook support, horizontal layout, and broader release validation are still in progress.
+> **Work in progress:** ⑨ Reader is actively developed. The core reading, dictionary, and Anki workflow is available, while sync, statistics, Sasayaki audiobook support, horizontal layout, and broader release validation are still in progress.
 
 <!--
 <p align="center">
@@ -31,7 +31,7 @@ The reading and lookup experience is primarily aligned with [Hoshi Reader Androi
 
 ## Status
 
-Hoshi Reader Windows is currently intended for local development and testing.
+⑨ Reader is currently intended for local development and testing.
 
 There is not yet a fully verified public release pipeline. You can build the application locally from source, or create a portable ZIP through the included packaging script.
 
@@ -56,7 +56,7 @@ There is not yet a fully verified public release pipeline. You can build the app
 
 ## Windows Interaction
 
-Hoshi Reader Windows is designed around desktop reading and lookup behavior:
+⑨ Reader is designed around desktop reading and lookup behavior:
 
 - The bookshelf keeps `Library`, `Dictionaries`, `Anki`, `Appearance`, `Advanced`, and `Shortcuts` available as separate panels.
 - Imported EPUBs are copied into an app-owned library. Removing a book from HSW does not delete the original EPUB file.
@@ -75,7 +75,7 @@ Card creation uses [AnkiConnect](https://ankiweb.net/shared/info/2055492159) run
 
 2. Start Anki.
 
-3. Open Hoshi Reader Windows and select `Anki` from the bookshelf sidebar.
+3. Open ⑨ Reader and select `Anki` from the bookshelf sidebar.
 
 4. Set or confirm the local endpoint:
 
@@ -95,7 +95,7 @@ For safety, HSW only accepts local AnkiConnect HTTP endpoints such as `localhost
 
 ## Dictionary Setup
 
-Hoshi Reader Windows uses Yomitan-format dictionary archives.
+⑨ Reader uses Yomitan-format dictionary archives.
 
 1. Open the `Dictionaries` panel from the bookshelf.
 2. Choose **Import Dictionary**.
@@ -158,8 +158,8 @@ For native dictionary support, use an **x64 Visual Studio Developer Command Prom
 Clone the repository together with its submodules:
 
 ```bash
-git clone --recurse-submodules https://github.com/Dr-TNineS/Hoshi-Reader-Windows.git
-cd Hoshi-Reader-Windows
+git clone --recurse-submodules https://github.com/Dr-TNineS/9Reader.git
+cd 9Reader
 npm install
 ```
 
@@ -253,7 +253,7 @@ cargo test --lib
 
 ## Relationship To Hoshi Reader
 
-Hoshi Reader Windows is an independent Windows/Tauri implementation of the Hoshi Reader reading and dictionary workflow.
+⑨ Reader is an independent Windows/Tauri implementation inspired by the Hoshi Reader reading and dictionary workflow.
 
 [Hoshi Reader Android](https://github.com/HuangAntimony/Hoshi-Reader-Android) is the primary reference for user-visible reading, lookup, dictionary, and Anki behavior.
 
