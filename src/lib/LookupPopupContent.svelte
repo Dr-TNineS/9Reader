@@ -423,9 +423,18 @@
     const container = placeholder.querySelector<HTMLElement>(".gloss-image-container");
     const sizer = placeholder.querySelector<HTMLElement>(".gloss-image-sizer");
     if (!container || !sizer || image.naturalWidth <= 0 || image.naturalHeight <= 0) return;
-    if (placeholder.dataset.inlineGaiji === "true") return;
 
     const aspectRatio = image.naturalHeight / image.naturalWidth;
+    const hasPreferredDimensions = placeholder.dataset.hasPreferredWidth === "true"
+      || placeholder.dataset.hasPreferredHeight === "true";
+    if (placeholder.dataset.sizeUnits === "em" && !hasPreferredDimensions) {
+      const usedWidth = positiveDatasetNumber(placeholder.dataset.usedWidth)
+        ?? (image.naturalWidth / 15);
+      container.style.width = `${usedWidth}em`;
+      sizer.style.paddingTop = `${aspectRatio * 100}%`;
+      return;
+    }
+
     const explicitDimensions = placeholder.dataset.hasExplicitDimensions === "true";
     if (!explicitDimensions) {
       const viewportWidth = Math.max(1, window.innerWidth - 20);
@@ -433,11 +442,6 @@
       container.style.width = `${imageWidth}px`;
       sizer.style.paddingTop = `${aspectRatio * 100}%`;
       return;
-    }
-
-    if (placeholder.dataset.sizeUnits === "em" && !placeholder.dataset.usedWidth) {
-      container.style.width = `${image.naturalWidth / 15}em`;
-      sizer.style.paddingTop = `${aspectRatio * 100}%`;
     }
   }
 
@@ -1372,11 +1376,9 @@
   .lookup-glossary-content :global(.gloss-media-image) { display: inline-block; max-width: 100%; max-height: calc(180px * var(--popup-scale, 1)); border: 0; object-fit: contain; outline: 0; vertical-align: top; }
   .lookup-glossary-content :global(.gloss-media-placeholder[data-inline-gaiji="true"]) { display: inline-block !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; color: inherit; vertical-align: baseline; }
   .lookup-glossary-content :global(.gloss-media-placeholder[data-inline-gaiji="true"] .gloss-image-container),
-  .lookup-glossary-content :global([data-sc-img][data-sc-class="gaiji"] .gloss-image-container) { display: inline-flex !important; width: calc(1.15em * var(--popup-scale, 1)) !important; height: calc(1.15em * var(--popup-scale, 1)) !important; max-width: calc(1.15em * var(--popup-scale, 1)) !important; max-height: calc(1.15em * var(--popup-scale, 1)) !important; margin-inline-end: calc(0.15em * var(--popup-scale, 1)); vertical-align: -0.15em; flex: 0 0 auto !important; }
-  .lookup-glossary-content :global(.gloss-media-placeholder[data-inline-gaiji="true"] .gloss-image-sizer),
-  .lookup-glossary-content :global([data-sc-img][data-sc-class="gaiji"] .gloss-image-sizer) { display: none !important; }
+  .lookup-glossary-content :global([data-sc-img][data-sc-class="gaiji"] .gloss-image-container) { display: inline-block !important; max-width: calc(1.15em * var(--popup-scale, 1)) !important; max-height: calc(1.15em * var(--popup-scale, 1)) !important; margin-inline-end: calc(0.15em * var(--popup-scale, 1)); vertical-align: -0.15em; flex: 0 0 auto !important; }
   .lookup-glossary-content :global(.gloss-media-placeholder[data-inline-gaiji="true"] .gloss-media-image),
-  .lookup-glossary-content :global([data-sc-img][data-sc-class="gaiji"] .gloss-media-image) { width: 100% !important; height: 100% !important; max-width: calc(1.15em * var(--popup-scale, 1)) !important; max-height: calc(1.15em * var(--popup-scale, 1)) !important; object-fit: contain; vertical-align: middle; }
+  .lookup-glossary-content :global([data-sc-img][data-sc-class="gaiji"] .gloss-media-image) { max-width: calc(1.15em * var(--popup-scale, 1)) !important; max-height: calc(1.15em * var(--popup-scale, 1)) !important; object-fit: contain; vertical-align: middle; }
   .lookup-glossary-content :global([data-sc-img][data-sc-class="gaiji"]) { display: inline-block; line-height: 1; vertical-align: -0.12em; }
   .lookup-glossary-content :global([data-sc-img][data-sc-class="gaiji"] .gloss-media-placeholder) { display: inline-block !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; color: inherit; vertical-align: baseline; }
   .anki-preview { display: flex; flex-direction: column; gap: calc(4px * var(--popup-scale, 1)); padding: calc(6px * var(--popup-scale, 1)) calc(8px * var(--popup-scale, 1)); background: var(--app-bg, #000); border: 1px solid var(--app-border, #333333); border-radius: calc(4px * var(--popup-scale, 1)); }

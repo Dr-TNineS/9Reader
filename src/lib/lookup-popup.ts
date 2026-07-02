@@ -220,6 +220,8 @@ function renderStructuredImage(record: Record<string, unknown>, dictionary: stri
   const height = finiteNumber(record.height) ?? fallbackSize;
   const preferredWidth = finiteNumber(record.preferredWidth);
   const preferredHeight = finiteNumber(record.preferredHeight);
+  const hasPreferredWidth = preferredWidth !== null;
+  const hasPreferredHeight = preferredHeight !== null;
   const invAspectRatio = preferredWidth && preferredHeight
     ? preferredHeight / preferredWidth
     : height / width;
@@ -252,6 +254,8 @@ function renderStructuredImage(record: Record<string, unknown>, dictionary: stri
     `data-collapsed="${collapsed}"`,
     `data-collapsible="${collapsible}"`,
     `data-has-explicit-dimensions="${hasExplicitDimensions}"`,
+    `data-has-preferred-width="${hasPreferredWidth}"`,
+    `data-has-preferred-height="${hasPreferredHeight}"`,
     `data-used-width="${escapeAttribute(String(usedWidth))}"`,
     `data-inv-aspect-ratio="${escapeAttribute(String(invAspectRatio))}"`,
     inlineGaiji ? `data-inline-gaiji="true"` : "",

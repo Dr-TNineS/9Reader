@@ -311,6 +311,23 @@ async function popupMetrics(page) {
           .find((node) => node instanceof HTMLElement && !node.closest('[data-sc-img][data-sc-class="gaiji"]'));
         return image instanceof HTMLElement ? getComputedStyle(image).maxHeight : "";
       })(),
+      wideBlockMedia: (() => {
+        const placeholder = document.querySelector('.lookup-glossary-content .gloss-media-placeholder[data-media-path="images/wide.svg"]');
+        const container = placeholder?.querySelector(".gloss-image-container");
+        const image = placeholder?.querySelector(".gloss-media-image");
+        if (!(container instanceof HTMLElement) || !(image instanceof HTMLElement)) return null;
+        const containerRect = container.getBoundingClientRect();
+        const imageRect = image.getBoundingClientRect();
+        return {
+          containerWidth: containerRect.width,
+          containerHeight: containerRect.height,
+          imageWidth: imageRect.width,
+          imageHeight: imageRect.height,
+          containerImageWidthDelta: Math.abs(containerRect.width - imageRect.width),
+          containerImageHeightDelta: Math.abs(containerRect.height - imageRect.height),
+          ratio: containerRect.height / containerRect.width,
+        };
+      })(),
       gaijiImageMaxHeight: (() => {
         const image = document.querySelector('.lookup-glossary-content [data-sc-img][data-sc-class="gaiji"] .gloss-media-image');
         return image instanceof HTMLElement ? getComputedStyle(image).maxHeight : "";
@@ -336,6 +353,12 @@ async function popupMetrics(page) {
         const image = document.querySelector('.lookup-glossary-content [data-sc-img][data-sc-class="gaiji"] .gloss-media-image');
         if (!(container instanceof HTMLElement) || !(image instanceof HTMLElement)) return Number.NaN;
         return Math.abs(container.getBoundingClientRect().width - image.getBoundingClientRect().width);
+      })(),
+      gaijiContainerImageHeightDelta: (() => {
+        const container = document.querySelector('.lookup-glossary-content [data-sc-img][data-sc-class="gaiji"] .gloss-image-container');
+        const image = document.querySelector('.lookup-glossary-content [data-sc-img][data-sc-class="gaiji"] .gloss-media-image');
+        if (!(container instanceof HTMLElement) || !(image instanceof HTMLElement)) return Number.NaN;
+        return Math.abs(container.getBoundingClientRect().height - image.getBoundingClientRect().height);
       })(),
       gaijiComputedContainerWidths: Array.from(document.querySelectorAll('.lookup-glossary-content [data-inline-gaiji="true"] .gloss-image-container'))
         .filter((node) => node instanceof HTMLElement)
@@ -754,12 +777,21 @@ async function main() {
     assert(ready.mediaErrors === 0 && ready.mediaLoading === 0, "Successful dictionary media should not remain loading or error.", ready);
     assert(ready.mediaImageMaxHeight === "180px", "Dictionary media image should be constrained inside the popup.", ready);
     assert(
+      ready.wideBlockMedia
+        && Math.abs(ready.wideBlockMedia.ratio - 0.45) < 0.02
+        && ready.wideBlockMedia.containerImageWidthDelta < 1
+        && ready.wideBlockMedia.containerImageHeightDelta < 1,
+      "Wide block dictionary media should backfill the container from natural image dimensions instead of keeping a square fallback.",
+      ready.wideBlockMedia ?? ready,
+    );
+    assert(
       ready.gaijiImageMaxHeight !== "180px"
         && ready.gaijiContainerWidth !== ""
         && Number.parseFloat(ready.gaijiContainerWidth) < 32
         && ready.gaijiImageWidth !== ""
         && Math.abs(Number.parseFloat(ready.gaijiContainerWidth) - Number.parseFloat(ready.gaijiImageWidth)) < 1
         && ready.gaijiContainerImageWidthDelta < 1
+        && ready.gaijiContainerImageHeightDelta < 1
         && ready.gaijiContainerDisplay !== "flex",
       "MK3 gaiji SVG media should stay inline and small rather than rendering as oversized flex/block media cards.",
       ready,

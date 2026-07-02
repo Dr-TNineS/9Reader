@@ -168,6 +168,7 @@
           ],
         },
         { tag: "img", path: "images/school.svg", alt: "school icon" },
+        { tag: "img", path: "images/wide.svg", alt: "wide block media" },
         {
           tag: "img",
           path: "icons/mono.svg",
@@ -964,6 +965,12 @@
 
   async function loadDictionaryMediaResource(dictionary: string, path: string) {
     if (mediaMode === "fail") throw new Error(`Missing probe media: ${dictionary}/${path}`);
+    if (path === "images/wide.svg") {
+      return {
+        mimeType: "image/svg+xml",
+        dataBase64: "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0ODAiIGhlaWdodD0iMjE2IiB2aWV3Qm94PSIwIDAgNDgwIDIxNiI+PHJlY3Qgd2lkdGg9IjQ4MCIgaGVpZ2h0PSIyMTYiIGZpbGw9IiM5ZWM2ZTgiLz48Y2lyY2xlIGN4PSIyNDAiIGN5PSIxMDgiIHI9IjY0IiBmaWxsPSIjNTg3ODk2Ii8+PC9zdmc+",
+      };
+    }
     return {
       mimeType: "image/svg+xml",
       dataBase64: "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDY0IDQwIj48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNDAiIHJ4PSI2IiBmaWxsPSIjMzAzNDNhIi8+PHBhdGggZD0iTTEwIDI4aDQ0TDM5IDEyIDI4IDI0bC02LTYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzc5ZDI5MSIgc3Ryb2tlLXdpZHRoPSIzIi8+PC9zdmc+",
