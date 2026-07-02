@@ -90,4 +90,6 @@ Hoshi Reader Windows（HSW）是 Hoshi Reader 阅读体验的 Windows/Tauri 实�
 
 - 不要将无关既有 worktree 改动、参考项目改动、构建产物、个人本地配置或 ignored test data 混入 commit。
 
+- 处理 PR merge、cherry-pick 或 integration 前，先审查当前工作树的实际变化，不要只因 `git status` 有输出就默认新建 worktree。至少查看 `git status --short --branch` 与 `git diff --stat`；必要时用 `git diff --ignore-space-at-eol` 或等价命令确认是否只是 LF/CRLF、文件模式或无内容差异。只有存在真实未提交改动、会与 PR 修改同文件/同模块冲突、验证环境可能被污染，或任务本身高风险时，才新建 integration worktree/branch；若只是换行提示、ignored build/cache 目录或无内容 diff，优先在当前 worktree 处理并复用现有依赖与构建缓存。
+
 - 小型、低风险、边界清楚的修复可在当前分支完成；较大功能、跨模块重构、高风险 reader/storage 改动应使用独立 `codex/` 分支或 worktree。
