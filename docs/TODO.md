@@ -1,4 +1,4 @@
-# Hoshi Reader Windows Agent TODO
+# ⑨ Reader Agent TODO
 
 Last updated: 2026-06-29
 

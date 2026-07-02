@@ -1,4 +1,4 @@
-﻿# Hoshi Reader - Portable Zip Builder
+﻿# ⑨ Reader - Portable Zip Builder
 # 用法: .\scripts\package-portable.ps1
 # 一键构建 + 打包 zip（不需要 NSIS）
 
@@ -15,7 +15,7 @@ $productName = $config.productName -replace " ", "-"
 $zipName = "${productName}-v${version}-portable.zip"
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  Hoshi Reader - Portable Zip Builder" -ForegroundColor Cyan
+Write-Host "  ⑨ Reader - Portable Zip Builder" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -31,12 +31,12 @@ Write-Host "[2/2] Packaging portable zip..." -ForegroundColor Yellow
 $tempDir = "$outDir\temp-portable"
 New-Item -ItemType Directory -Force -Path $tempDir | Out-Null
 
-Copy-Item "$releaseDir\$binaryName" "$tempDir\Hoshi Reader.exe" -Force -ErrorAction Stop
+Copy-Item "$releaseDir\$binaryName" "$tempDir\⑨ Reader.exe" -Force -ErrorAction Stop
 
 @"
-Hoshi Reader v$version (Portable)
+⑨ Reader v$version (Portable)
 ================================
-直接双击 "Hoshi Reader.exe" 即可运行，无需安装。
+直接双击 "⑨ Reader.exe" 即可运行，无需安装。
 
 首次启动可能需要 WebView2 运行时（Windows 11 已自带）。
 如无法启动，请从微软官网安装：
@@ -56,4 +56,4 @@ Write-Host "Done! " -ForegroundColor Green -NoNewline
 Write-Host "$zipName ($zipSize MB)" -ForegroundColor White
 Write-Host "Location: $zipPath" -ForegroundColor Gray
 Write-Host ""
-Write-Host "发给朋友：解压后双击 Hoshi Reader.exe 即可运行。" -ForegroundColor Cyan
+Write-Host "发给朋友：解压后双击 ⑨ Reader.exe 即可运行。" -ForegroundColor Cyan

@@ -175,12 +175,12 @@ Validated on 2026-06-08:
 ## Validation Commands
 
 - Documentation-only changes: `git diff --check`
-- Frontend changes: `cd hoshi-reader-windows; npm run check`
-- Frontend production changes: `cd hoshi-reader-windows; npm run build`
-- Rust/backend changes: `cd hoshi-reader-windows/src-tauri; cargo check`
-- Rust dictionary tests: `cd hoshi-reader-windows/src-tauri; cargo test --lib`
-- Linked build check: `cd hoshi-reader-windows/src-tauri; $env:RUSTFLAGS='--cfg hoshi_dicts_linked'; $env:CARGO_TARGET_DIR='target-linked-check'; cargo check`
-- Tauri runtime check: `cd hoshi-reader-windows; cmd /c npx.cmd tauri dev`
+- Frontend changes: `cd 9Reader; npm run check`
+- Frontend production changes: `cd 9Reader; npm run build`
+- Rust/backend changes: `cd 9Reader/src-tauri; cargo check`
+- Rust dictionary tests: `cd 9Reader/src-tauri; cargo test --lib`
+- Linked build check: `cd 9Reader/src-tauri; $env:RUSTFLAGS='--cfg hoshi_dicts_linked'; $env:CARGO_TARGET_DIR='target-linked-check'; cargo check`
+- Tauri runtime check: `cd 9Reader; cmd /c npx.cmd tauri dev`
 
 ## Assumptions
 

@@ -239,9 +239,9 @@
 <section class="bookshelf">
   <aside class="sidebar" aria-label="Bookshelf navigation">
     <div class="brand">
-      <div class="brand-mark">HR</div>
+      <div class="brand-mark">⑨</div>
       <div>
-        <h1>Hoshi Reader</h1>
+        <h1>⑨ Reader</h1>
         <p>Windows</p>
       </div>
     </div>

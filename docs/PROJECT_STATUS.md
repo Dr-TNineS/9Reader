@@ -1,8 +1,8 @@
-# Hoshi Reader Windows Project Status
+# ⑨ Reader Project Status
 
 Last updated: 2026-06-29
 
-This file records current implementation status for `hoshi-reader-windows`. It
+This file records current implementation status for ⑨ Reader. It
 is not an agent rule file, product roadmap, architecture overview, validation
 manual, or substitute for checking the current code.
 
@@ -10,7 +10,7 @@ Facts that cannot be confirmed from current code should be marked `unknown` or `
 
 ## Current Scope
 
-- Main project: `hoshi-reader-windows`.
+- Main project: ⑨ Reader.
 - Platform target: Windows desktop through Tauri.
 - Stack: Tauri 2, Svelte 5, TypeScript, Vite, Rust.
 - Primary path: bookshelf -> import EPUB -> open reader -> select text -> lookup.

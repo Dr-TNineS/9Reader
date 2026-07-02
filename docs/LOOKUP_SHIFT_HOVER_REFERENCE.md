@@ -2,7 +2,7 @@
 
 ## Summary
 
-This document records the read-only comparison of Hibiki's Shift+hover lookup behavior against Hoshi Reader Windows.
+This document records the read-only comparison of Hibiki's Shift+hover lookup behavior against ⑨ Reader.
 
 The goal is not to copy Hibiki's Flutter/WebView architecture. HSW already owns the reader DOM in Svelte, so the useful parts are the interaction model, throttling rules, selection algorithm details, and popup-layer behavior.
 

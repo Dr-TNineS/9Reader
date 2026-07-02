@@ -2,7 +2,7 @@
 
 Last updated: 2026-06-24
 
-This document evaluates how Hoshi Reader Windows (HSW) should move from the
+This document evaluates how ⑨ Reader (HSW) should move from the
 current disabled lookup-to-Anki payload boundary toward a Windows-native Anki
 integration.
 

@@ -4,7 +4,7 @@ Last updated: 2026-06-23
 
 ## Goal
 
-Align the Hoshi Reader Windows dictionary popup sizing and typography with the
+Align the ⑨ Reader dictionary popup sizing and typography with the
 current Hoshi Reader upstream popup while keeping the existing Svelte popup
 stack, Windows-first placement, and dictionary rendering boundaries.
 

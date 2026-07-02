@@ -1,12 +1,12 @@
-# Hoshi Reader Windows Agent 指南
+# ⑨ Reader Agent 指南
 
-Hoshi Reader Windows（HSW）是 Hoshi Reader 阅读体验的 Windows/Tauri 实现项目。目标是在 Windows 桌面平台完成稳定、可维护的阅读、词典查词与 Anki 工作流，并在明确需要时对齐 Hoshi Reader Android（HSA）的用户可见行为。
+⑨ Reader（HSW）是受 Hoshi Reader 阅读体验启发的 Windows/Tauri 实现项目。目标是在 Windows 桌面平台完成稳定、可维护的阅读、词典查词与 Anki 工作流，并在明确需要时对齐 Hoshi Reader Android（HSA）的用户可见行为。
 
 本文件只记录需要在未来会话中长期遵守的仓库级规则。当前实现状态、功能完成度、风险和任务进度不以本文件为准，必须回到当前代码和对应 `docs/` 文档核实。
 
 ## 工作原则
 
-- `hoshi-reader-windows` 当前代码是“当前实现事实”的唯一真源：用于确认现有数据流、状态所有者、模块边界和兼容风险。它不自动定义目标用户体验；当任务涉及用户可见行为对齐时，应以 HSA 的已验证行为为主要参考，并结合 HSM 的桌面端行为与 Windows 平台约束决定最终方案。
+- ⑨ Reader 当前代码是“当前实现事实”的唯一真源：用于确认现有数据流、状态所有者、模块边界和兼容风险。它不自动定义目标用户体验；当任务涉及用户可见行为对齐时，应以 HSA 的已验证行为为主要参考，并结合 HSM 的桌面端行为与 Windows 平台约束决定最终方案。
 - 当前 HSW 行为如与 HSA 的已验证核心体验冲突，不得仅因“现有代码如此实现”而保留；应先明确差异属于 bug、未完成迁移、合理的 Windows 平台适配，还是 HSW 有意形成的独立产品决策。
 - 开始修改前，先检查相关 Svelte、TypeScript、Rust command、storage 和测试/probe。
 - HSA 是需要对齐用户可见行为时的主要事实参考；HSM 仅作为补充参考。不要默认继承参考项目的产品定位、架构、平台 API、存储方案或实现细节。

@@ -1,6 +1,6 @@
 # HSW Validation Guide
 
-This file contains durable validation policy for Hoshi Reader Windows. Update it
+This file contains durable validation policy for ⑨ Reader. Update it
 only when validation requirements, probe names, test data, or stable manual QA
 flows change.
 

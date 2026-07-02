@@ -3,7 +3,7 @@
 Last updated: 2026-06-16
 
 This document records a read-only comparison of Hoshi Reader Android (HSA),
-Hibiki, and current Hoshi Reader Windows (HSW) dictionary popup behavior.
+Hibiki, and current ⑨ Reader (HSW) dictionary popup behavior.
 HSA is the primary reference. Hibiki is only a secondary reference where HSA is
 absent or where its behavior helps explain a desktop-specific interaction.
 

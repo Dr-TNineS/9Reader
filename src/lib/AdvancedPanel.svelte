@@ -39,7 +39,7 @@
   <div class="setting-card">
     <div class="setting-copy">
       <label for="reopen-last-book">Reopen last book on startup</label>
-      <p>Automatically return to the last reading session when Hoshi Reader starts.</p>
+      <p>Automatically return to the last reading session when ⑨ Reader starts.</p>
     </div>
     <UiSwitch
       id="reopen-last-book"

@@ -1,4 +1,4 @@
-# Hoshi Reader Windows Status
+# ⑨ Reader Status
 
 This root file is a short index only. Detailed and durable project documentation lives under `docs/`.
 

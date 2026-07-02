@@ -1,6 +1,6 @@
 # HSW Documentation Index
 
-This directory is the durable documentation home for Hoshi Reader Windows.
+This directory is the durable documentation home for ⑨ Reader.
 
 Use these files before falling back to the root `STATUS.md`:
 

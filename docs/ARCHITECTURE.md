@@ -2,7 +2,7 @@
 
 Last updated: 2026-06-29
 
-This document records current architecture facts for Hoshi Reader Windows. It
+This document records current architecture facts for ⑨ Reader. It
 is not a future plan, task log, or completion ledger. Current implementation
 status, known issues, and not-verified items live in `docs/PROJECT_STATUS.md`.
 Future refactor direction lives in `docs/ARCHITECTURE_REFACTORING.md`.
