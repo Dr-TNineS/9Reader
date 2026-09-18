@@ -1,4 +1,4 @@
-# HSW Current Architecture
+# 9Reader Current Architecture
 
 Last updated: 2026-06-29
 
@@ -9,7 +9,7 @@ Future refactor direction lives in `docs/ARCHITECTURE_REFACTORING.md`.
 
 ## App Shape
 
-- HSW is a Windows desktop app built with Svelte 5, TypeScript, Vite, Tauri 2,
+- 9Reader is a Windows desktop app built with Svelte 5, TypeScript, Vite, Tauri 2,
   and Rust.
 - `src/App.svelte` owns the top-level bookshelf/reader flow. Feature-specific
   state should live in the matching feature boundary or existing controller

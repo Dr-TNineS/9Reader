@@ -2,7 +2,7 @@ import { spawn, spawnSync } from "node:child_process";
 import { once } from "node:events";
 import { chromium } from "playwright";
 
-const port = Number(process.env.HSW_DICTIONARY_SEARCH_PORT || 5184);
+const port = Number(process.env.NINEREADER_DICTIONARY_SEARCH_PORT || 5184);
 const origin = `http://127.0.0.1:${port}`;
 
 function assert(condition, message, details = {}) {

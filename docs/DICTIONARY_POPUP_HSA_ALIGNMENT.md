@@ -3,15 +3,15 @@
 Last updated: 2026-06-16
 
 This document records a read-only comparison of Hoshi Reader Android (HSA),
-Hibiki, and current ⑨ Reader (HSW) dictionary popup behavior.
+Hibiki, and current ⑨ Reader (9Reader) dictionary popup behavior.
 HSA is the primary reference. Hibiki is only a secondary reference where HSA is
 absent or where its behavior helps explain a desktop-specific interaction.
 
 Do not modify `reference/` or `third_party/hoshidicts` from this document.
 
-## Current HSW State
+## Current 9Reader State
 
-- HSW uses Svelte DOM popups rendered from `src/App.svelte` and
+- 9Reader uses Svelte DOM popups rendered from `src/App.svelte` and
   `src/lib/LookupPopupContent.svelte`.
 - Reader lookup opens from Windows-oriented `Shift + hover`, not HSA's
   single-tap reader lookup.
@@ -30,7 +30,7 @@ Do not modify `reference/` or `third_party/hoshidicts` from this document.
 - Same-popup cross-reference redirect history is implemented with popup-local
   Back/Forward controls and scroll restoration. `Shift + hover` recursive
   lookup remains a child-popup action.
-- HSW does not yet support word audio, real Anki actions, or Sasayaki controls.
+- 9Reader does not yet support word audio, real Anki actions, or Sasayaki controls.
 
 ## HSA Reference Findings
 
@@ -55,7 +55,7 @@ shared iframe-based popup system:
   `https://appassets.androidplatform.net/image?dictionary=...&path=...` and
   the legacy `image://` scheme. It supports png, jpeg, gif, webp, avif, heic,
   and svg mime types.
-- HSA's popup renderer is the behavior reference for HSW. It groups glossaries by
+- HSA's popup renderer is the behavior reference for 9Reader. It groups glossaries by
   dictionary, renders furigana, tags, pitch/frequency, structured content,
   dictionary media images, dictionary-specific CSS, collapsed dictionaries,
   compact glossary modes, action buttons, popup tap selection, lookup redirects,
@@ -75,18 +75,18 @@ Important HSA behavior that is product-relevant:
 - Popup action controls are real DOM buttons and must stay separate from
   selectable glossary text.
 - Outside tap dismissal exists for Process Text host, but reader popup dismissal
-  is more constrained. HSW should not blindly add outside-click-to-dismiss for
+  is more constrained. 9Reader should not blindly add outside-click-to-dismiss for
   reader popups.
 
-Android/WebView-specific details that should not be copied directly to HSW:
+Android/WebView-specific details that should not be copied directly to 9Reader:
 
 - Android `WebView`, `WebResourceResponse`, `appassets.androidplatform.net`,
   `webkit.messageHandlers`, iframe sandboxing, Media3/Sasayaki bridges, and
   AnkiDroid flows are platform-specific.
-- HSA single-tap reader lookup is Android-first. HSW should keep
+- HSA single-tap reader lookup is Android-first. 9Reader should keep
   `Shift + hover` for the Windows reader unless a separate product decision
   changes that.
-- HSA iframe host solves WebView/touch/rendering constraints. HSW already owns
+- HSA iframe host solves WebView/touch/rendering constraints. 9Reader already owns
   the popup DOM in Svelte, so iframe migration is optional architecture work,
   not a prerequisite for renderer/media/history parity.
 
@@ -98,7 +98,7 @@ Hibiki is useful mainly for desktop-style interaction details:
 - It uses Shift-hover movement thresholding for reader and popup glossary
   lookup.
 - Child popups are anchored to glossary text rects and managed as a stack.
-- It needs WebView-to-native coordinate translation; HSW does not, because
+- It needs WebView-to-native coordinate translation; 9Reader does not, because
   Svelte DOM `Range.getBoundingClientRect()` already returns viewport
   coordinates.
 
@@ -107,11 +107,11 @@ HSA has a clear behavior.
 
 ## Recommendation
 
-Do not migrate HSW to the HSA iframe host yet.
+Do not migrate 9Reader to the HSA iframe host yet.
 
 Reasoning:
 
-- HSW has already implemented the important user-visible stack behavior in
+- 9Reader has already implemented the important user-visible stack behavior in
   native Svelte DOM.
 - The next missing features are renderer fidelity, dictionary media, and
   history/back-forward. All three can be implemented against the existing Svelte
@@ -123,18 +123,18 @@ Reasoning:
 
 Adopt HSA behavior first, not HSA architecture:
 
-- Keep HSW popup stack in Svelte.
+- Keep 9Reader popup stack in Svelte.
 - Reuse HSA's behavioral contracts for renderer grouping, media URL semantics,
   redirect history, and action controls.
 - Reconsider iframe host only if Svelte DOM rendering becomes unable to support
   dictionary CSS/media safely, or if future Dictionary tab / Process Text flows
   require a shared popup document.
 
-Current note: HSW now supports a first-pass scoped dictionary `styles.css`
+Current note: 9Reader now supports a first-pass scoped dictionary `styles.css`
 path. This is a safe subset for glossary styling, not a full HSA iframe/CSS
 compatibility promise.
 
-Current note: HSW also supports the Svelte popup dictionary media path through
+Current note: 9Reader also supports the Svelte popup dictionary media path through
 lazy placeholders backed by the read-only `dictionary_media` Tauri command.
 Automated popup probes cover successful image replacement, unavailable media,
 and non-Tauri fallback behavior. Runtime validation with a normal media-bearing
@@ -151,14 +151,14 @@ current local app-data 明鏡 import has no `media.idx`/`media.bin`.
 
 Current note: Slice 2C is active. `MK3Fix0407.zip` stores `gaiji/...` media
 filenames with a legacy non-UTF-8 encoding while term bank JSON references
-normal UTF-8 paths. HSW must preserve those media files and normalize entry
+normal UTF-8 paths. 9Reader must preserve those media files and normalize entry
 names before hoshidicts import; old `mediaCount=0` imports must be reimported.
 
 ## Follow-Up Implementation Slices
 
 ### Slice 1: HSA-Style Renderer Parity
 
-Goal: make HSW popup rendering closer to HSA while keeping Svelte DOM.
+Goal: make 9Reader popup rendering closer to HSA while keeping Svelte DOM.
 
 Key changes:
 
@@ -189,7 +189,7 @@ Validation:
 
 ### Slice 2: Dictionary Media Resource Path
 
-Status: implemented at the HSW Svelte popup level; real media-bearing dictionary
+Status: implemented at the 9Reader Svelte popup level; real media-bearing dictionary
 runtime validation remains manual/not verified.
 
 Goal: support HSA-style dictionary media images when imported media exists.
@@ -316,7 +316,7 @@ Acceptance:
 
 - Lookup `目` displays `bs一`, `ws一`, `bs二`, and `参照` gaiji SVGs without
   `Media unavailable` and without oversized generic media cards.
-- Anki glossary fields contain `<img src="hsw_...svg">` for inline gaiji and
+- Anki glossary fields contain `<img src="nine_reader_...svg">` for inline gaiji and
   preserve red bracket styling.
 - `{dictionary-media}` still renders the standalone media list.
 

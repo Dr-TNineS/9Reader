@@ -59,7 +59,7 @@ There is not yet a fully verified public release pipeline. You can build the app
 ⑨ Reader is designed around desktop reading and lookup behavior:
 
 - The bookshelf keeps `Library`, `Dictionaries`, `Anki`, `Appearance`, `Advanced`, and `Shortcuts` available as separate panels.
-- Imported EPUBs are copied into an app-owned library. Removing a book from HSW does not delete the original EPUB file.
+- Imported EPUBs are copied into an app-owned library. Removing a book from 9Reader does not delete the original EPUB file.
 - `Esc` first clears an active lookup selection, then closes the table of contents, then returns to the bookshelf.
 - Arrow keys navigate pages.
 - `Ctrl` / `Meta` chapter navigation is supported in the reader.
@@ -87,11 +87,11 @@ Card creation uses [AnkiConnect](https://ankiweb.net/shared/info/2055492159) run
 
 6. Fetch available decks and note types.
 
-7. Select a deck and note type, then map HSW fields to your Anki fields.
+7. Select a deck and note type, then map 9Reader fields to your Anki fields.
 
 8. Open a dictionary popup in the reader and use the Anki action to create a note.
 
-For safety, HSW only accepts local AnkiConnect HTTP endpoints such as `localhost` and `127.0.0.1`.
+For safety, 9Reader only accepts local AnkiConnect HTTP endpoints such as `localhost` and `127.0.0.1`.
 
 ## Dictionary Setup
 
@@ -107,7 +107,7 @@ For safety, HSW only accepts local AnkiConnect HTTP endpoints such as `localhost
 5. Enable it and adjust its order if needed.
 6. Return to the reader and trigger a lookup.
 
-The dictionary backend requires the bundled `hoshidicts` native dependency to build successfully. If the engine is unavailable, HSW will show a dedicated dictionary-engine state instead of returning fake results.
+The dictionary backend requires the bundled `hoshidicts` native dependency to build successfully. If the engine is unavailable, 9Reader will show a dedicated dictionary-engine state instead of returning fake results.
 
 ## Keyboard And Mouse Shortcuts
 
@@ -259,7 +259,7 @@ cargo test --lib
 
 [Hoshi Reader Mac](https://github.com/W1ght/Hoshi-Reader-Mac) is an important supplementary reference for desktop-oriented UI design, bookshelf and settings-panel organization, window-based interaction, and other macOS-to-Windows desktop adaptation ideas.
 
-HSW does not directly copy the Android or Mac implementation. It adapts relevant observable behavior and interaction patterns to the Windows desktop environment and the Tauri, Rust, Svelte, and TypeScript stack.
+9Reader does not directly copy the Android or Mac implementation. It adapts relevant observable behavior and interaction patterns to the Windows desktop environment and the Tauri, Rust, Svelte, and TypeScript stack.
 
 ## Libraries
 
@@ -287,7 +287,7 @@ HSW does not directly copy the Android or Mac implementation. It adapts relevant
 ## Special Thanks
 
 - **[Manhhao/Hoshi-Reader](https://github.com/Manhhao/Hoshi-Reader)** — for the original Hoshi Reader project and the ecosystem this project builds alongside.
-- **[HuangAntimony/Hoshi-Reader-Android](https://github.com/HuangAntimony/Hoshi-Reader-Android)** — for serving as the primary behavior reference for HSW.
+- **[HuangAntimony/Hoshi-Reader-Android](https://github.com/HuangAntimony/Hoshi-Reader-Android)** — for serving as the primary behavior reference for 9Reader.
 - [**W1ght/Hoshi-Reader-Mac**](https://github.com/W1ght/Hoshi-Reader-Mac) — for providing valuable reference material for adapting Hoshi Reader into a desktop-oriented interface and interaction model.
 - **[Yomitan](https://github.com/yomidevs/yomitan)** — for making Japanese dictionary lookup and mining workflows much more approachable.
 - **[TheMoeWay](https://learnjapanese.moe/)** — for helping make immersion learning more accessible to learners around the world.

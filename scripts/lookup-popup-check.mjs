@@ -2,7 +2,7 @@ import { spawn, spawnSync } from "node:child_process";
 import { once } from "node:events";
 import { chromium } from "playwright";
 
-const port = Number(process.env.HSW_LOOKUP_POPUP_PORT || 5175);
+const port = Number(process.env.NINEREADER_LOOKUP_POPUP_PORT || 5175);
 const origin = `http://127.0.0.1:${port}`;
 
 function assert(condition, message, details = {}) {
@@ -221,7 +221,7 @@ async function popupMetrics(page) {
       text: Array.from(document.querySelectorAll(".lookup-pop")).map((node) => node.textContent ?? "").join("\n"),
       nativeSelectionText: window.getSelection()?.toString().replace(/\s+/g, " ").trim() ?? "",
       popupHighlightText: (() => {
-        const highlight = CSS.highlights?.get("hsw-popup-lookup-selection");
+        const highlight = CSS.highlights?.get("nine-reader-popup-lookup-selection");
         const parts = [];
         if (highlight?.forEach) {
           highlight.forEach((range) => parts.push(range.toString()));
@@ -854,7 +854,7 @@ async function main() {
     assert(ready.daijisenCircleBorderStyle === "solid" && ready.daijisenCircleBorderRadius === "10px", "Daijisen-like circle markers should keep rounded dictionary styling.", ready);
     assert(ready.daijisenLogoGroupBackground === "rgb(48, 48, 48)" && ready.daijisenLogoBackground === "rgb(255, 255, 255)" && ready.daijisenLogoColor === "rgb(51, 42, 27)", "Daijisen-like supplemental labels should keep dictionary logo styling.", ready);
     assert(ready.noCssCjkBadgeColor !== "rgb(16, 154, 47)" && ready.noCssCjkBadgeBorderStyle === "none", "Dictionary CSS should stay scoped to the matching dictionary group.", ready);
-    assert(ready.numericMarkerCount >= 2, "Structured text numeric markers should receive HSW marker classes.", ready);
+    assert(ready.numericMarkerCount >= 2, "Structured text numeric markers should receive 9Reader marker classes.", ready);
     assert(ready.numericMarkerMainColor === "rgb(255, 255, 255)" && ready.numericMarkerInlineColor === "rgb(255, 255, 255)", "Numeric markers should render white digits.", ready);
     assert(/Segoe UI|Arial|sans-serif/i.test(ready.numericMarkerMainFontFamily), "Numeric markers should use a UI/sans digit font.", ready);
     assert(ready.numericMarkerMainHeight > ready.numericMarkerInlineHeight, "Main numeric markers should be taller than inline markers.", ready);
@@ -942,12 +942,12 @@ async function main() {
     const ankiAdded = await popupMetrics(page);
     assert(ankiAdded.ankiAddCount === 1, "Add Anki should call the note creation callback once.", ankiAdded);
     assert(ankiAdded.ankiStoreCount === 1, "Add Anki should store dictionary media before note creation.", ankiAdded);
-    assert(ankiAdded.ankiLastMedia.length >= 6 && ankiAdded.ankiLastMedia.every((item) => item.filename.startsWith("hsw_")), "Stored media request should use deterministic HSW filenames.", ankiAdded);
+    assert(ankiAdded.ankiLastMedia.length >= 6 && ankiAdded.ankiLastMedia.every((item) => item.filename.startsWith("nine_reader_")), "Stored media request should use deterministic 9Reader filenames.", ankiAdded);
     assert(ankiAdded.ankiLastMedia.some((item) => item.path === "gaiji/bs一.svg") && ankiAdded.ankiLastMedia.some((item) => item.path === "gaiji/ws一.svg"), "Stored media request should include MK3 bs/ws one gaiji references.", ankiAdded);
     assert(ankiAdded.ankiLastMedia.some((item) => item.path === "gaiji/参照.svg"), "Stored media request should include MK3 reference gaiji references.", ankiAdded);
     assert(ankiAdded.ankiLastMedia.some((item) => item.path === "gaiji/参考.svg"), "Stored media request should include Yomitan type:image gaiji references.", ankiAdded);
     assert(ankiAdded.ankiLastDeck === "Mining" && ankiAdded.ankiLastModel === "Hoshi Vocabulary", "Add Anki should send selected deck and note type.", ankiAdded);
-    assert(ankiAdded.ankiLastRequest.tags.join(" ") === "hoshi-reader mining", "Add Anki should send configured whitespace-separated tags.", ankiAdded);
+    assert(ankiAdded.ankiLastRequest.tags.join(" ") === "9reader mining", "Add Anki should send configured whitespace-separated tags.", ankiAdded);
     assert(ankiAdded.ankiLastRequest.allowDuplicates === false && ankiAdded.ankiLastRequest.duplicateScope === "collection", "Add Anki should send default duplicate policy.", ankiAdded);
     assert(ankiAdded.ankiLastFields.Expression === "school / school", "Add Anki should send rendered field values.", ankiAdded);
     assert(ankiAdded.ankiLastFields.ExpressionFurigana === "school ", "Add Anki should render the HSA furigana-plain field.", ankiAdded);
@@ -964,21 +964,21 @@ async function main() {
     assert((ankiAdded.ankiLastFields.FullGlossary.match(/data-dictionary="Jitendex\.org \[probe\]"] \.gloss-sc-div/g) ?? []).length === 1, "Anki full glossary should not duplicate CSS for repeated entries from one dictionary.", ankiAdded);
     assert(ankiAdded.ankiLastFields.Meaning.includes('data-sc-headword="school"'), "Add Anki should preserve structured glossary data attributes.", ankiAdded);
     assert(ankiAdded.ankiLastFields.Meaning.includes('data-sc-red=""') && ankiAdded.ankiLastFields.Meaning.includes("color:#ff3333"), "Add Anki should preserve MK3 red bracket styling inside glossary HTML.", ankiAdded);
-    assert(ankiAdded.ankiLastFields.Meaning.includes('<img class="gloss-image gloss-media-image" src="stored_hsw_') && ankiAdded.ankiLastFields.Meaning.includes('data-sc-class="gaiji"'), "Add Anki should render inline gaiji media as stored SVG images inside glossary HTML.", ankiAdded);
+    assert(ankiAdded.ankiLastFields.Meaning.includes('<img class="gloss-image gloss-media-image" src="stored_nine_reader_') && ankiAdded.ankiLastFields.Meaning.includes('data-sc-class="gaiji"'), "Add Anki should render inline gaiji media as stored SVG images inside glossary HTML.", ankiAdded);
     assert(!ankiAdded.ankiLastFields.Meaning.includes(">gaiji/bs一.svg<") && !ankiAdded.ankiLastFields.Meaning.includes(">gaiji/参照.svg<"), "Add Anki should not leave MK3 gaiji media paths as glossary text.", ankiAdded);
     assert(ankiAdded.ankiLastFields.JmOnly.includes("school; a place of study") && ankiAdded.ankiLastFields.JmOnly.includes('data-dictionary="JMdict [probe]"'), "Add Anki should send dictionary-specific glossary values with template-compatible wrappers.", ankiAdded);
     assert(ankiAdded.ankiLastFields.JmOnly.includes('.yomitan-glossary [data-dictionary="JMdict [probe]"] li'), "Dictionary-specific Anki glossary fields should inline scoped CSS for their dictionary.", ankiAdded);
     assert(ankiAdded.ankiLastFields.MissingDict === "", "Unknown dictionary-specific glossary tokens should render empty.", ankiAdded);
     assert(ankiAdded.ankiAudioStoreCount === 1, "Add Anki should store remote word audio before note creation.", ankiAdded);
     assert(ankiAdded.ankiLastAudioRequest.expression === "school" && ankiAdded.ankiLastAudioRequest.reading === "school", "Remote audio request should use lookup expression and reading.", ankiAdded);
-    assert(ankiAdded.ankiLastFields.Audio === "[sound:hsw_audio_probe.mp3]", "Add Anki should render the stored word audio filename.", ankiAdded);
+    assert(ankiAdded.ankiLastFields.Audio === "[sound:nine_reader_audio_probe.mp3]", "Add Anki should render the stored word audio filename.", ankiAdded);
     assert(ankiAdded.ankiLastFields.Pitch === '<ol><li><span style="display:inline;"><span>[</span><span>0</span><span>]</span></span></li><li><span style="display:inline;"><span>[</span><span>2</span><span>]</span></span></li><li><span style="display:inline;"><span>[</span><span>3</span><span>]</span></span></li></ol>', "Add Anki should render HSA-style pitch accent positions.", ankiAdded);
     assert(ankiAdded.coverStoreCount === 1 && ankiAdded.coverLastBookId === "probe-book", "Referenced book cover should be stored by bookId.", ankiAdded);
-    assert(ankiAdded.ankiLastFields.Picture === '<img src="hsw_cover_probe.jpg">', "Stored cover should render into the book-cover field.", ankiAdded);
+    assert(ankiAdded.ankiLastFields.Picture === '<img src="nine_reader_cover_probe.jpg">', "Stored cover should render into the book-cover field.", ankiAdded);
     assert(ankiAdded.operationEvents === "dictionary,cover,audio,add", "Media should store in dictionary-cover-audio order before addNote.", ankiAdded);
-    assert(ankiAdded.ankiLastFields.Media.includes("<img src=\"stored_hsw_") && ankiAdded.ankiLastFields.Media.includes(".svg"), "Add Anki should include stored dictionary media filenames.", ankiAdded);
+    assert(ankiAdded.ankiLastFields.Media.includes("<img src=\"stored_nine_reader_") && ankiAdded.ankiLastFields.Media.includes(".svg"), "Add Anki should include stored dictionary media filenames.", ankiAdded);
     assert(ankiAdded.text.includes("Added Anki note 4242."), "Added state should show the Anki note id message.", ankiAdded);
-    assert(ankiAdded.text.includes("Word audio stored as hsw_audio_probe.mp3"), "Add state should expose stored word audio.", ankiAdded);
+    assert(ankiAdded.text.includes("Word audio stored as nine_reader_audio_probe.mp3"), "Add state should expose stored word audio.", ankiAdded);
 
     await openProbe(page, "ready", { ankiMode: "configured", sasayakiField: true });
     await page.getByRole("button", { name: "Add to Anki" }).click();
@@ -997,7 +997,7 @@ async function main() {
       ankiSasayaki,
     );
     assert(
-      ankiSasayaki.ankiLastFields.SentenceAudio === "[sound:hsw_sasayaki_probe.wav]",
+      ankiSasayaki.ankiLastFields.SentenceAudio === "[sound:nine_reader_sasayaki_probe.wav]",
       "Stored Sasayaki WAV should render through the sentence-audio token.",
       ankiSasayaki,
     );
@@ -1076,7 +1076,7 @@ async function main() {
     await openProbe(page, "ready", { ankiMode: "configured", firstRemoteMiss: true });
     await page.getByRole("button", { name: "Add to Anki" }).click();
     const ankiRemoteFallback = await popupMetrics(page);
-    assert(ankiRemoteFallback.ankiAudioStoreCount === 2 && ankiRemoteFallback.ankiLastFields.Audio === "[sound:hsw_audio_probe.mp3]", "A remote miss should continue to the next enabled source.", ankiRemoteFallback);
+    assert(ankiRemoteFallback.ankiAudioStoreCount === 2 && ankiRemoteFallback.ankiLastFields.Audio === "[sound:nine_reader_audio_probe.mp3]", "A remote miss should continue to the next enabled source.", ankiRemoteFallback);
     assert(ankiRemoteFallback.text.includes("Missing Audio") && ankiRemoteFallback.text.includes("HTTP 404"), "Earlier remote-source warnings should remain visible after fallback succeeds.", ankiRemoteFallback);
 
     await openProbe(page, "ready", { ankiMode: "configured", firstRemoteUnsafe: true });
@@ -1095,13 +1095,13 @@ async function main() {
     assert(ankiLocalAudio.localAudioStoreCount === 1, "Enabled local audio should be attempted first.", ankiLocalAudio);
     assert(ankiLocalAudio.ankiAudioStoreCount === 0, "A local audio hit should skip remote audio.", ankiLocalAudio);
     assert(ankiLocalAudio.localAudioLastRequest.expression === "school", "Local audio should receive the lookup expression.", ankiLocalAudio);
-    assert(ankiLocalAudio.ankiLastFields.Audio === "[sound:hsw_audio_local.ogg]", "A local audio hit should render into the audio field.", ankiLocalAudio);
+    assert(ankiLocalAudio.ankiLastFields.Audio === "[sound:nine_reader_audio_local.ogg]", "A local audio hit should render into the audio field.", ankiLocalAudio);
 
     await openProbe(page, "ready", { ankiMode: "configured", localAudio: true, localAudioStoreMode: "missing" });
     await page.getByRole("button", { name: "Add to Anki" }).click();
     const ankiLocalMissing = await popupMetrics(page);
     assert(ankiLocalMissing.localAudioStoreCount === 1 && ankiLocalMissing.ankiAudioStoreCount === 1, "A local miss should fall back to remote audio.", ankiLocalMissing);
-    assert(ankiLocalMissing.ankiLastFields.Audio === "[sound:hsw_audio_probe.mp3]", "Remote fallback should populate the audio field.", ankiLocalMissing);
+    assert(ankiLocalMissing.ankiLastFields.Audio === "[sound:nine_reader_audio_probe.mp3]", "Remote fallback should populate the audio field.", ankiLocalMissing);
 
     await openProbe(page, "ready", { ankiMode: "configured", localAudio: true, localAudioStoreMode: "error" });
     await page.getByRole("button", { name: "Add to Anki" }).click();

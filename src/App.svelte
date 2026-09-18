@@ -928,14 +928,14 @@
   }
 
   function sasayakiDiagnosticsEnabled(): boolean {
-    return typeof localStorage !== "undefined" && localStorage.getItem("hoshi_sasayaki_debug") === "1";
+    return typeof localStorage !== "undefined" && localStorage.getItem("nine_reader_sasayaki_debug") === "1";
   }
 
   function sasayakiPersistenceWindow(): Window & {
-    __HSW_SASAYAKI_PERSISTENCE__?: SasayakiPersistenceTraceEntry[];
+    __NINEREADER_SASAYAKI_PERSISTENCE__?: SasayakiPersistenceTraceEntry[];
   } {
     return window as Window & {
-      __HSW_SASAYAKI_PERSISTENCE__?: SasayakiPersistenceTraceEntry[];
+      __NINEREADER_SASAYAKI_PERSISTENCE__?: SasayakiPersistenceTraceEntry[];
     };
   }
 
@@ -954,16 +954,16 @@
       ...details,
     };
     const target = sasayakiPersistenceWindow();
-    const trace = target.__HSW_SASAYAKI_PERSISTENCE__ ?? [];
+    const trace = target.__NINEREADER_SASAYAKI_PERSISTENCE__ ?? [];
     trace.push(entry);
-    target.__HSW_SASAYAKI_PERSISTENCE__ = trace.slice(-SASAYAKI_PERSISTENCE_TRACE_LIMIT);
-    if (sasayakiDiagnosticsEnabled()) console.debug("[HSW SasayakiPersistence]", entry);
+    target.__NINEREADER_SASAYAKI_PERSISTENCE__ = trace.slice(-SASAYAKI_PERSISTENCE_TRACE_LIMIT);
+    if (sasayakiDiagnosticsEnabled()) console.debug("[9Reader SasayakiPersistence]", entry);
   }
 
   function recordSasayakiDiagnostic(event: string, details: Record<string, unknown> = {}) {
     if (!sasayakiDiagnosticsEnabled()) return;
     sasayakiRepaintSentinel += 1;
-    console.debug("[HSW Sasayaki]", event, {
+    console.debug("[9Reader Sasayaki]", event, {
       currentTime: sasayakiCurrentTime,
       duration: sasayakiDuration,
       chapterIndex,
@@ -1874,7 +1874,7 @@
       audioSources: defaultAnkiAudioSources(),
       audioDownloadTimeoutMs: 5000,
       forceSyncAfterAdd: false,
-      tags: "hoshi-reader",
+      tags: "9reader",
       allowDuplicates: false,
       checkDuplicatesAcrossAllModels: false,
       duplicateScope: "collection",

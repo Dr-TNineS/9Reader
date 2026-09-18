@@ -264,7 +264,7 @@ export function payloadWithStoredDictionaryMedia(
 
 export function stableDictionaryMediaFilename(dictionary: string, path: string): string {
   const extension = mediaExtension(path);
-  return `hsw_${fnv1a(`${dictionary}\u0000${path}`)}${extension}`;
+  return `nine_reader_${fnv1a(`${dictionary}\u0000${path}`)}${extension}`;
 }
 
 function knownDefaultMappings(noteType: AnkiNoteType): AnkiFieldMapping[] {

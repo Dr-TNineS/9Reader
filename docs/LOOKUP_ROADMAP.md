@@ -1,4 +1,4 @@
-# HSW Reader Lookup Remaining Slice Plan
+# 9Reader Reader Lookup Remaining Slice Plan
 
 ## Summary
 
@@ -6,7 +6,7 @@ Current completed work includes Reader selection capture, Shift hover continuous
 
 The remaining goal is to move the lookup feature package from "minimally callable" to "manageable, verifiable, and ready for a later Anki slice".
 
-This plan only continues the HSW Windows implementation. Do not modify HSA, `hoshidicts`, or other reference projects.
+This plan only continues the 9Reader Windows implementation. Do not modify HSA, `hoshidicts`, or other reference projects.
 
 ## Progress
 
@@ -156,7 +156,7 @@ Tests:
 
 - Implement manifest/config first, then result shape, then popup UX.
 - The current machine may not have CMake/C++ toolchain. Real hoshidicts lookup and zip import end-to-end validation requires a suitable toolchain and a real dictionary zip.
-- The default local hoshidicts checkout path is `third_party/hoshidicts`; `HSW_HOSHIDICTS_DIR` may override it.
+- The default local hoshidicts checkout path is `third_party/hoshidicts`; `NINEREADER_HOSHIDICTS_DIR` may override it.
 - Do not modify HSA, `hoshidicts`, or `hibiki-windows-x64`.
 - Do not automatically scan user disks, migrate old dictionary paths, or delete user data.
 - Do not implement settings, sync, actual Anki card creation, Sasayaki/audio, or Android-only features in these slices.

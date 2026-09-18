@@ -9,7 +9,7 @@ This document records the lookup timing boundary used for the first low-risk per
 - Dictionary configuration: 4 enabled term dictionaries (650,853 term records), 1 frequency dictionary (99,999 records), and 1 pitch dictionary (327,037 records)
 - Lookup behavior: `maxResults = 16`, `scanLength = 16`
 
-Debug builds retain the latest frontend records in `window.__HSW_LOOKUP_PERFORMANCE__`. Frontend console records use `[lookup-perf]`; Rust records use `lookup_perf`. Release builds do not emit these records.
+Debug builds retain the latest frontend records in `window.__NINEREADER_LOOKUP_PERFORMANCE__`. Frontend console records use `[lookup-perf]`; Rust records use `lookup_perf`. Release builds do not emit these records.
 
 ## Baseline
 

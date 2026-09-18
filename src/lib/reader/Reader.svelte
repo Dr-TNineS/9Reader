@@ -148,7 +148,7 @@
   }
 
   function readerDebugEnabled(): boolean {
-    return typeof localStorage !== "undefined" && localStorage.getItem("hoshi_reader_debug") === "1";
+    return typeof localStorage !== "undefined" && localStorage.getItem("nine_reader_debug") === "1";
   }
 
   function pageSize(): number {

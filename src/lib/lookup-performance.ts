@@ -20,7 +20,7 @@ export interface LookupPerformanceRecord {
 
 declare global {
   interface Window {
-    __HSW_LOOKUP_PERFORMANCE__?: LookupPerformanceRecord[];
+    __NINEREADER_LOOKUP_PERFORMANCE__?: LookupPerformanceRecord[];
   }
 }
 
@@ -48,14 +48,14 @@ export function beginLookupPerformance(
     details: {},
   };
   activeRecords.set(requestId, record);
-  const retained = window.__HSW_LOOKUP_PERFORMANCE__ ?? [];
+  const retained = window.__NINEREADER_LOOKUP_PERFORMANCE__ ?? [];
   retained.push(record);
   if (retained.length > MAX_RETAINED_RECORDS) {
     const removed = retained.splice(0, retained.length - MAX_RETAINED_RECORDS);
     for (const oldRecord of removed) activeRecords.delete(oldRecord.requestId);
   }
-  window.__HSW_LOOKUP_PERFORMANCE__ = retained;
-  performance.mark(`hsw.lookup.${requestId}.start`);
+  window.__NINEREADER_LOOKUP_PERFORMANCE__ = retained;
+  performance.mark(`nine_reader.lookup.${requestId}.start`);
 }
 
 export function markLookupPerformance(
@@ -69,7 +69,7 @@ export function markLookupPerformance(
   const elapsedMs = performance.now() - record.startedAt;
   record.stages[stage] = elapsedMs;
   Object.assign(record.details, details);
-  performance.mark(`hsw.lookup.${requestId}.${stage}`);
+  performance.mark(`nine_reader.lookup.${requestId}.${stage}`);
   const detailText = Object.entries(details)
     .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
     .join(" ");

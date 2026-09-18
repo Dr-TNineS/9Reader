@@ -1,8 +1,8 @@
-# HSW Reader Entry Characterization
+# 9Reader Reader Entry Characterization
 
 Last updated: 2026-06-23
 
-This checklist records the durable behavior baseline for the HSW bookshelf, EPUB import, reader entry, reader exit, and session restore path.
+This checklist records the durable behavior baseline for the 9Reader bookshelf, EPUB import, reader entry, reader exit, and session restore path.
 
 Use this before and after changes that touch bookshelf state, app-owned EPUB import, reader open/close, progress saving, or session restore.
 
@@ -26,8 +26,8 @@ Use this before and after changes that touch bookshelf state, app-owned EPUB imp
 
 ## Session Restore
 
-- On Tauri startup, HSW attempts to restore the last saved reader session once when `Reopen last book on startup` is enabled; the option defaults to enabled.
-- When startup restore is disabled, HSW loads the bookshelf and saved reading state without opening the session.
+- On Tauri startup, 9Reader attempts to restore the last saved reader session once when `Reopen last book on startup` is enabled; the option defaults to enabled.
+- When startup restore is disabled, 9Reader loads the bookshelf and saved reading state without opening the session.
 - Disabling startup restore does not clear the saved session or reading progress; manual reopen and later re-enabling still resume from saved progress.
 - Importing an EPUB without opening it does not replace the saved reader session.
 - A valid app-owned session opens by `bookId`.
@@ -63,12 +63,12 @@ Use this before and after changes that touch bookshelf state, app-owned EPUB imp
 
 ## Validation Checklist
 
-- Import EPUB from an empty shelf and confirm HSW remains on the bookshelf with the imported row present.
+- Import EPUB from an empty shelf and confirm 9Reader remains on the bookshelf with the imported row present.
 - Open the imported row and enter Reader.
 - Return to shelf and confirm the book row and progress are present.
 - Reopen the imported book and confirm progress restore.
 - Restart the Tauri app and confirm a valid session restores once.
-- Disable `Reopen last book on startup`, restart, and confirm HSW remains on the bookshelf while manual reopen still restores progress.
+- Disable `Reopen last book on startup`, restart, and confirm 9Reader remains on the bookshelf while manual reopen still restores progress.
 - Re-enable startup restore, restart, and confirm the saved session opens again.
 - Move or delete the original EPUB after app-owned import and confirm the app-owned record still opens.
 - Try a legacy path-only record with a missing file and confirm the error is contained.

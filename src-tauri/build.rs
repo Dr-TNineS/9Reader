@@ -7,7 +7,7 @@ fn main() {
     println!("cargo:rustc-check-cfg=cfg(hoshi_dicts_linked)");
     println!("cargo:rerun-if-changed=src/dict/dict_capi.cpp");
     println!("cargo:rerun-if-changed=src/dict/dict_capi.h");
-    println!("cargo:rerun-if-env-changed=HSW_HOSHIDICTS_DIR");
+    println!("cargo:rerun-if-env-changed=NINEREADER_HOSHIDICTS_DIR");
 
     if let Err(err) = try_link_hoshidicts() {
         println!("cargo:warning=hoshidicts backend disabled: {err}");
@@ -19,7 +19,7 @@ fn main() {
 fn try_link_hoshidicts() -> Result<(), String> {
     let cmake = find_program("cmake").ok_or_else(|| "cmake was not found in PATH".to_string())?;
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").map_err(|e| e.to_string())?);
-    let hoshidicts_dir = env::var_os("HSW_HOSHIDICTS_DIR")
+    let hoshidicts_dir = env::var_os("NINEREADER_HOSHIDICTS_DIR")
         .map(PathBuf::from)
         .unwrap_or_else(|| {
             manifest_dir

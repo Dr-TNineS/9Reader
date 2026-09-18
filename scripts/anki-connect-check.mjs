@@ -2,7 +2,7 @@ import { spawn, spawnSync } from "node:child_process";
 import { once } from "node:events";
 import { chromium } from "playwright";
 
-const port = Number(process.env.HSW_ANKI_CONNECT_PORT || 5178);
+const port = Number(process.env.NINEREADER_ANKI_CONNECT_PORT || 5178);
 const origin = `http://127.0.0.1:${port}`;
 
 function assert(condition, message, details = {}) {
@@ -156,15 +156,15 @@ async function main() {
     await page.getByLabel("Sync after add").click();
     metrics = await panelMetrics(page);
     assert(metrics.forceSyncAfterAdd === "true" && metrics.syncEvents.includes("true"), "Sync toggle should update settings through the panel boundary.", metrics);
-    assert(metrics.text.includes("Note Options") && metrics.tags === "hoshi-reader", "Ready panel should expose persisted note tags and duplicate settings.", metrics);
-    await page.getByLabel("Anki tags").fill("hoshi-reader mined");
+    assert(metrics.text.includes("Note Options") && metrics.tags === "9reader", "Ready panel should expose persisted note tags and duplicate settings.", metrics);
+    await page.getByLabel("Anki tags").fill("9reader mined");
     await page.getByLabel("Anki tags").blur();
     await page.getByLabel("Allow duplicates").click();
     await page.getByLabel("Check all note types").click();
     await page.locator(".select-row").filter({ hasText: "Duplicate Scope" }).getByRole("button").click();
     await page.getByRole("option", { name: "Deck and children" }).click();
     metrics = await panelMetrics(page);
-    assert(metrics.tags === "hoshi-reader mined" && metrics.allowDuplicates === "true", "Note tags and allow-duplicates should update through the panel boundary.", metrics);
+    assert(metrics.tags === "9reader mined" && metrics.allowDuplicates === "true", "Note tags and allow-duplicates should update through the panel boundary.", metrics);
     assert(metrics.duplicateScope === "deckRoot" && metrics.checkAllModels === "true", "Duplicate scope and all-model checking should update through the panel boundary.", metrics);
     assert(metrics.noteOptionEvents.includes("deckRoot"), "Note option changes should emit settings events.", metrics);
     await page.getByLabel("Compact glossary cards").click();

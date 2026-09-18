@@ -1,4 +1,4 @@
-# HSW Validation Guide
+# 9Reader Validation Guide
 
 This file contains durable validation policy for ⑨ Reader. Update it
 only when validation requirements, probe names, test data, or stable manual QA
@@ -62,7 +62,7 @@ replace these behavior probes.
 
 The hoshidicts linked backend needs a VS x64 developer environment or
 equivalent MSVC, CMake, and Ninja setup. Prefer the repository wrapper so the
-validation runs from the current worktree and derives `HSW_HOSHIDICTS_DIR`
+validation runs from the current worktree and derives `NINEREADER_HOSHIDICTS_DIR`
 without hardcoded checkout paths:
 
 ```text
@@ -90,15 +90,15 @@ Use runtime validation only when the local dependency and test data are actually
 available. If not, record the result as `not verified`.
 
 - Real desktop Anki add-note validation: from `src-tauri`, set
-  `HSW_ANKI_RUNTIME_VALIDATE=1`, then run
+  `NINEREADER_ANKI_RUNTIME_VALIDATE=1`, then run
   `cargo test --lib validates_real_ankiconnect_add_note_and_duplicate_check -- --ignored --nocapture`.
 - Real desktop Anki store-media validation: from `src-tauri`, set
-  `HSW_ANKI_RUNTIME_VALIDATE=1`, then run
+  `NINEREADER_ANKI_RUNTIME_VALIDATE=1`, then run
   `cargo test --lib validates_real_ankiconnect_store_dictionary_media -- --ignored --nocapture`.
 - Linked real dictionary validation: use a VS developer shell or
   `scripts\vs-x64-cargo.cmd`, set `RUSTFLAGS=--cfg hoshi_dicts_linked`,
   `CARGO_TARGET_DIR=target-linked-check`, and
-  `HSW_REAL_YOMITAN_ZIP=<local dictionary zip>`, then run
+  `NINEREADER_REAL_YOMITAN_ZIP=<local dictionary zip>`, then run
   `cargo test --lib imports_real_yomitan_zip_and_loads_runtime -- --ignored --nocapture`.
 - Tauri runtime visual checks: use `cmd /c npx.cmd tauri dev` when a real Tauri
   WebView or native command path must be observed.

@@ -18,9 +18,9 @@ declare global {
 
 }
 
-export const READER_LOOKUP_HIGHLIGHT = "hsw-reader-lookup-selection";
-export const POPUP_LOOKUP_HIGHLIGHT = "hsw-popup-lookup-selection";
-export const READER_SASAYAKI_HIGHLIGHT = "hsw-reader-sasayaki-cue";
+export const READER_LOOKUP_HIGHLIGHT = "nine-reader-lookup-selection";
+export const POPUP_LOOKUP_HIGHLIGHT = "nine-reader-popup-lookup-selection";
+export const READER_SASAYAKI_HIGHLIGHT = "nine-reader-sasayaki-cue";
 
 export function setLookupHighlightRange(name: string, range: Range): void {
   setLookupHighlightRanges(name, [range]);
@@ -63,10 +63,10 @@ function lookupHighlightRegistry(): HighlightRegistry | null {
 }
 
 function ensureLookupHighlightStyles(): void {
-  if (document.querySelector("style[data-hsw-lookup-highlight]")) return;
+  if (document.querySelector("style[data-nine-reader-lookup-highlight]")) return;
 
   const style = document.createElement("style");
-  style.dataset.hswLookupHighlight = "true";
+  style.dataset.nineReaderLookupHighlight = "true";
   style.textContent = `
 ::highlight(${READER_LOOKUP_HIGHLIGHT}) {
   background-color: var(--lookup-highlight-color, rgba(160, 160, 160, 0.32));

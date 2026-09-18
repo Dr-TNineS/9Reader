@@ -14,7 +14,7 @@ export const defaultLookupPopupSettings: LookupPopupSettings = {
   scale: 1,
 };
 
-const LOOKUP_POPUP_SETTINGS_KEY = "hoshi_reader_lookup_popup";
+const LOOKUP_POPUP_SETTINGS_KEY = "nine_reader_lookup_popup";
 
 function normalizeStep(
   value: unknown,

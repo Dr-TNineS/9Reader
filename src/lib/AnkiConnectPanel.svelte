@@ -124,7 +124,7 @@
 
   function updateNoteOptions(patch: Partial<Pick<AnkiSettings, "tags" | "allowDuplicates" | "duplicateScope" | "checkDuplicatesAcrossAllModels">>) {
     onSetNoteOptions(
-      patch.tags ?? settings?.tags ?? "hoshi-reader",
+      patch.tags ?? settings?.tags ?? "9reader",
       patch.allowDuplicates ?? settings?.allowDuplicates ?? false,
       patch.duplicateScope ?? settings?.duplicateScope ?? "collection",
       patch.checkDuplicatesAcrossAllModels ?? settings?.checkDuplicatesAcrossAllModels ?? false,
@@ -248,7 +248,7 @@
       <span>Tags</span>
       <input
         aria-label="Anki tags"
-        value={settings?.tags ?? "hoshi-reader"}
+        value={settings?.tags ?? "9reader"}
         disabled={busy}
         spellcheck="false"
         onchange={(event) => updateNoteOptions({ tags: event.currentTarget.value })}

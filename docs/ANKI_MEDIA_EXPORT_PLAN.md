@@ -12,10 +12,10 @@ add-note integration is implemented with popup warnings for missing media.
 
 ## Current Baseline
 
-- HSW can create text Anki notes through desktop AnkiConnect.
+- 9Reader can create text Anki notes through desktop AnkiConnect.
 - Runtime validation passed on 2026-06-18 with AnkiConnect v6 on
   `127.0.0.1:8765`: a throwaway deck/model was created, one note was added
-  through HSW `anki_add_note`, a second add was blocked as a duplicate, and
+  through 9Reader `anki_add_note`, a second add was blocked as a duplicate, and
   cleanup was attempted.
 - Lookup popup already renders dictionary image placeholders from structured
   glossary content and lazily loads them through the read-only
@@ -62,7 +62,7 @@ Reasoning:
 3. Ask Rust to resolve and read each media file using the same safety rules as
    `dictionary_media`.
 4. Store each file through AnkiConnect `storeMediaFile` with a deterministic
-   filename, such as `hsw_<hash>.<ext>`.
+   filename, such as `nine_reader_<hash>.<ext>`.
 5. Add rendered HTML snippets to Anki field rendering through
    `{dictionary-media}`.
 6. Call duplicate check and `addNote` using the existing `anki_add_note` path.

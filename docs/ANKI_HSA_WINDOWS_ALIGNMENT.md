@@ -2,7 +2,7 @@
 
 Last updated: 2026-06-24
 
-This document evaluates how ⑨ Reader (HSW) should move from the
+This document evaluates how ⑨ Reader (9Reader) should move from the
 current disabled lookup-to-Anki payload boundary toward a Windows-native Anki
 integration.
 
@@ -17,14 +17,14 @@ AnkiConnect v6 on localhost. Follow-up media/audio work is tracked in
 Do not modify `reference/`, `third_party/hoshidicts`, HSA, or Anki from this
 document.
 
-## Current HSW State
+## Current 9Reader State
 
 - Lookup popup results can build a typed `LookupAnkiPayload` with selected text,
   expression, reading, glossary entries, dictionary label, match/deinflection
   data, source book locator, and source chapter.
 - The popup exposes a HSA-style compact Anki affordance. It stays disabled until
   configuration is complete, then calls the Windows AnkiConnect add-note path.
-- HSW has a minimal Windows AnkiConnect readiness/configuration path:
+- 9Reader has a minimal Windows AnkiConnect readiness/configuration path:
   - Rust/Tauri commands load/save `anki/settings.json` under app data.
   - `anki_ping` checks a localhost AnkiConnect endpoint without throwing UI
     errors for normal connection failure.
@@ -37,7 +37,7 @@ document.
   - Configured lookup popup results can call Rust `anki_add_note`, which checks
     `canAddNotesWithErrorDetail` before calling AnkiConnect `addNote`.
 - Real Anki runtime add-note validation with a throwaway deck/model passed on
-  2026-06-18 using `HSW_ANKI_RUNTIME_VALIDATE=1`.
+  2026-06-18 using `NINEREADER_ANKI_RUNTIME_VALIDATE=1`.
 - Dictionary image media plus remote and HSA-compatible local word-audio export
   are implemented for add-note; sync remains unimplemented.
 - Existing lookup popup probes cover that disabled Anki/audio boundaries remain
@@ -65,17 +65,17 @@ HSA has a full Anki subsystem with clear layers:
   Kiku, and Senren, using handlebars like `{expression}`, `{reading}`,
   `{glossary-first}`, `{sentence}`, `{frequencies}`, and `{pitch-accent-positions}`.
 
-Android-specific pieces that should not be copied directly to HSW:
+Android-specific pieces that should not be copied directly to 9Reader:
 
 - AnkiDroid provider access, Android runtime permissions, Android `FileProvider`,
   Android Settings screens, and AnkiDroid direct database/provider APIs.
 - Sasayaki sentence audio and local Android audio flows.
-- Android popup iframe bridge mechanics. HSW already owns Svelte DOM popups and
+- Android popup iframe bridge mechanics. 9Reader already owns Svelte DOM popups and
   can call Tauri commands directly.
 
 ## Windows Recommendation
 
-HSW should implement Anki in small Windows-first slices using desktop
+9Reader should implement Anki in small Windows-first slices using desktop
 AnkiConnect as the first backend.
 
 - Default endpoint: `http://127.0.0.1:8765`.
@@ -107,7 +107,7 @@ Key changes:
 
 Acceptance:
 
-- With Anki + AnkiConnect running, HSW can ping, fetch decks, fetch note types,
+- With Anki + AnkiConnect running, 9Reader can ping, fetch decks, fetch note types,
   and persist selections across restart.
 - With AnkiConnect unavailable, UI shows a clear actionable error.
 - No `addNote` or duplicate check is called.
@@ -180,7 +180,7 @@ Validation:
 - `npm run build`
 - `npm run check:lookup-popup`
 - Real AnkiConnect runtime validation:
-  `HSW_ANKI_RUNTIME_VALIDATE=1 cargo test --lib validates_real_ankiconnect_add_note_and_duplicate_check -- --ignored --nocapture`
+  `NINEREADER_ANKI_RUNTIME_VALIDATE=1 cargo test --lib validates_real_ankiconnect_add_note_and_duplicate_check -- --ignored --nocapture`
 
 ### Slice 4: Media, Audio, And Sync Follow-Up
 
@@ -213,7 +213,7 @@ Acceptance:
 
 - Desktop Windows Anki integration should prioritize AnkiConnect over direct
   Anki profile/database access.
-- The first usable HSW card creation path should be text-first and reader-flow
+- The first usable 9Reader card creation path should be text-first and reader-flow
   oriented.
 - Settings UI should stay minimal until card creation proves useful.
 - Existing dictionary popup stack, Shift-hover behavior, redirect history, and

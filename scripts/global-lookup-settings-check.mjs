@@ -3,7 +3,7 @@ import { once } from "node:events";
 import path from "node:path";
 import { chromium } from "playwright";
 
-const port = Number(process.env.HSW_GLOBAL_LOOKUP_SETTINGS_PORT || 5189);
+const port = Number(process.env.NINEREADER_GLOBAL_LOOKUP_SETTINGS_PORT || 5189);
 const origin = `http://127.0.0.1:${port}`;
 const root = process.cwd();
 
@@ -185,7 +185,7 @@ async function main() {
 
     const globalLookupPage = await browser.newPage({ viewport: { width: 900, height: 900 } });
     await globalLookupPage.addInitScript(() => {
-      localStorage.setItem("hoshi_reader_lookup_popup", JSON.stringify({ width: 680, height: 800, scale: 1.15 }));
+      localStorage.setItem("nine_reader_lookup_popup", JSON.stringify({ width: 680, height: 800, scale: 1.15 }));
     });
     await globalLookupPage.goto(`${origin}/?globalLookup=1`);
     await globalLookupPage.locator(".popup-shell").waitFor({ state: "attached" });

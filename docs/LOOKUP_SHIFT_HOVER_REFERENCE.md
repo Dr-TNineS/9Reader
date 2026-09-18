@@ -4,10 +4,10 @@
 
 This document records the read-only comparison of Hibiki's Shift+hover lookup behavior against ⑨ Reader.
 
-The goal is not to copy Hibiki's Flutter/WebView architecture. HSW already owns the reader DOM in Svelte, so the useful parts are the interaction model, throttling rules, selection algorithm details, and popup-layer behavior.
+The goal is not to copy Hibiki's Flutter/WebView architecture. 9Reader already owns the reader DOM in Svelte, so the useful parts are the interaction model, throttling rules, selection algorithm details, and popup-layer behavior.
 
-Current HSW decision (2026-06-23): the fixed 8px movement threshold remains a
-Hibiki reference fact, not the HSA behavior target. HSW will coalesce Shift-hover
+Current 9Reader decision (2026-06-23): the fixed 8px movement threshold remains a
+Hibiki reference fact, not the HSA behavior target. 9Reader will coalesce Shift-hover
 pointer movement to at most one hit test per animation frame and dedupe by the
 actual DOM text node plus character offset. Lookup highlighting will follow HSA:
 remain hidden while lookup is pending, then reveal only the first result's
@@ -29,7 +29,7 @@ Main Hibiki files:
 - `tools\browser-extension\vendor\popup.js`
 - `tools\browser-extension\vendor\selection.js`
 
-Main HSW files for comparison:
+Main 9Reader files for comparison:
 
 - `D:\9Reader\src\lib\reader\Reader.svelte`
 - `D:\9Reader\src\App.svelte`
@@ -71,7 +71,7 @@ Important behaviors:
 - It returns selection metadata such as selected text, sentence, rectangle, and normalized offsets.
 - It highlights the selected text with CSS Highlights when supported, with a wrapper fallback.
 
-The HSW equivalent currently lives in `Reader.svelte` as `selectTextFromPoint(...)`, with DOM hit-testing, token expansion, range creation, and popup selection callback.
+The 9Reader equivalent currently lives in `Reader.svelte` as `selectTextFromPoint(...)`, with DOM hit-testing, token expansion, range creation, and popup selection callback.
 
 ## Popup Recursive Lookup
 
@@ -85,7 +85,7 @@ Observed flow:
 4. Popup `selection.js` calls Flutter's `textSelected` handler with the selected text and rect.
 5. Flutter opens a deeper/nested popup anchored to the word selected inside the parent popup.
 
-This is separate from reader-body lookup. It is relevant only after HSW wants recursive lookup inside popup glossary text.
+This is separate from reader-body lookup. It is relevant only after 9Reader wants recursive lookup inside popup glossary text.
 
 ### Hibiki Popup Files
 
@@ -130,7 +130,7 @@ The key idea:
 - `dictionary_popup_layer.dart` asks the rendered WebView's `RenderBox` to map local coordinates to global coordinates.
 - The child popup uses that global rect as its anchor.
 
-HSW does not need this exact Flutter transform machinery because popup content is normal Svelte DOM in the same window. For HSW, `Range.getBoundingClientRect()` already returns viewport coordinates. That is a useful simplification.
+9Reader does not need this exact Flutter transform machinery because popup content is normal Svelte DOM in the same window. For 9Reader, `Range.getBoundingClientRect()` already returns viewport coordinates. That is a useful simplification.
 
 ### Popup Selection Rules
 
@@ -139,11 +139,11 @@ The popup selection rules differ from reader selection in two ways:
 - Popup scan length is shorter: Hibiki uses `20` characters inside popup glossary content, while reader body selection uses `400`.
 - Popup selection is constrained to definition/glossary content and avoids controls such as headers, tags, links, and buttons.
 
-HSW should preserve that distinction. Lookup inside definitions should feel lightweight and should not accidentally trigger from action buttons, close buttons, dictionary tags, or import controls.
+9Reader should preserve that distinction. Lookup inside definitions should feel lightweight and should not accidentally trigger from action buttons, close buttons, dictionary tags, or import controls.
 
 ### Popup Rendering Reference
 
-Hibiki's popup renderer is much richer than HSW's current `LookupPopupContent.svelte`.
+Hibiki's popup renderer is much richer than 9Reader's current `LookupPopupContent.svelte`.
 
 Important behaviors to reference, but not wholesale copy:
 
@@ -155,7 +155,7 @@ Important behaviors to reference, but not wholesale copy:
 - Keep controls outside the glossary hit-testing area.
 - Avoid raw JSON display for structured content.
 
-HSW already covers the most urgent structured-content issue through `renderGlossaryContent(...)`. The next popup work should focus on interaction and containment rather than another broad renderer rewrite.
+9Reader already covers the most urgent structured-content issue through `renderGlossaryContent(...)`. The next popup work should focus on interaction and containment rather than another broad renderer rewrite.
 
 ## Popup Barrier Hover
 
@@ -165,11 +165,11 @@ When a popup is open, the overlay/barrier may intercept hover events before they
 
 This preserves the "hold Shift and keep moving across text" behavior even while a popup is visible.
 
-This is the most directly useful difference for HSW if the current lookup popup ever blocks continued Shift+hover selection.
+This is the most directly useful difference for 9Reader if the current lookup popup ever blocks continued Shift+hover selection.
 
-## HSW Current State
+## 9Reader Current State
 
-HSW already has the core interaction:
+9Reader already has the core interaction:
 
 - `Reader.svelte` tracks Shift key state.
 - `handlePointerMove` records the latest pointer position.
@@ -177,7 +177,7 @@ HSW already has the core interaction:
 - `selectTextFromPoint(...)` resolves the character at the point, expands through text nodes, creates browser selection ranges, computes the selection rect, and calls `onSelectionChange(...)`.
 - `App.svelte` receives the selection and calls `dict_lookup`.
 
-The pre-alignment HSW model is simpler than Hibiki:
+The pre-alignment 9Reader model is simpler than Hibiki:
 
 - It combines a 45ms timer with Hibiki-style 8px movement-distance thresholding.
 - It dedupes repeated lookup callbacks for the same selected text and rounded anchor rect.
@@ -235,7 +235,7 @@ Goal: make current Shift+hover feel closer to Hibiki without changing popup arch
 
 Implementation status: superseded on 2026-06-23 by the completed active slice
 above. This section preserves the earlier Hibiki-derived implementation history;
-current HSW no longer uses its 8px threshold or timer.
+current 9Reader no longer uses its 8px threshold or timer.
 
 Key changes:
 
@@ -279,7 +279,7 @@ Validation:
 
 Goal: allow Shift+hover inside rendered glossary text to look up nested terms.
 
-Implementation status: implemented in HSW as stacked nested lookup. Shift+hover inside popup glossary text selects the word under the pointer and opens a child popup anchored to that glossary word.
+Implementation status: implemented in 9Reader as stacked nested lookup. Shift+hover inside popup glossary text selects the word under the pointer and opens a child popup anchored to that glossary word.
 
 Key changes:
 
@@ -298,11 +298,11 @@ Validation:
 
 ### Slice 4: Popup Result Structure Parity
 
-Goal: selectively improve HSW popup readability using Hibiki's popup organization, without porting the whole vendor renderer.
+Goal: selectively improve 9Reader popup readability using Hibiki's popup organization, without porting the whole vendor renderer.
 
 Key changes:
 
-- Keep `LookupPopupContent.svelte` as the owner of HSW popup UI.
+- Keep `LookupPopupContent.svelte` as the owner of 9Reader popup UI.
 - Keep `renderGlossaryContent(...)` as the safe structured-content renderer boundary.
 - Add result sections only when data exists: tags, frequencies, pitches, glossary, and source dictionary.
 - Make glossary blocks the only nested-lookup hit-test region.
@@ -319,8 +319,8 @@ Validation:
 
 ## Non-Goals
 
-- Do not port Hibiki's Flutter WebView bridge into HSW.
-- Do not replace HSW reader pagination as part of this plan.
+- Do not port Hibiki's Flutter WebView bridge into 9Reader.
+- Do not replace 9Reader reader pagination as part of this plan.
 - Do not copy vendor popup code wholesale.
 - Do not implement Anki, sync, Sasayaki/audio, or settings as part of Shift hover hardening.
 - Do not modify `D:\hibiki_code\hibiki`.
@@ -329,6 +329,6 @@ Validation:
 
 - Resolved 2026-06-23: remove both the timer and fixed movement threshold; use
   animation-frame coalescing plus DOM character-hit dedupe.
-- Should HSW eventually add popup history/back-forward controls like HSA, or keep the current stack-only behavior?
-- Resolved: HSW uses CSS Highlights and will reveal only HSA's first-result
+- Should 9Reader eventually add popup history/back-forward controls like HSA, or keep the current stack-only behavior?
+- Resolved: 9Reader uses CSS Highlights and will reveal only HSA's first-result
   `matched` range after lookup succeeds.

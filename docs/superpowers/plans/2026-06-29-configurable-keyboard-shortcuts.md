@@ -159,7 +159,7 @@ export type ShortcutCaptureResult =
   | { status: "reset" }
   | { status: "invalid"; message: string };
 
-export const KEYBOARD_SHORTCUT_SETTINGS_KEY = "hoshi_keyboard_shortcuts";
+export const KEYBOARD_SHORTCUT_SETTINGS_KEY = "nine_reader_keyboard_shortcuts";
 
 const modifierOrder = ["Ctrl", "Alt", "Shift", "Win"] as const;
 const actionIdSet = new Set<string>(keyboardShortcutActionIds);

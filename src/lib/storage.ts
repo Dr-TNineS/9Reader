@@ -1,8 +1,8 @@
 import { invoke } from "@tauri-apps/api/core";
 import type { EpubMeta, ReaderProgress } from "./types";
 
-const BOOKS_KEY = "hoshi_books";
-const SESSION_KEY = "hoshi_session";
+const BOOKS_KEY = "nine_reader_books";
+const SESSION_KEY = "nine_reader_session";
 const MAX_BOOKS = 12;
 
 export type LibraryBookRecord = {

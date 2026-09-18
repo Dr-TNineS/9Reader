@@ -89,7 +89,7 @@
     audioSources: [{ id: "default", name: "Default", url: "", enabled: false }],
     audioDownloadTimeoutMs: 5000,
     forceSyncAfterAdd: false,
-    tags: "hoshi-reader",
+    tags: "9reader",
     allowDuplicates: false,
     checkDuplicatesAcrossAllModels: false,
     duplicateScope: "collection",

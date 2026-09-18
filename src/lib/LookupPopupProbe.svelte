@@ -401,7 +401,7 @@
       ],
       audioDownloadTimeoutMs: 5000,
       forceSyncAfterAdd: params.get("forceSync") === "enabled",
-      tags: "hoshi-reader mining",
+      tags: "9reader mining",
       allowDuplicates: params.get("allowDuplicates") === "enabled",
       checkDuplicatesAcrossAllModels: params.get("checkAllModels") === "enabled",
       duplicateScope: params.get("duplicateScope") === "deckRoot" ? "deckRoot" : "collection",
@@ -689,7 +689,7 @@
     coverStoreRequests = [...coverStoreRequests, bookId];
     if (coverStoreMode === "error") throw new Error("Probe cover path escapes the app-owned book directory.");
     if (coverStoreMode === "missing") return { filename: null, warnings: ["Book cover is not available."] };
-    return { filename: "hsw_cover_probe.jpg", warnings: [] };
+    return { filename: "nine_reader_cover_probe.jpg", warnings: [] };
   }
 
   async function storeAnkiRemoteAudio(request: AnkiRemoteAudioRequest): Promise<AnkiStoreRemoteAudioResult> {
@@ -706,14 +706,14 @@
     if (ankiAudioStoreMode === "unsupported") {
       return { filename: null, warnings: ["Word audio (Probe Audio): The response was not a supported audio file."] };
     }
-    return { filename: "hsw_audio_probe.mp3", warnings: [] };
+    return { filename: "nine_reader_audio_probe.mp3", warnings: [] };
   }
 
   async function storeAnkiLocalAudio(request: LocalAudioStoreRequest): Promise<LocalAudioStoreResult> {
     localAudioStoreRequests = [...localAudioStoreRequests, request];
     if (localAudioStoreMode === "missing") return { filename: null, warnings: [] };
     if (localAudioStoreMode === "error") return { filename: null, warnings: ["Local word audio: Probe database read failure."] };
-    return { filename: "hsw_audio_local.ogg", warnings: [] };
+    return { filename: "nine_reader_audio_local.ogg", warnings: [] };
   }
 
   async function storeAnkiWordAudio(request: WordAudioResolveRequest): Promise<AnkiStoreRemoteAudioResult> {
@@ -750,7 +750,7 @@
     if (sasayakiStoreMode === "missing") {
       return { filename: null, warnings: ["The selected Sasayaki cue is no longer matched."] };
     }
-    return { filename: "hsw_sasayaki_probe.wav", warnings: [] };
+    return { filename: "nine_reader_sasayaki_probe.wav", warnings: [] };
   }
 
   async function prepareWordAudio(request: WordAudioResolveRequest): Promise<WordAudioPlaybackResult> {
@@ -995,7 +995,7 @@
           popup.state === "noDictionaries"
             ? "No imported dictionaries found."
             : popup.state === "engineUnavailable"
-              ? "Dictionary engine not linked. Install CMake/C++ build tools and rebuild HSW with hoshidicts."
+              ? "Dictionary engine not linked. Install CMake/C++ build tools and rebuild 9Reader with hoshidicts."
               : popup.state === "error"
                 ? "Cannot parse dictionary manifest: probe"
                 : ""

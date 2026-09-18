@@ -695,7 +695,7 @@ where
         .iter()
         .map(|byte| format!("{byte:02x}"))
         .collect::<String>();
-    let filename = format!("hsw_cover_{hash}.{detected}");
+    let filename = format!("nine_reader_cover_{hash}.{detected}");
     let stored = request(
         &endpoint,
         "storeMediaFile",
@@ -778,7 +778,7 @@ where
         .iter()
         .map(|byte| format!("{byte:02x}"))
         .collect::<String>();
-    let filename = format!("hsw_sasayaki_{hash}.wav");
+    let filename = format!("nine_reader_sasayaki_{hash}.wav");
     let stored_filename = request(
         &endpoint,
         "storeMediaFile",
@@ -1315,7 +1315,7 @@ fn remote_audio_filename(bytes: &[u8], extension: &str) -> String {
         .iter()
         .map(|byte| format!("{byte:02x}"))
         .collect::<String>();
-    format!("hsw_audio_{hash}.{extension}")
+    format!("nine_reader_audio_{hash}.{extension}")
 }
 
 fn remote_audio_warning(source_name: &str, warning: &str) -> String {
@@ -1398,7 +1398,7 @@ fn normalize_settings(mut settings: AnkiSettings) -> AnkiSettings {
 }
 
 fn default_anki_tags() -> String {
-    "hoshi-reader".into()
+    "9reader".into()
 }
 
 fn default_audio_sources() -> Vec<AnkiAudioSource> {
@@ -1880,7 +1880,7 @@ mod tests {
 
     fn temp_root(name: &str) -> PathBuf {
         let root = std::env::temp_dir().join(format!(
-            "hoshi_anki_settings_{name}_{}",
+            "nine_reader_anki_settings_{name}_{}",
             now_millis().unwrap()
         ));
         fs::create_dir_all(&root).unwrap();
@@ -1948,7 +1948,7 @@ mod tests {
             default_audio_download_timeout_ms()
         );
         assert_eq!(loaded.version, SETTINGS_VERSION);
-        assert_eq!(loaded.tags, "hoshi-reader");
+        assert_eq!(loaded.tags, "9reader");
         assert!(!loaded.allow_duplicates);
         assert_eq!(loaded.duplicate_scope, AnkiDuplicateScope::Collection);
         assert!(!loaded.compact_glossaries);
@@ -2370,7 +2370,7 @@ mod tests {
         })
         .unwrap();
         assert_eq!(result.filename.as_deref(), Some(stored_filename.as_str()));
-        assert!(stored_filename.starts_with("hsw_cover_"));
+        assert!(stored_filename.starts_with("nine_reader_cover_"));
         assert!(stored_filename.ends_with(".jpg"));
 
         let same = store_book_cover_from_path(DEFAULT_ENDPOINT, &cover, |_, _, params| {
@@ -2443,7 +2443,7 @@ mod tests {
         let first = remote_audio_filename(b"ID3 stable bytes", "mp3");
         let second = remote_audio_filename(b"ID3 stable bytes", "mp3");
         assert_eq!(first, second);
-        assert!(first.starts_with("hsw_audio_"));
+        assert!(first.starts_with("nine_reader_audio_"));
         assert!(first.ends_with(".mp3"));
         assert!(!first.contains('/') && !first.contains('\\'));
     }
@@ -2457,7 +2457,7 @@ mod tests {
             |_endpoint, action, params| {
                 assert_eq!(action, "storeMediaFile");
                 let filename = params.unwrap()["filename"].as_str().unwrap().to_string();
-                assert!(filename.starts_with("hsw_sasayaki_"));
+                assert!(filename.starts_with("nine_reader_sasayaki_"));
                 assert!(filename.ends_with(".wav"));
                 Ok(Value::String(filename))
             },
@@ -2479,8 +2479,8 @@ mod tests {
     #[test]
     fn parses_ankiconnect_store_media_response() {
         assert_eq!(
-            parse_anki_response(r#"{"result":"hsw_audio_probe.mp3","error":null}"#).unwrap(),
-            json!("hsw_audio_probe.mp3")
+            parse_anki_response(r#"{"result":"nine_reader_audio_probe.mp3","error":null}"#).unwrap(),
+            json!("nine_reader_audio_probe.mp3")
         );
         assert!(
             parse_anki_response(r#"{"result":null,"error":"store failed"}"#)
@@ -2537,7 +2537,7 @@ mod tests {
             deck_name: "Mining".into(),
             model_name: "Basic".into(),
             fields,
-            tags: vec!["hoshi-reader".into()],
+            tags: vec!["9reader".into()],
             force_sync_after_add: false,
             allow_duplicates: false,
             check_duplicates_across_all_models: false,
@@ -2547,7 +2547,7 @@ mod tests {
         assert_eq!(value["deckName"], "Mining");
         assert_eq!(value["modelName"], "Basic");
         assert_eq!(value["fields"]["Expression"], "学校");
-        assert_eq!(value["tags"][0], "hoshi-reader");
+        assert_eq!(value["tags"][0], "9reader");
         assert_eq!(value["options"]["allowDuplicate"], false);
         assert_eq!(value["options"]["duplicateScope"], "collection");
         assert!(value["options"].get("duplicateScopeOptions").is_none());
@@ -2613,7 +2613,7 @@ mod tests {
             deck_name: "Mining".into(),
             model_name: "Basic".into(),
             fields,
-            tags: vec!["hoshi-reader".into()],
+            tags: vec!["9reader".into()],
             force_sync_after_add: true,
             allow_duplicates: false,
             check_duplicates_across_all_models: false,
@@ -2722,8 +2722,8 @@ mod tests {
     #[test]
     fn validates_anki_media_filename() {
         assert_eq!(
-            validate_anki_media_filename(" hsw_1234.png ").unwrap(),
-            "hsw_1234.png"
+            validate_anki_media_filename(" nine_reader_1234.png ").unwrap(),
+            "nine_reader_1234.png"
         );
         assert!(validate_anki_media_filename("").is_err());
         assert!(validate_anki_media_filename("../x.png").is_err());
@@ -2738,7 +2738,7 @@ mod tests {
         let refs = vec![AnkiDictionaryMediaRef {
             dictionary: "dict".into(),
             path: "missing.png".into(),
-            filename: "hsw_missing.png".into(),
+            filename: "nine_reader_missing.png".into(),
         }];
         let result =
             store_dictionary_media_from_manifest(DEFAULT_ENDPOINT, &manifest, &refs).unwrap();
@@ -2758,7 +2758,7 @@ mod tests {
         let refs = vec![AnkiDictionaryMediaRef {
             dictionary: "dict".into(),
             path: "images/entry.txt".into(),
-            filename: "hsw_entry.txt".into(),
+            filename: "nine_reader_entry.txt".into(),
         }];
         let error =
             store_dictionary_media_from_manifest(DEFAULT_ENDPOINT, &manifest, &refs).unwrap_err();
@@ -2769,19 +2769,19 @@ mod tests {
     #[test]
     #[ignore]
     fn validates_real_ankiconnect_add_note_and_duplicate_check() {
-        if std::env::var("HSW_ANKI_RUNTIME_VALIDATE").ok().as_deref() != Some("1") {
+        if std::env::var("NINEREADER_ANKI_RUNTIME_VALIDATE").ok().as_deref() != Some("1") {
             eprintln!(
-                "Set HSW_ANKI_RUNTIME_VALIDATE=1 to run the real AnkiConnect add-note validation."
+                "Set NINEREADER_ANKI_RUNTIME_VALIDATE=1 to run the real AnkiConnect add-note validation."
             );
             return;
         }
 
         let endpoint =
-            std::env::var("HSW_ANKI_ENDPOINT").unwrap_or_else(|_| DEFAULT_ENDPOINT.into());
+            std::env::var("NINEREADER_ANKI_ENDPOINT").unwrap_or_else(|_| DEFAULT_ENDPOINT.into());
         let suffix = now_millis().unwrap();
-        let deck_name = format!("HSW Runtime Validation {suffix}");
-        let model_name = format!("HSW Runtime Model {suffix}");
-        let expression = format!("hoshi-runtime-{suffix}");
+        let deck_name = format!("9Reader Runtime Validation {suffix}");
+        let model_name = format!("9Reader Runtime Model {suffix}");
+        let expression = format!("nine-reader-runtime-{suffix}");
 
         anki_request(&endpoint, "createDeck", Some(json!({ "deck": deck_name }))).unwrap();
         anki_request(
@@ -2804,14 +2804,14 @@ mod tests {
         fields.insert("Expression".into(), expression);
         fields.insert(
             "Meaning".into(),
-            "Created by HSW runtime validation.".into(),
+            "Created by 9Reader runtime validation.".into(),
         );
         let note = AnkiNoteRequest {
             endpoint: endpoint.clone(),
             deck_name: deck_name.clone(),
             model_name: model_name.clone(),
             fields,
-            tags: vec!["hoshi-reader-runtime-validation".into()],
+            tags: vec!["9reader-runtime-validation".into()],
             force_sync_after_add: false,
             allow_duplicates: false,
             check_duplicates_across_all_models: false,
@@ -2841,17 +2841,17 @@ mod tests {
     #[test]
     #[ignore]
     fn validates_real_ankiconnect_store_dictionary_media() {
-        if std::env::var("HSW_ANKI_RUNTIME_VALIDATE").ok().as_deref() != Some("1") {
+        if std::env::var("NINEREADER_ANKI_RUNTIME_VALIDATE").ok().as_deref() != Some("1") {
             eprintln!(
-                "Set HSW_ANKI_RUNTIME_VALIDATE=1 to run the real AnkiConnect media validation."
+                "Set NINEREADER_ANKI_RUNTIME_VALIDATE=1 to run the real AnkiConnect media validation."
             );
             return;
         }
 
         let endpoint =
-            std::env::var("HSW_ANKI_ENDPOINT").unwrap_or_else(|_| DEFAULT_ENDPOINT.into());
+            std::env::var("NINEREADER_ANKI_ENDPOINT").unwrap_or_else(|_| DEFAULT_ENDPOINT.into());
         let suffix = now_millis().unwrap();
-        let filename = format!("hsw_runtime_{suffix}.svg");
+        let filename = format!("nine_reader_runtime_{suffix}.svg");
         let root = temp_root("store_media_runtime");
         let media_dir = root.join("images");
         fs::create_dir_all(&media_dir).unwrap();

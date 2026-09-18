@@ -33,7 +33,7 @@ export const defaultDictionarySettings: DictionarySettings = {
   compactPitchAccents: true,
 };
 
-const STORAGE_KEY = "hoshi_reader_dictionary_settings";
+const STORAGE_KEY = "nine_reader_dictionary_settings";
 
 export function normalizeDictionarySettings(value: unknown): DictionarySettings {
   const record = value && typeof value === "object" ? value as Partial<DictionarySettings> : {};

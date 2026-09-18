@@ -41,7 +41,7 @@ type ShortcutBinding = {
 };
 ```
 
-Persist frontend shortcut settings in browser `localStorage` under a versioned key such as `hoshi_keyboard_shortcuts`. The persisted shape should be:
+Persist frontend shortcut settings in browser `localStorage` under a versioned key such as `nine_reader_keyboard_shortcuts`. The persisted shape should be:
 
 ```ts
 type KeyboardShortcutSettings = {

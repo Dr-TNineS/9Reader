@@ -1,4 +1,4 @@
-# HSW Documentation Index
+# 9Reader Documentation Index
 
 This directory is the durable documentation home for ⑨ Reader.
 

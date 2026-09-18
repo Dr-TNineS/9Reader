@@ -64,7 +64,7 @@ export type ReaderAppearancePalette = {
   appShadow: string;
 };
 
-const APPEARANCE_KEY = "hoshi_reader_appearance";
+const APPEARANCE_KEY = "nine_reader_appearance";
 const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
 const SASAYAKI_BACKGROUND_ALPHA = 0.4;
 export const READER_FONT_SIZE = { min: 10, max: 60, step: 1 } as const;

@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "9reader",
   "version": "0.2.0",
-  "identifier": "com.hoshi.reader",
+  "identifier": "com.nine.reader",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",

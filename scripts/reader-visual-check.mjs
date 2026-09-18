@@ -2,7 +2,7 @@ import { spawn, spawnSync } from "node:child_process";
 import { once } from "node:events";
 import { chromium } from "playwright";
 
-const port = Number(process.env.HSW_READER_VISUAL_PORT || 5174);
+const port = Number(process.env.NINEREADER_READER_VISUAL_PORT || 5174);
 const origin = `http://127.0.0.1:${port}`;
 const url = `${origin}/?readerVisualProbe=1`;
 
@@ -438,7 +438,7 @@ async function probeRenderedHighlightText(page) {
 
 async function readerLookupHighlightState(page) {
   return page.evaluate(() => {
-    const cssHighlightSize = CSS.highlights?.get("hsw-reader-lookup-selection")?.size ?? 0;
+    const cssHighlightSize = CSS.highlights?.get("nine-reader-lookup-selection")?.size ?? 0;
     const layer = document.querySelector(".lookup-highlight-layer");
     const rects = Array.from(document.querySelectorAll(".lookup-highlight-rect"));
     const rectObject = (rect) => ({
@@ -516,7 +516,7 @@ function rubyHighlightGeometry(state, rubyText) {
 
 async function sasayakiHighlightState(page) {
   return page.evaluate(() => {
-    const cssHighlightSize = CSS.highlights?.get("hsw-reader-sasayaki-cue")?.size ?? 0;
+    const cssHighlightSize = CSS.highlights?.get("nine-reader-sasayaki-cue")?.size ?? 0;
     const reader = document.querySelector(".rc");
     const viewport = document.querySelector(".rv");
     const layer = document.querySelector(".sasayaki-highlight-layer");
@@ -946,7 +946,7 @@ async function main() {
       const callbacks = [];
       const originalRequestAnimationFrame = window.requestAnimationFrame;
       const originalCancelAnimationFrame = window.cancelAnimationFrame;
-      window.__hswReaderVisualRaf = {
+      window.__nineReaderVisualRaf = {
         callbacks,
         originalRequestAnimationFrame,
         originalCancelAnimationFrame,
@@ -972,14 +972,14 @@ async function main() {
       window.dispatchEvent(new KeyboardEvent("keyup", { key: "Shift" }));
     }, adjacentPoints.second);
     const repeatRafState = await page.evaluate(() => {
-      const state = window.__hswReaderVisualRaf;
+      const state = window.__nineReaderVisualRaf;
       if (!state) throw new Error("Reader visual RAF hook was not installed.");
       const scheduled = state.callbacks.length;
       const cancelled = state.callbacks.filter((entry) => entry.cancelled).length;
       const callbacks = [...state.callbacks];
       window.requestAnimationFrame = state.originalRequestAnimationFrame;
       window.cancelAnimationFrame = state.originalCancelAnimationFrame;
-      delete window.__hswReaderVisualRaf;
+      delete window.__nineReaderVisualRaf;
       for (const entry of callbacks) {
         if (!entry.cancelled) entry.callback(performance.now());
       }

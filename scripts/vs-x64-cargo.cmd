@@ -24,7 +24,7 @@ if not defined VSDEVCMD (
 
 call "%VSDEVCMD%" -arch=x64 -host_arch=x64 || exit /b 1
 
-set "HSW_HOSHIDICTS_DIR=%ROOT%\third_party\hoshidicts"
+set "NINEREADER_HOSHIDICTS_DIR=%ROOT%\third_party\hoshidicts"
 cd /d "%ROOT%\src-tauri" || exit /b 1
 
 if "%~1"=="" (

@@ -372,7 +372,7 @@ mod tests {
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_nanos();
-        let root = std::env::temp_dir().join(format!("hsw_audio_clip_{name}_{suffix}"));
+        let root = std::env::temp_dir().join(format!("nine_reader_audio_clip_{name}_{suffix}"));
         fs::create_dir_all(&root).unwrap();
         root
     }

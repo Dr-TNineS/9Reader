@@ -9,7 +9,7 @@ export type AdvancedSettings = {
 
 export type ReadingStatisticsAutostartMode = "off" | "pageTurn" | "on";
 
-const ADVANCED_SETTINGS_KEY = "hoshi_advanced_settings";
+const ADVANCED_SETTINGS_KEY = "nine_reader_advanced_settings";
 
 export const defaultAdvancedSettings: AdvancedSettings = {
   reopenLastBookOnStartup: true,

@@ -4,7 +4,7 @@
 
 The reader lookup implementation slices are complete. The next phase is to verify the real hoshidicts path end to end with local CMake/C++ tooling, a real Yomitan dictionary zip, and the Tauri runtime.
 
-This plan only covers validation and minimal HSW fixes discovered by validation. Do not modify `reference/`, `third_party/hoshidicts`, HSA, settings, sync, Anki card creation, audio, release packaging, or broad reader UI.
+This plan only covers validation and minimal 9Reader fixes discovered by validation. Do not modify `reference/`, `third_party/hoshidicts`, HSA, settings, sync, Anki card creation, audio, release packaging, or broad reader UI.
 
 ## Progress
 
@@ -23,8 +23,8 @@ Validated on 2026-06-07:
 - `third_party/hoshidicts/CMakeLists.txt` exists.
 - Visual Studio 2022 Build Tools, MSVC 14.44, Windows SDK 10.0.26100.0, VS-bundled CMake, and VS-bundled Ninja are installed locally.
 - A plain `cargo check` from `src-tauri` passes in the normal shell and falls back with `hoshidicts backend disabled: cmake was not found in PATH`.
-- A VS developer-shell linked check reaches the hoshidicts CMake build after HSW build fixes for Windows verbatim paths and MSVC UTF-8 source handling.
-- Follow-up HSW build fixes force-include `external/utfcpp/source/utf8/cpp11.h` for the hoshidicts MSVC build and avoid a C API `Deinflector` name collision with hoshidicts.
+- A VS developer-shell linked check reaches the hoshidicts CMake build after 9Reader build fixes for Windows verbatim paths and MSVC UTF-8 source handling.
+- Follow-up 9Reader build fixes force-include `external/utfcpp/source/utf8/cpp11.h` for the hoshidicts MSVC build and avoid a C API `Deinflector` name collision with hoshidicts.
 - A VS developer-shell linked `cargo check` now passes with hoshidicts linked.
 - Temporary validation build directories were removed after the slice.
 
@@ -32,7 +32,7 @@ Next-slice adjustment: Slice 7 is no longer blocked by the linked build. It stil
 
 ## Slice 6: Toolchain Readiness & Linked Build
 
-Make HSW compile/link the hoshidicts backend instead of falling back to `engineUnavailable`.
+Make 9Reader compile/link the hoshidicts backend instead of falling back to `engineUnavailable`.
 
 Key checks:
 
@@ -40,7 +40,7 @@ Key checks:
 - Confirm CMake, MSVC C++ Build Tools, Windows SDK, and either Ninja or a Visual Studio CMake generator are available.
 - Run `cargo check` from `src-tauri` and verify hoshidicts is not disabled because CMake/C++ tooling is missing.
 - Run a linked check with `RUSTFLAGS='--cfg hoshi_dicts_linked'` and a temporary `CARGO_TARGET_DIR`.
-- If linked build fails, make only minimal HSW `build.rs` or C bridge fixes. Do not patch hoshidicts.
+- If linked build fails, make only minimal 9Reader `build.rs` or C bridge fixes. Do not patch hoshidicts.
 
 Acceptance:
 
@@ -125,13 +125,13 @@ Key checks:
 
 - Reproduce the original linked importer failure on Windows.
 - Keep normal Yomitan imports on the original direct path.
-- On Windows code-page import failures, retry through an HSW-generated lookup-safe compatibility zip.
+- On Windows code-page import failures, retry through an 9Reader-generated lookup-safe compatibility zip.
 - Preserve the user-facing manifest title from the original `index.json`.
 - Verify the resulting dictionary loads and returns real lookup results.
 
 Acceptance:
 
-- Original `MK3Fix0213.zip` imports through the linked HSW path.
+- Original `MK3Fix0213.zip` imports through the linked 9Reader path.
 - The manifest title is `明鏡国語辞典 第三版`.
 - Runtime lookup returns real results.
 - No source zip, compatibility zip, target directory, or imported dictionary data is tracked by git.
@@ -141,7 +141,7 @@ Acceptance:
 Validated on 2026-06-08 with the original user-provided `MK3Fix0213.zip`:
 
 - The direct hoshidicts import still fails first with the Windows code-page error, confirming the compatibility path is needed.
-- HSW now retries those failures with a temporary lookup-safe zip that keeps only root-level Yomitan lookup files: `index.json`, `styles.css`, `term_bank_*.json`, `term_meta_bank_*.json`, and `tag_bank_*.json`.
+- 9Reader now retries those failures with a temporary lookup-safe zip that keeps only root-level Yomitan lookup files: `index.json`, `styles.css`, `term_bank_*.json`, `term_meta_bank_*.json`, and `tag_bank_*.json`.
 - The retry rewrites the temporary import title to ASCII so hoshidicts can create and load the import directory on Windows; the persisted manifest restores the original title `明鏡国語辞典 第三版`.
 - `MK3Fix0213.zip` imported successfully with `dict_id=93e8e532b599ba4a`, `term=140821`, `meta=0`, `freq=0`, `pitch=0`, `media=0`.
 - Linked runtime loaded the imported dictionary and `lookup("学校")` returned 2 real results.

@@ -29,7 +29,7 @@ export const systemReaderStatisticsClock: ReaderStatisticsClock = {
   currentDateKey: () => localDateKey(new Date()),
 };
 
-const PATH_STATISTICS_KEY = "hoshi_reading_statistics";
+const PATH_STATISTICS_KEY = "nine_reader_reading_statistics";
 export const HSA_STATISTICS_INT_MAX = 2_147_483_647;
 
 function localDateKey(date: Date): string {

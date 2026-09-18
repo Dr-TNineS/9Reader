@@ -1748,7 +1748,7 @@ mod tests {
 
     fn temp_book(name: &str) -> PathBuf {
         let root =
-            std::env::temp_dir().join(format!("hsw_sasayaki_{name}_{}", now_millis().unwrap()));
+            std::env::temp_dir().join(format!("nine_reader_sasayaki_{name}_{}", now_millis().unwrap()));
         let book_dir = root.join("books").join("book-id");
         fs::create_dir_all(&book_dir).unwrap();
         fs::write(book_dir.join("book.epub"), b"epub").unwrap();
@@ -2314,11 +2314,11 @@ mod tests {
     }
 
     #[test]
-    #[ignore = "requires HSW_REAL_SASAYAKI_DIR with matching EPUB, M4B, and SRT files"]
+    #[ignore = "requires NINEREADER_REAL_SASAYAKI_DIR with matching EPUB, M4B, and SRT files"]
     fn validates_real_m4b_srt_epub_pipeline() {
         let source_root = PathBuf::from(
-            std::env::var("HSW_REAL_SASAYAKI_DIR")
-                .expect("HSW_REAL_SASAYAKI_DIR must point to the fixture directory"),
+            std::env::var("NINEREADER_REAL_SASAYAKI_DIR")
+                .expect("NINEREADER_REAL_SASAYAKI_DIR must point to the fixture directory"),
         );
         let find_extension = |extension: &str| {
             fs::read_dir(&source_root)

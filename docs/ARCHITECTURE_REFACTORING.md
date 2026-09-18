@@ -1,4 +1,4 @@
-# HSW Architecture Refactoring
+# 9Reader Architecture Refactoring
 
 Last updated: 2026-06-29
 
@@ -65,7 +65,7 @@ Exit criteria:
 
 Priority: medium
 
-HSW currently uses JSON files for library, reading state, dictionary manifest,
+9Reader currently uses JSON files for library, reading state, dictionary manifest,
 Anki settings, and per-book sidecars. This is acceptable today, but schema
 ownership and migration rules should become more explicit as data grows.
 

@@ -921,7 +921,7 @@ fn import_yomitan_zip(
         let _ = final_dir;
         let _ = state;
         let _ = low_ram;
-        Err("Dictionary importer is not linked. Install CMake/C++ build tools and rebuild HSW with hoshidicts.".into())
+        Err("Dictionary importer is not linked. Install CMake/C++ build tools and rebuild 9Reader with hoshidicts.".into())
     }
 }
 
@@ -989,7 +989,7 @@ fn initialize_runtime(app: &AppHandle) -> DictRuntime {
             loaded_dictionaries: load_plan.len(),
             imported_count,
             dictionary_title_overrides,
-            error: Some("Dictionary engine not linked. Install CMake/C++ build tools and rebuild HSW with hoshidicts.".into()),
+            error: Some("Dictionary engine not linked. Install CMake/C++ build tools and rebuild 9Reader with hoshidicts.".into()),
             manifest_error: None,
         }
     }
@@ -2315,7 +2315,7 @@ fn run_linked_import_attempt(
     let source = source.to_path_buf();
     let staging_root = staging_root.to_path_buf();
     std::thread::Builder::new()
-        .name("hsw-dictionary-import".into())
+        .name("nine-reader-dictionary-import".into())
         .stack_size(DICTIONARY_IMPORT_WORKER_STACK)
         .spawn(move || run_linked_import_attempt_inner(&source, &staging_root, low_ram))
         .map_err(|e| format!("Dictionary import worker failed: {e}"))?
@@ -2559,7 +2559,7 @@ fn rewrite_index_title_for_compat_import(
     if let Some(object) = index.as_object_mut() {
         object.insert(
             "title".into(),
-            serde_json::Value::String(format!("hoshi-import-{dict_id}")),
+            serde_json::Value::String(format!("nine-reader-import-{dict_id}")),
         );
     }
     serde_json::to_vec(&index).map_err(|e| format!("Cannot rewrite dictionary index metadata: {e}"))
@@ -2794,7 +2794,7 @@ mod tests {
 
     fn temp_path(name: &str) -> PathBuf {
         std::env::temp_dir().join(format!(
-            "hoshi_dict_test_{name}_{}",
+            "nine_reader_dict_test_{name}_{}",
             SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
@@ -3024,7 +3024,7 @@ mod tests {
         assert_eq!(original_index.download_url, "https://example.test/dict.zip");
         let entries = dictionary_entries_for_import_with_metadata(
             "abc",
-            DictionaryImportMetadata::from_index(original_index, "hoshi-import-abc"),
+            DictionaryImportMetadata::from_index(original_index, "nine-reader-import-abc"),
             "dictionaries/imported/abc".into(),
             (10, 0, 0, 0, 1),
             123,
@@ -3068,7 +3068,7 @@ mod tests {
             .unwrap()
             .read_to_string(&mut rewritten_index)
             .unwrap();
-        assert!(rewritten_index.contains("hoshi-import-abc"));
+        assert!(rewritten_index.contains("nine-reader-import-abc"));
 
         let _ = fs::remove_dir_all(root);
     }
@@ -4173,27 +4173,27 @@ mod tests {
             expression: "学校".into(),
             reading: "がっこう".into(),
             glossary: vec![GlossaryEntry {
-                dict: "hoshi-import-abc".into(),
+                dict: "nine-reader-import-abc".into(),
                 text: "school".into(),
             }],
             matched: "学校".into(),
             deinflected: "学校".into(),
             rules: String::new(),
-            dictionary: "hoshi-import-abc".into(),
+            dictionary: "nine-reader-import-abc".into(),
             frequencies: vec![FrequencyEntry {
-                dictionary: "hoshi-import-abc".into(),
+                dictionary: "nine-reader-import-abc".into(),
                 items: vec![FrequencyItem {
                     value: 1,
                     display_value: "1".into(),
                 }],
             }],
             pitches: vec![PitchEntry {
-                dictionary: "hoshi-import-abc".into(),
+                dictionary: "nine-reader-import-abc".into(),
                 positions: vec![1],
                 transcriptions: Vec::new(),
             }],
         }];
-        let overrides = HashMap::from([("hoshi-import-abc".into(), "明鏡国語辞典 第三版".into())]);
+        let overrides = HashMap::from([("nine-reader-import-abc".into(), "明鏡国語辞典 第三版".into())]);
 
         apply_dictionary_title_overrides(&mut results, &overrides);
 
@@ -4252,7 +4252,7 @@ mod tests {
     #[test]
     #[ignore]
     fn imports_real_mk3_zip_with_legacy_encoded_media() {
-        let zip_path = std::env::var("HSW_REAL_MK3_ZIP").expect("HSW_REAL_MK3_ZIP is required");
+        let zip_path = std::env::var("NINEREADER_REAL_MK3_ZIP").expect("NINEREADER_REAL_MK3_ZIP is required");
         let source = PathBuf::from(zip_path);
         assert!(source.is_file(), "real MK3 dictionary zip must exist");
 
@@ -4312,7 +4312,7 @@ mod tests {
     fn imports_real_yomitan_zip_and_loads_runtime() {
         let total_started = std::time::Instant::now();
         let zip_path =
-            std::env::var("HSW_REAL_YOMITAN_ZIP").expect("HSW_REAL_YOMITAN_ZIP is required");
+            std::env::var("NINEREADER_REAL_YOMITAN_ZIP").expect("NINEREADER_REAL_YOMITAN_ZIP is required");
         let source = PathBuf::from(zip_path);
         assert!(source.is_file(), "real dictionary zip must exist");
 
